@@ -77,6 +77,7 @@ class SkillInstance with ChangeNotifier {
       for(Map<String, dynamic> spec in json['specializations']) {
         var sp = SpecializedSkill.create(
           parent: instance.skill,
+          parentImplementation: spec['parent_implementation'],
           name: spec['name'],
           reserved: spec['reserved'],
           reservedPrefix: spec.containsKey('reserved_prefix') ? spec['reserved_prefix'] : null,
@@ -97,6 +98,7 @@ class SkillInstance with ChangeNotifier {
       for(var sp in specializations) {
         var j = <String, dynamic>{
           'name': sp.skill.name,
+          'parent_implementation': sp.skill.parentImplementation,
           'reserved': sp.skill.reserved,
           'value': sp.value,
         };

@@ -88,15 +88,15 @@ class SpecializedSkill {
   static List<SpecializedSkill> withParent(
     Skill parent,
     {
-      includeReserved = false,
+      bool includeReserved = false,
       Caste? includeForCaste
     }
   ) {
     _initializeGlobalSpecializedSkills();
     return _instances.values
         .where(
-            (SpecializedSkill s) => (
-            (!s.reserved || includeReserved) && s.parent == parent)
+          (SpecializedSkill s) =>
+            ((!s.reserved || includeReserved) && s.parent == parent)
             && (includeForCaste == null || s.reservedCastes.contains(includeForCaste))
         )
         .toList();

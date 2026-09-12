@@ -286,11 +286,9 @@ class SpecializedSkillPickerDialogState extends State<SpecializedSkillPickerDial
                     _specializedSkillController.clear();
                   }
                   else {
-                    // TODO: for skills that require an implementation,
-                    // this will return specializations that don't match
-                    // the selected implementation.
                     _specializedSkills = SpecializedSkill
                         .withParent(_currentSkill!.skill)
+                        .where((SpecializedSkill s) => s.parentImplementation == _currentSkill!.implementation)
                         .where((SpecializedSkill s) => !s.reserved)
                         .toList()
                         ..sort((a, b) => a.name.compareTo(b.name));
@@ -349,6 +347,7 @@ class SpecializedSkillPickerDialogState extends State<SpecializedSkillPickerDial
                         else {
                           skill = SpecializedSkill.create(
                             parent: _currentSkill!.skill,
+                            parentImplementation: _currentSkill!.implementation,
                             name: _specializedSkillController.text,
                             reserved: _reserved,
                             reservedPrefix: _reserved
