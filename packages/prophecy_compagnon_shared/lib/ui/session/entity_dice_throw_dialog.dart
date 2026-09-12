@@ -90,7 +90,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
     criticalDie: criticalDie,
   );
 
-  bool canRollCritical() {
+  bool mustRollCritical() {
     if(!hasDieResult()) return false;
     var die = createResult().dieResult();
     return die == 1 || die == 10;
@@ -137,23 +137,38 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
       );
     }
 
-    int? total;
+    String? totalText;
+    var totalColor = Colors.indigo;
     if(hasDieResult()) {
-      total =
-          widget.request.base.value(widget.entity)
-          + createResult().total()
-          + modifiersTotal;
+      if(mustRollCritical()) {
+        if(
+            criticalDie != null
+            && createResult().criticalType(
+                  widget.request.base.componentValue(widget.entity)
+               ) == DiceThrowResultType.criticalFail
+        ) {
+          totalText = 'Échec critique';
+          totalColor = Colors.red;
+        }
+      }
+
+      if(totalText == null) {
+        var total = widget.request.base.value(widget.entity)
+            + createResult().total()
+            + modifiersTotal;
+        totalText = total.toString();
+
+        if(widget.request.difficulty != null) {
+          if(total >= widget.request.difficulty!) {
+            totalColor = Colors.green;
+          }
+          else {
+            totalColor = Colors.red;
+          }
+        }
+      }
     }
 
-    var totalColor = Colors.indigo;
-    if(total != null && widget.request.difficulty != null) {
-      if(total >= widget.request.difficulty!) {
-        totalColor = Colors.green;
-      }
-      else {
-        totalColor = Colors.red;
-      }
-    }
     var totalWidget = Container(
       decoration: BoxDecoration(
         color: totalColor,
@@ -162,7 +177,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
         child: Text(
-          total != null ? total.toString() : '?',
+          totalText ?? '?',
           style: theme.textTheme.headlineSmall!
             .copyWith(color: Colors.white),
         ),
@@ -386,7 +401,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
                       fatalityDie: fatalityDie,
                       humanDie: humanDie,
                     ),
-                  if(canRollCritical())
+                  if(mustRollCritical())
                     _DiceThrowRow(
                       label: Text.rich(
                         TextSpan(
@@ -468,7 +483,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
           child: const Text('Annuler'),
         ),
         ElevatedButton(
-          onPressed: () {
+          onPressed: !hasDieResult() || (mustRollCritical() && criticalDie == null) ? null : () {
             Navigator.of(context, rootNavigator: true).pop(createResult());
           },
           style: ElevatedButton.styleFrom(
