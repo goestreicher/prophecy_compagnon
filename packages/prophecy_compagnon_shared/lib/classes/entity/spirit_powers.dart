@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025-2026 Grégory Oestreicher
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 enum SpiritPower {
   apaisement(title: "Apaisement", cost: 2, description: "Ce pouvoir Mental doit être utilisé au contact et permet d'apaiser l'esprit d'une personne. Un jet de Mental + Présence détermine l'ampleur des effets. À 15, il est possible de juguler une peur, une appréhension ou une phobie à 1. À 20, il est possible de juguler une peur surnaturelle ou résultant phobie à 3 ou à 5. À 25, on peut bloquer la douleur, mais la victime devient inerte et incapable de mouvements violents. À 30, la victime peut être plongée dans un sommeil profond et réparateur dont la durée dépend des conditions extérieures."),
   auraDePresence(title: "Aura de présence", cost: 3, description: "Ce pouvoir permet d'irradier littéralement un sentiment afin d'impressionner ses interlocuteurs. L'aura peut être au choix inquiétante, fascinante, innocente, séduisante, entêtante ou autre… Utiliser ce pouvoir nécessite un jet de Mental + Présence contre une Difficulté de 15 et fonctionne sur un nombre de cibles égal à son Empathie. Il est possible d'y résister par un jet de Mental + Volonté contre une Difficulté égale à 5 par point de Ferveur dépensé par l'utilisateur +1 / NR sur son jet. L'aura dure environ une heure."),
