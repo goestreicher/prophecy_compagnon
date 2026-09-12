@@ -283,31 +283,57 @@ class KorDate implements Comparable<KorDate> {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class KorDateTime {
-  KorDateTime({
-    required this.date,
+class KorTime {
+  KorTime({
     required this.hour,
     required this.minute,
   });
 
-  KorDate date;
   int hour;
   int minute;
 
+  bool operator <(KorTime other) =>
+      hour < other.hour
+      && minute < other.minute;
+
+  @override
+  bool operator ==(Object other) =>
+      other is KorTime
+      && hour == other.hour
+      && minute == other.minute;
+
+  @override
+  int get hashCode => Object.hash(hour, minute);
+
+  Map<String, dynamic> toJson() =>
+      _$KorTimeToJson(this);
+
+  factory KorTime.fromJson(Map<String, dynamic> json) =>
+      _$KorTimeFromJson(json);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class KorDateTime {
+  KorDateTime({
+    required this.date,
+    required this.time,
+  });
+
+  KorDate date;
+  KorTime time;
+
   bool operator <(KorDateTime other) =>
       date < other.date
-      && hour < other.hour
-      && minute < other.minute;
+      && time < other.time;
 
   @override
   bool operator ==(Object other) =>
       other is KorDateTime
       && date == other.date
-      && hour == other.hour
-      && minute == other.minute;
+      && time == other.time;
 
   @override
-  int get hashCode => Object.hash(date.hashCode, hour, minute);
+  int get hashCode => Object.hash(date.hashCode, time.hashCode);
 
   Map<String, dynamic> toJson() =>
       _$KorDateTimeToJson(this);

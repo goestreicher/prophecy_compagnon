@@ -8,6 +8,9 @@ CombatActionDescription? actionDescriptionForCombatAction(CombatAction action) {
   CombatActionDescription? ret;
 
   switch(action.type) {
+    case CombatActionType.effect:
+      // No description for this action
+      break;
     case CombatActionType.movement:
       if(action is CombatActionAssignedMovement) {
         ret = CombatActionMovementDescription(movementType: action.movementType);

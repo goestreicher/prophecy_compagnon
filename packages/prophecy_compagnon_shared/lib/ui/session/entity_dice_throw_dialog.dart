@@ -8,8 +8,8 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
+import 'package:prophecy_compagnon_shared/ui/entity/pill_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/num_input_widget.dart';
-import 'package:prophecy_compagnon_shared/ui/session/entity_pill_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/widget_group_container.dart';
 
 class EntityDiceThrowDialog extends StatefulWidget {
@@ -174,7 +174,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
       title: Row(
         spacing: 8.0,
         children: [
-          SessionEntityPillWidget(
+          EntityPillWidget(
             entity: widget.entity,
             width: 40,
             height: 40,

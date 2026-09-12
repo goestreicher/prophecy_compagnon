@@ -3,25 +3,34 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'combat_status.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class EntityCombatStatusValue {
-  static final none     = EntityCombatStatusValue(0);
-  static final onGround = EntityCombatStatusValue(1 << 1);
-  static final grappled = EntityCombatStatusValue(1 << 2);
+enum EntityCombatStatusFlag {
+  none(value: 0, label: 'OK'),
+  onGround(value: 1 << 1, label: 'Au sol'),
+  grappled(value: 1 << 2, label: 'Saisi(e)'),
+  ;
 
+  final int value;
+  final String label;
+
+  const EntityCombatStatusFlag({ required this.value, required this.label });
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true, constructor: 'fromBitfield')
+class EntityCombatStatusValue {
   EntityCombatStatusValue.empty() : bitfield = 0;
-  EntityCombatStatusValue(this.bitfield);
+  EntityCombatStatusValue(EntityCombatStatusFlag flag) : bitfield = flag.value;
+  EntityCombatStatusValue.fromBitfield(this.bitfield);
 
   int bitfield;
 
   EntityCombatStatusValue operator &(EntityCombatStatusValue other) =>
-      EntityCombatStatusValue(other.bitfield & bitfield);
+      EntityCombatStatusValue.fromBitfield(other.bitfield & bitfield);
 
   EntityCombatStatusValue operator |(EntityCombatStatusValue other) =>
-      EntityCombatStatusValue(other.bitfield | bitfield);
+      EntityCombatStatusValue.fromBitfield(other.bitfield | bitfield);
 
   EntityCombatStatusValue operator ~() =>
-      EntityCombatStatusValue(~bitfield);
+      EntityCombatStatusValue.fromBitfield(~bitfield);
 
   @override
   bool operator ==(Object other) =>
@@ -40,7 +49,7 @@ class EntityCombatStatusValue {
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class EntityCombatStatus with ChangeNotifier {
   EntityCombatStatus({ required EntityCombatStatusValue value }) : _value = value;
-  EntityCombatStatus.empty() : _value = EntityCombatStatusValue.none;
+  EntityCombatStatus.empty() : _value = EntityCombatStatusValue(EntityCombatStatusFlag.none);
 
   @JsonKey(defaultValue: EntityCombatStatusValue.empty)
   EntityCombatStatusValue get value => _value;
@@ -51,14 +60,14 @@ class EntityCombatStatus with ChangeNotifier {
 
   EntityCombatStatusValue _value;
 
-  bool has(EntityCombatStatusValue status) =>
-      value & status != EntityCombatStatusValue.none;
+  bool has(EntityCombatStatusFlag status) =>
+      (value & EntityCombatStatusValue(status)).bitfield != EntityCombatStatusFlag.none.value;
 
-  void add(EntityCombatStatusValue status) =>
-      value = _value | status;
+  void add(EntityCombatStatusFlag status) =>
+      value = _value | EntityCombatStatusValue(status);
 
-  void clear(EntityCombatStatusValue status) =>
-      value = _value & ~status;
+  void clear(EntityCombatStatusFlag status) =>
+      value = _value & ~EntityCombatStatusValue(status);
 
   factory EntityCombatStatus.fromJson(Map<String, dynamic> json) =>
       _$EntityCombatStatusFromJson(json);

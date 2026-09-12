@@ -1,12 +1,13 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_description.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/finder.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
+import 'package:prophecy_compagnon_shared/ui/entity/pill_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/button_renderer.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/menu_renderer.dart';
-import 'package:prophecy_compagnon_shared/ui/session/entity_pill_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/delay_action.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
@@ -117,6 +118,8 @@ class TurnActionWidget extends StatelessWidget {
 
           if(actionDescription == null) {
             // TODO: propose to un-assign the action
+            // Though some actions (effect) are without CombatActionDescription,
+            // but in this case we shouldn't be in this branch
           }
           else {
             bottomRow.add(
@@ -139,6 +142,13 @@ class TurnActionWidget extends StatelessWidget {
       }
     }
 
+    var combatStatuses = <String>[];
+    for(var s in EntityCombatStatusFlag.values) {
+      if(action.entity.combatStatus.has(s)) {
+        combatStatuses.add(s.label);
+      }
+    }
+
     var child = InkWell(
       onTap: (isActive || locked) ? null : onSetActive,
       child: Padding(
@@ -149,16 +159,25 @@ class TurnActionWidget extends StatelessWidget {
             Row(
               spacing: 8.0,
               children: [
-                SessionEntityPillWidget(
+                EntityPillWidget(
                   entity: action.entity,
                   width: 40,
                   height: 40,
                 ),
-                Text(
-                  action.entity.name,
-                  style: theme.textTheme.titleLarge!
-                    .copyWith(fontWeight: FontWeight.bold),
-                )
+                Column(
+                  children: [
+                    Text(
+                      action.entity.name,
+                      style: theme.textTheme.titleLarge!
+                        .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    if(combatStatuses.isNotEmpty)
+                      Text(
+                        'Statut de combat : ${combatStatuses.join(", ")}',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                  ],
+                ),
               ],
             ),
             Row(

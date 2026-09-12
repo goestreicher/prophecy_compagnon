@@ -7,6 +7,7 @@ import 'package:prophecy_compagnon_shared/classes/session/map/movement_path.dart
 
 class CombatActionAssignedMovement extends CombatAction {
   CombatActionAssignedMovement({
+    required super.entityId,
     required super.rank,
     required this.movementType,
     super.interpolate = false,
@@ -20,17 +21,16 @@ class CombatActionAssignedMovement extends CombatAction {
 
 class CombatActionMovement extends CombatActionAssignedMovement {
   CombatActionMovement({
+    required super.entityId,
     required super.rank,
     required super.movementType,
     super.distanceMultiplier,
     required this.mapId,
-    required this.entityId,
     required this.path,
   })
     : super(interpolate: true);
 
   final String mapId;
-  final String entityId;
   final MovementPath path;
 
   @override

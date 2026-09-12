@@ -8,7 +8,7 @@ part of 'combat_status.dart';
 
 EntityCombatStatusValue _$EntityCombatStatusValueFromJson(
   Map<String, dynamic> json,
-) => EntityCombatStatusValue((json['bitfield'] as num).toInt());
+) => EntityCombatStatusValue.fromBitfield((json['bitfield'] as num).toInt());
 
 Map<String, dynamic> _$EntityCombatStatusValueToJson(
   EntityCombatStatusValue instance,

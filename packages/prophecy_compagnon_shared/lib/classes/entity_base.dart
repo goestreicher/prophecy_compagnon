@@ -132,19 +132,22 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
   ExportableBinaryData? _icon;
 
   bool canAct() =>
-      !healthStatus.has(EntityHealthStatusValue.dead)
-      && !healthStatus.has(EntityHealthStatusValue.unconscious);
+      !healthStatus.has(EntityHealthStatusFlag.dead)
+      && !healthStatus.has(EntityHealthStatusFlag.unconscious);
 
   bool canMove() =>
       canAct()
-      && !combatStatus.has(EntityCombatStatusValue.onGround)
-      && !combatStatus.has(EntityCombatStatusValue.grappled);
+      && !combatStatus.has(EntityCombatStatusFlag.onGround)
+      && !combatStatus.has(EntityCombatStatusFlag.grappled);
 
   List<CombatActionDescription> availableActionsForType(CombatActionType type) {
     var ret = <CombatActionDescription>[];
     if(!canAct()) return ret;
 
     switch(type) {
+      case CombatActionType.effect:
+        // Nothing to do here
+        break;
       case CombatActionType.movement:
         if(canMove()) {
           ret.addAll([
@@ -159,7 +162,7 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
             ),
           ]);
         }
-        else if(combatStatus.has(EntityCombatStatusValue.onGround)) {
+        else if(combatStatus.has(EntityCombatStatusFlag.onGround)) {
           // TODO: create action for the entity to get back up
         }
     }
@@ -178,7 +181,7 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     if(finalDamage > 0) {
       injuries.manager.dealDamage(finalDamage);
       if(injuries.manager.isDead()) {
-        healthStatus.add(EntityHealthStatusValue.dead);
+        healthStatus.add(EntityHealthStatusFlag.dead);
       }
     }
 
@@ -199,7 +202,7 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
       );
     }
 
-    if(healthStatus.has(EntityHealthStatusValue.stunned)) {
+    if(healthStatus.has(EntityHealthStatusFlag.stunned)) {
       ret.add(
         DiceThrowModifier(
           label: 'Étourdi',
@@ -215,7 +218,7 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
 
   int actionMalus() {
     var malus = damageMalus();
-    if(healthStatus.has(EntityHealthStatusValue.stunned)) {
+    if(healthStatus.has(EntityHealthStatusFlag.stunned)) {
       malus += 10;
     }
     return malus;

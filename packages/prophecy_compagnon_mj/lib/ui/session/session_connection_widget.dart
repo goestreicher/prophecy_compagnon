@@ -12,6 +12,7 @@ import 'package:prophecy_compagnon_shared/ui/session/messages/responses/action/d
 import 'package:prophecy_compagnon_shared/ui/session/messages/responses/action/pc_review_result.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_property_status.dart';
 
 class SessionConnectionWidget extends StatefulWidget {
@@ -56,6 +57,9 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
     }
     else if(m is SessionEntitySetPropertyMessage) {
       _doEntitySetProperty(m);
+    }
+    else if(m is SessionEntitySetEffectMessage) {
+      _doEntitySetEffect(m);
     }
   }
 
@@ -162,6 +166,16 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
         entity.usedProficiency += m.value as int;
       case EntityMessageProperty.gainProficiencyPoints:
         entity.gainProficiencyPoints(m.value as int);
+    }
+  }
+
+  void _doEntitySetEffect(SessionEntitySetEffectMessage m) {
+    var entity = widget.client.session?.entity(m.entityId);
+    if(entity == null) return;
+
+    m.effect.apply(entity);
+    if(!(m.effect.once ?? false)) {
+      widget.client.session?.effectManager.addEffect(m.entityId, m.effect);
     }
   }
 }

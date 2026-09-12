@@ -4,11 +4,13 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/entity_effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/definition/action_configuration.dart';
 import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
@@ -20,6 +22,7 @@ import 'package:prophecy_compagnon_shared/ui/session/messages/map/get_movement_p
 import 'package:prophecy_compagnon_shared/ui/session/messages/responses/action/movement_path_result.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_effect.dart';
 
 class ActionConfigurationMovementSprint extends ActionConfiguration {
   ActionConfigurationMovementSprint();
@@ -84,9 +87,21 @@ class ActionConfigurationMovementSprint extends ActionConfiguration {
       );
 
       // TODO: manage duration
-      // TODO: manage critical fail
-      var throwResultType = evaluateDiceThrow(bundle);
-      if(throwResultType.resultType == DiceThrowResultType.fail) {
+      var evaluation = evaluateDiceThrow(bundle);
+      if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
+        messageBus.publish(
+          SessionEntitySetEffectMessage(
+            broadcastIncludesSelf: true,
+            entityId: action.entity.id,
+            effect: EffectSetCombatStatus(
+              status: EntityCombatStatusFlag.onGround,
+            )
+          )
+        );
+
+        return;
+      }
+      else if(evaluation.resultType == DiceThrowResultType.fail) {
         distanceMultiplier = 3.0;
       }
       else {
@@ -116,6 +131,7 @@ class ActionConfigurationMovementSprint extends ActionConfiguration {
               destination: SessionMessage.masterIdentifier,
               actionUuid: a.uuid,
               combatAction: CombatActionAssignedMovement(
+                entityId: a.entity.id,
                 rank: a.rank,
                 movementType: CombatActionMovementType.run,
                 distanceMultiplier: distanceMultiplier,

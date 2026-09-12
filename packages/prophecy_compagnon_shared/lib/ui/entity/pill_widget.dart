@@ -6,8 +6,8 @@ import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/icon_builder.dart';
 import 'package:prophecy_compagnon_shared/ui/generic_image_widget.dart';
 
-class SessionEntityPillWidget extends StatelessWidget {
-  const SessionEntityPillWidget({
+class EntityPillWidget extends StatelessWidget {
+  const EntityPillWidget({
     super.key,
     required this.entity,
     required this.width,
@@ -52,7 +52,7 @@ class SessionEntityPillWidget extends StatelessWidget {
           }
 
           return GenericImageWidget(
-            image: snapshot.data!
+              image: snapshot.data!
           );
         },
       );

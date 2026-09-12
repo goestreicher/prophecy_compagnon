@@ -48,17 +48,25 @@ const _$WeekDayEnumMap = {
   WeekDay.serpent: 'serpent',
 };
 
-KorDateTime _$KorDateTimeFromJson(Map<String, dynamic> json) => KorDateTime(
-  date: KorDate.fromJson(json['date'] as Map<String, dynamic>),
+KorTime _$KorTimeFromJson(Map<String, dynamic> json) => KorTime(
   hour: (json['hour'] as num).toInt(),
   minute: (json['minute'] as num).toInt(),
+);
+
+Map<String, dynamic> _$KorTimeToJson(KorTime instance) => <String, dynamic>{
+  'hour': instance.hour,
+  'minute': instance.minute,
+};
+
+KorDateTime _$KorDateTimeFromJson(Map<String, dynamic> json) => KorDateTime(
+  date: KorDate.fromJson(json['date'] as Map<String, dynamic>),
+  time: KorTime.fromJson(json['time'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$KorDateTimeToJson(KorDateTime instance) =>
     <String, dynamic>{
       'date': instance.date.toJson(),
-      'hour': instance.hour,
-      'minute': instance.minute,
+      'time': instance.time.toJson(),
     };
 
 KorDateRange _$KorDateRangeFromJson(Map<String, dynamic> json) => KorDateRange(

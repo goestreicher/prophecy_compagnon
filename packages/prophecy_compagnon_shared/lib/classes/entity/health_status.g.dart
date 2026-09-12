@@ -8,7 +8,7 @@ part of 'health_status.dart';
 
 EntityHealthStatusValue _$EntityHealthStatusValueFromJson(
   Map<String, dynamic> json,
-) => EntityHealthStatusValue((json['bitfield'] as num).toInt());
+) => EntityHealthStatusValue.fromBitfield((json['bitfield'] as num).toInt());
 
 Map<String, dynamic> _$EntityHealthStatusValueToJson(
   EntityHealthStatusValue instance,

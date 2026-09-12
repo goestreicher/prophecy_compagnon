@@ -3,27 +3,36 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'health_status.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class EntityHealthStatusValue {
-  static final none        = EntityHealthStatusValue(0);
-  static final injured     = EntityHealthStatusValue(1 << 1);
-  static final dead        = EntityHealthStatusValue(1 << 2);
-  static final stunned     = EntityHealthStatusValue(1 << 3);
-  static final unconscious = EntityHealthStatusValue(1 << 4);
+enum EntityHealthStatusFlag {
+  none(value: 0, label: 'OK'),
+  injured(value: 1 << 1, label: 'Blessé'),
+  dead(value: 1 << 2, label: 'Mort'),
+  stunned(value: 1 << 3, label: 'Sonné'),
+  unconscious(value: 1 << 4, label: 'Inconscient'),
+  ;
 
+  final int value;
+  final String label;
+
+  const EntityHealthStatusFlag({ required this.value, required this.label });
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true, constructor: 'fromBitfield')
+class EntityHealthStatusValue {
   EntityHealthStatusValue.empty() : bitfield = 0;
-  EntityHealthStatusValue(this.bitfield);
+  EntityHealthStatusValue(EntityHealthStatusFlag flag) : bitfield = flag.value;
+  EntityHealthStatusValue.fromBitfield(this.bitfield);
 
   int bitfield;
 
   EntityHealthStatusValue operator &(EntityHealthStatusValue other) =>
-      EntityHealthStatusValue(other.bitfield & bitfield);
+      EntityHealthStatusValue.fromBitfield(other.bitfield & bitfield);
 
   EntityHealthStatusValue operator |(EntityHealthStatusValue other) =>
-      EntityHealthStatusValue(other.bitfield | bitfield);
+      EntityHealthStatusValue.fromBitfield(other.bitfield | bitfield);
 
   EntityHealthStatusValue operator ~() =>
-      EntityHealthStatusValue(~bitfield);
+      EntityHealthStatusValue.fromBitfield(~bitfield);
 
   @override
   bool operator ==(Object other) =>
@@ -42,7 +51,7 @@ class EntityHealthStatusValue {
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class EntityHealthStatus with ChangeNotifier {
   EntityHealthStatus({ required EntityHealthStatusValue value }) : _value = value;
-  EntityHealthStatus.empty() : _value = EntityHealthStatusValue.none;
+  EntityHealthStatus.empty() : _value = EntityHealthStatusValue(EntityHealthStatusFlag.none);
 
   @JsonKey(defaultValue: EntityHealthStatusValue.empty)
   EntityHealthStatusValue get value => _value;
@@ -53,14 +62,14 @@ class EntityHealthStatus with ChangeNotifier {
 
   EntityHealthStatusValue _value;
 
-  bool has(EntityHealthStatusValue status) =>
-      value & status != EntityHealthStatusValue.none;
+  bool has(EntityHealthStatusFlag status) =>
+      (value & EntityHealthStatusValue(status)).bitfield != EntityHealthStatusFlag.none.value;
 
-  void add(EntityHealthStatusValue status) =>
-      value = _value | status;
+  void add(EntityHealthStatusFlag status) =>
+      value = _value | EntityHealthStatusValue(status);
 
-  void clear(EntityHealthStatusValue status) =>
-      value = _value & ~status;
+  void clear(EntityHealthStatusFlag status) =>
+      value = _value & ~EntityHealthStatusValue(status);
 
   factory EntityHealthStatus.fromJson(Map<String, dynamic> json) =>
       _$EntityHealthStatusFromJson(json);

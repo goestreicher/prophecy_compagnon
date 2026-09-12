@@ -6,6 +6,7 @@ import 'package:prophecy_compagnon_shared/classes/scenario/scenario.dart';
 import 'package:prophecy_compagnon_shared/classes/scenario/scenario_event.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/board.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
+import 'package:prophecy_compagnon_shared/classes/session/entity_effect_manager.dart';
 import 'package:prophecy_compagnon_shared/classes/session/event.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/storable.dart';
 import 'package:prophecy_compagnon_shared/classes/table.dart';
@@ -57,10 +58,12 @@ class GameSession extends ChangeNotifier {
     SessionDays? sessionDays,
     SessionEncounter? encounter,
     SessionGameBoard? board,
+    EntityEffectManager? effectManager,
   })
     : uuid = uuid ?? const Uuid().v4().toString(),
       encounter = ValueNotifier<SessionEncounter?>(encounter),
-      board = board ?? SessionGameBoard()
+      board = board ?? SessionGameBoard(),
+      effectManager = effectManager ?? EntityEffectManager()
   {
     if(sessionDays == null) {
       this.sessionDays = SessionDays.fromJson(
@@ -92,6 +95,21 @@ class GameSession extends ChangeNotifier {
   late int scenarioDay;
   late int dayHour;
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
+    late SessionDays sessionDays;
+
+  // TODO: add this to JSON
+  @JsonKey(includeFromJson: false, includeToJson: false)
+    ValueNotifier<SessionEncounter?> encounter;
+
+  // TODO: add this to JSON
+  @JsonKey(includeFromJson: false, includeToJson: false)
+    SessionGameBoard board;
+
+  // TODO: add this to JSON
+  @JsonKey(includeFromJson: false, includeToJson: false)
+    EntityEffectManager effectManager;
+
   EntityBase? entity(String id) {
     for(var e in table.players) {
       if(e.id == id) return e;
@@ -103,10 +121,8 @@ class GameSession extends ChangeNotifier {
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
-  late SessionDays sessionDays;
+    int get day => scenarioDay;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  int get day => scenarioDay;
   set day(int d) {
     scenarioDay = d;
     dayHour = 0;
@@ -114,11 +130,13 @@ class GameSession extends ChangeNotifier {
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
-  int get hour => dayHour;
+    int get hour => dayHour;
+
   set hour(int h) {
     dayHour = h;
     notifyListeners();
   }
+
   void nextHour() {
     if(dayHour == 23) {
       scenarioDay += 1;
@@ -150,24 +168,6 @@ class GameSession extends ChangeNotifier {
       return '$relative ${dayOffset.abs()} jour$plural';
     }
   }
-
-  // TODO: add this to JSON
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  ValueNotifier<SessionEncounter?> encounter;
-
-  // set encounter(SessionEncounter? newEncounter) {
-  //   if(encounter != null) {
-  //     throw ArgumentError("Une rencontre est déjà en cours");
-  //   }
-  //   _currentEncounter = newEncounter;
-  //   notifyListeners();
-  // }
-  //
-  // SessionEncounter? _currentEncounter;
-
-  // TODO: add this to JSON
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  SessionGameBoard board;
 
   factory GameSession.fromJson(Map<String, dynamic> json) {
     var ret = _$GameSessionFromJson(json);

@@ -4,10 +4,15 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/session/entity_effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
+import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
+import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_effect.dart';
 import 'package:provider/provider.dart';
 
 class PlayCharactersPage extends StatelessWidget {
@@ -17,15 +22,19 @@ class PlayCharactersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var session = context.watch<GameSession>();
+    var session = context.read<GameSession>();
 
     var pcWidgets = <Widget>[];
     for(var pc in session.table.players) {
       pcWidgets.add(
         Row(
-          spacing: 8.0,
+          spacing: 16.0,
           children: [
-            Text(pc.name),
+            EntityStatusWidget(
+              entity: pc,
+              iconWidth: 50.0,
+              iconHeight: 50.0,
+            ),
             TextButton(
               onPressed: () async {
                 var request = DiceThrowRequest(
@@ -53,7 +62,19 @@ class PlayCharactersPage extends StatelessWidget {
                   result: result,
                 );
 
-                evaluateDiceThrow(bundle);
+                var evaluation = evaluateDiceThrow(bundle);
+                print('${evaluation.criticalType} / ${evaluation.resultType}');
+                if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
+                  SessionMessageBusClient.instance?.publish(
+                    SessionEntitySetEffectMessage(
+                      broadcastIncludesSelf: true,
+                      entityId: pc.id,
+                      effect: EffectSetCombatStatus(
+                        status: EntityCombatStatusFlag.onGround,
+                      )
+                    )
+                  );
+                }
               },
               child: Text('click-o'),
             )

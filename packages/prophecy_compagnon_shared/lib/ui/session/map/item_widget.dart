@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/item.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/item_entity.dart';
-import 'package:prophecy_compagnon_shared/ui/session/entity_pill_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/entity/pill_widget.dart';
 
 class SessionMapItemWidget extends StatelessWidget {
   const SessionMapItemWidget({
@@ -29,7 +29,7 @@ class SessionMapItemWidget extends StatelessWidget {
               image = snapshot.data!;
             }
 
-            return SessionEntityPillWidget(
+            return EntityPillWidget(
               entity: (item as SessionMapEntityItem).entity,
               width: w,
               height: h,

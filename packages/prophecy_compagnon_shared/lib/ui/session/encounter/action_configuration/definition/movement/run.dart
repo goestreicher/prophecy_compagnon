@@ -60,6 +60,7 @@ class ActionConfigurationMovementRun extends ActionConfiguration {
               destination: SessionMessage.masterIdentifier,
               actionUuid: a.uuid,
               combatAction: CombatActionAssignedMovement(
+                entityId: a.entity.id,
                 rank: a.rank,
                 movementType: CombatActionMovementType.run,
                 distanceMultiplier: 2.0,

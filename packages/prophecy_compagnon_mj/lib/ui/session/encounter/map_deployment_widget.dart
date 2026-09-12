@@ -6,7 +6,7 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/item.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/item_entity.dart';
-import 'package:prophecy_compagnon_shared/ui/session/entity_pill_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/entity/pill_widget.dart';
 
 class MapDeploymentWidget extends StatelessWidget {
   const MapDeploymentWidget({
@@ -122,7 +122,7 @@ class _MapEntityDeploymentWidget extends StatelessWidget {
                   dragAnchorStrategy: (_, _, _) {
                     return Offset(MapDeploymentWidget.feedbackWidgetSize.width/2, MapDeploymentWidget.feedbackWidgetSize.height/2);
                   },
-                  feedback: SessionEntityPillWidget(
+                  feedback: EntityPillWidget(
                     entity: entities[index],
                     width: MapDeploymentWidget.feedbackWidgetSize.width,
                     height: MapDeploymentWidget.feedbackWidgetSize.height,
@@ -143,7 +143,7 @@ class _MapEntityDeploymentWidget extends StatelessWidget {
                   child: Row(
                     spacing: 8.0,
                     children: [
-                      SessionEntityPillWidget(
+                      EntityPillWidget(
                         entity: entities[index],
                         width: 40.0,
                         height: 40.0,
