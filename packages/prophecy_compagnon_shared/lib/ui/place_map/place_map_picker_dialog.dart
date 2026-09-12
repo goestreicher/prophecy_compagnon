@@ -58,19 +58,19 @@ class _PlaceMapPickerDialogState extends State<PlaceMapPickerDialog> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    var fpResult = await FilePicker.pickFiles(
+                    var fpResult = await FilePicker.pickFile(
                       type: FileType.image,
-                      withData: true,
                     );
                     if(fpResult == null) return;
 
                     try {
-                      var codec = await ui.instantiateImageCodec(fpResult.files.first.bytes!);
+                      var bytes = await fpResult.readAsBytes();
+                      var codec = await ui.instantiateImageCodec(bytes);
                       var frame = await codec.getNextFrame();
                       setState(() {
                         image = frame.image.clone();
-                        imageData = fpResult.files.first.bytes!;
-                        imageName = fpResult.files.first.name;
+                        imageData = bytes;
+                        imageName = fpResult.name;
                       });
                       frame.image.dispose();
                     }

@@ -399,15 +399,14 @@ class _FileUploadSelectorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
-        var fpResult = await FilePicker.pickFiles(
+        var fpResult = await FilePicker.pickFile(
           type: FileType.image,
-          withData: true,
         );
         if(fpResult == null) return;
 
         var item = SessionBoardItemImage.fromUint8List(
-          title: fpResult.files.first.name,
-          data: fpResult.files.first.bytes!,
+          title: fpResult.name,
+          data: (await fpResult.readAsBytes()),
         );
         // ignore: unused_local_variable
         var h = item.content.binary!.hash; // pre-cache the hash now instead of when the dimension text fields are updated

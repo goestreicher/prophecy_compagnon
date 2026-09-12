@@ -152,14 +152,13 @@ class _IllustrationEditWidgetState extends State<IllustrationEditWidget> {
       return Center(
         child: TextButton(
           onPressed: () async {
-            var fpResult = await FilePicker.pickFiles(
+            var fpResult = await FilePicker.pickFile(
               type: FileType.image,
-              withData: true,
             );
             if(fpResult == null) return;
 
             try {
-              image = ExportableBinaryData(data: fpResult.files.first.bytes!);
+              image = ExportableBinaryData(data: (await fpResult.readAsBytes()));
               await _getImageInfo();
               icon = null;
               setState(() {

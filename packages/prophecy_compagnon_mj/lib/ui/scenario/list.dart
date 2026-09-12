@@ -234,17 +234,16 @@ class _ScenariosListPageState extends State<ScenariosListPage> {
                             ],
                           ),
                           onPressed: () async {
-                            var result = await FilePicker.pickFiles(
+                            var result = await FilePicker.pickFile(
                               type: FileType.custom,
                               allowedExtensions: ['json'],
-                              withData: true,
                             );
                             if(result == null) return;
                             try {
                               setState(() {
                                 _isWorking = true;
                               });
-                              var jsonStr = const Utf8Decoder().convert(result.files.first.bytes!);
+                              var jsonStr = const Utf8Decoder().convert((await result.readAsBytes()));
                               var j = json.decode(jsonStr);
 
                               var summ = await ScenarioSummaryStore().get(j['uuid']);

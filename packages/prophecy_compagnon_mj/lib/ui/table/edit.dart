@@ -164,10 +164,9 @@ class _TableEditPageState extends State<TableEditPage> {
                     ],
                   ),
                   onPressed: () async {
-                    var result = await FilePicker.pickFiles(
+                    var result = await FilePicker.pickFile(
                       type: FileType.custom,
                       allowedExtensions: ['json'],
-                      withData: true,
                     );
                     if(result == null) return;
 
@@ -176,7 +175,7 @@ class _TableEditPageState extends State<TableEditPage> {
                         isWorking = true;
                       });
 
-                      var jsonStr = const Utf8Decoder().convert(result.files.first.bytes!);
+                      var jsonStr = const Utf8Decoder().convert(await result.readAsBytes());
                       var character = PlayerCharacter.import(json.decode(jsonStr));
                       await PlayerCharacterStore().save(character);
 

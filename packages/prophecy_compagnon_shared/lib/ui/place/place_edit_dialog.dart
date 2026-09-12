@@ -185,18 +185,18 @@ class _PlaceEditDialogState extends State<PlaceEditDialog> {
                         child: Center(
                           child: ElevatedButton(
                             onPressed: () async {
-                              var fpResult = await FilePicker.pickFiles(
+                              var fpResult = await FilePicker.pickFile(
                                 type: FileType.image,
-                                withData: true,
                               );
                               if(fpResult == null) return;
 
                               try {
-                                var codec = await ui.instantiateImageCodec(fpResult.files.first.bytes!);
+                                var bytes = await fpResult.readAsBytes();
+                                var codec = await ui.instantiateImageCodec(bytes);
                                 var frame = await codec.getNextFrame();
                                 setState(() {
-                                  mapSourceLocalFileName = fpResult.files.first.name;
-                                  mapSourceLocalFileData = fpResult.files.first.bytes;
+                                  mapSourceLocalFileName = fpResult.name;
+                                  mapSourceLocalFileData = bytes;
                                   mapImageWidth = frame.image.width;
                                   mapImageHeight = frame.image.height;
                                 });

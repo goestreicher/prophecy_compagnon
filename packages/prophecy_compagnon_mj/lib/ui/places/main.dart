@@ -238,16 +238,15 @@ class _PlacesMainPageState extends State<PlacesMainPage> {
                 padding: const EdgeInsets.all(4.0),
                 tooltip: 'Importer un lieu',
                 onPressed: () async {
-                  var result = await FilePicker.pickFiles(
+                  var result = await FilePicker.pickFile(
                     type: FileType.custom,
                     allowedExtensions: ['json'],
-                    withData: true,
                   );
                   if(!context.mounted) return;
                   if(result == null) return;
 
                   try {
-                    var jsonStr = const Utf8Decoder().convert(result.files.first.bytes!);
+                    var jsonStr = const Utf8Decoder().convert((await result.readAsBytes()));
                     List<dynamic> j = json.decode(jsonStr);
                     await Place.import(j);
 

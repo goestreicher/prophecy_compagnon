@@ -63,10 +63,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       label: const Text('Importer une sauvegarde'),
                       icon: Icon(Icons.publish),
                       onPressed: () async {
-                        var result = await FilePicker.pickFiles(
+                        var result = await FilePicker.pickFile(
                           type: FileType.custom,
                           allowedExtensions: ['zip'],
-                          withData: true,
                         );
                         if(!context.mounted) return;
                         if(result == null) return;
@@ -74,7 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         setState(() {
                           isWorking = true;
                         });
-                        await DataStorage.instance.import(result.files.first.bytes!);
+                        await DataStorage.instance.import(await result.readAsBytes());
                         setState(() {
                           isWorking = false;
                         });

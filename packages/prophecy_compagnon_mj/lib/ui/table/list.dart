@@ -205,10 +205,9 @@ class _TablesListPageState extends State<TablesListPage> {
                             ],
                           ),
                           onPressed: () async {
-                            var result = await FilePicker.pickFiles(
+                            var result = await FilePicker.pickFile(
                               type: FileType.custom,
                               allowedExtensions: ['json'],
-                              withData: true,
                             );
                             if(!context.mounted) return;
                             if(result == null) return;
@@ -218,7 +217,7 @@ class _TablesListPageState extends State<TablesListPage> {
                                 _isWorking = true;
                               });
 
-                              var jsonStr = const Utf8Decoder().convert(result.files.first.bytes!);
+                              var jsonStr = const Utf8Decoder().convert((await result.readAsBytes()));
                               await importGameTable(json.decode(jsonStr));
                               setState(() {
                                 _isWorking = false;

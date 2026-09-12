@@ -181,10 +181,9 @@ class _NPCsListPageState extends State<NPCsListPage> {
                       ],
                     ),
                     onPressed: () async {
-                      var result = await FilePicker.pickFiles(
+                      var result = await FilePicker.pickFile(
                         type: FileType.custom,
                         allowedExtensions: ['json'],
-                        withData: true,
                       );
                       if(!context.mounted) return;
                       if(result == null) return;
@@ -194,7 +193,7 @@ class _NPCsListPageState extends State<NPCsListPage> {
                           isWorking = true;
                         });
 
-                        var jsonStr = const Utf8Decoder().convert(result.files.first.bytes!);
+                        var jsonStr = const Utf8Decoder().convert((await result.readAsBytes()));
                         var j = json.decode(jsonStr);
                         var npc = await NonPlayerCharacter.import(j);
 
