@@ -15,10 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
 
+part 'health_status.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class EffectSetHealthStatus extends EntityEffect {
   EffectSetHealthStatus({
     required this.status,
@@ -32,8 +36,16 @@ class EffectSetHealthStatus extends EntityEffect {
 
   @override
   void unapply(EntityBase entity) {}
+
+  factory EffectSetHealthStatus.fromJson(Map<String, dynamic> json) =>
+      _$EffectSetHealthStatusFromJson(json);
+
+  @override
+  Map<String, dynamic> effectToJson() =>
+      _$EffectSetHealthStatusToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class EffectClearHealthStatus extends EntityEffect {
   EffectClearHealthStatus({
     required this.status,
@@ -47,4 +59,11 @@ class EffectClearHealthStatus extends EntityEffect {
 
   @override
   void unapply(EntityBase entity) {}
+
+  factory EffectClearHealthStatus.fromJson(Map<String, dynamic> json) =>
+      _$EffectClearHealthStatusFromJson(json);
+
+  @override
+  Map<String, dynamic> effectToJson() =>
+      _$EffectClearHealthStatusToJson(this);
 }

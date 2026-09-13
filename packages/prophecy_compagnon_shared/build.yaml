@@ -11,3 +11,9 @@ builders:
     build_extensions: {"lib/$lib$": ["lib/register_store_adapters.dart"]}
     auto_apply: root_package
     build_to: source
+  register_entity_effects:
+    import: "package:prophecy_compagnon_shared/builders/entity_effects_builder.dart"
+    builder_factories: ["registerEntityEffectsBuilder"]
+    build_extensions: {"lib/$lib$": ["lib/classes/session/register_entity_effects.dart"]}
+    auto_apply: root_package
+    build_to: source

@@ -23,6 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/entity_effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
@@ -80,7 +81,6 @@ class PlayCharactersPage extends StatelessWidget {
                 );
 
                 var evaluation = evaluateDiceThrow(bundle);
-                print('${evaluation.criticalType} / ${evaluation.resultType}');
                 if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
                   SessionMessageBusClient.instance?.publish(
                     SessionEntitySetEffectMessage(

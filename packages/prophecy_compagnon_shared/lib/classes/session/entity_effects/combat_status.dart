@@ -15,10 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
 
+part 'combat_status.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class EffectSetCombatStatus extends EntityEffect {
   EffectSetCombatStatus({
     required this.status,
@@ -33,8 +37,16 @@ class EffectSetCombatStatus extends EntityEffect {
 
   @override
   void unapply(EntityBase entity) {}
+
+  factory EffectSetCombatStatus.fromJson(Map<String, dynamic> json) =>
+      _$EffectSetCombatStatusFromJson(json);
+
+  @override
+  Map<String, dynamic> effectToJson() =>
+      _$EffectSetCombatStatusToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class EffectClearCombatStatus extends EntityEffect {
   EffectClearCombatStatus({
     required this.status
@@ -48,4 +60,11 @@ class EffectClearCombatStatus extends EntityEffect {
 
   @override
   void unapply(EntityBase entity) {}
+
+  factory EffectClearCombatStatus.fromJson(Map<String, dynamic> json) =>
+      _$EffectClearCombatStatusFromJson(json);
+
+  @override
+  Map<String, dynamic> effectToJson() =>
+      _$EffectClearCombatStatusToJson(this);
 }

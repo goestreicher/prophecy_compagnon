@@ -15,8 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
+
+typedef EntityEffectJsonFactory = EntityEffect Function(Map<String, dynamic>);
 
 abstract class EntityEffect {
   EntityEffect({
@@ -36,4 +39,24 @@ abstract class EntityEffect {
 
   void apply(EntityBase entity);
   void unapply(EntityBase entity);
+  Map<String, dynamic> effectToJson();
+
+  factory EntityEffect.fromJson(Map<String, dynamic> json) {
+    if(!json.containsKey('_type')) {
+      throw(ArgumentError('Missing "_type" key in JSON'));
+    }
+    return _effectFactories[json['_type']]!(json);
+  }
+
+  Map<String, dynamic> toJson() {
+    var ret = effectToJson();
+    ret['_type'] = runtimeType.toString();
+    return ret;
+  }
+
+  static void registerEntityEffectJsonFactory(String name, EntityEffectJsonFactory factory) =>
+      _effectFactories[name] = factory;
+
+  static Map<String, EntityEffectJsonFactory> _effectFactories =
+      <String, EntityEffectJsonFactory>{};
 }
