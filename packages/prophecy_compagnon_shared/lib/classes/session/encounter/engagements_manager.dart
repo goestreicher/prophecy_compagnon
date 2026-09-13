@@ -69,6 +69,40 @@ class EngagementsManager {
     );
   }
 
-
   final Map<StringPairMapKey, WeaponRange> _engagements;
+
+  factory EngagementsManager.fromJson(List<dynamic> json) {
+    var arg = <(String, String, WeaponRange)>[];
+
+    for(var e in json) {
+      if(e is! List) {
+        throw(ArgumentError('Element is not a list in JSON for engagement'));
+      }
+      if(e.length != 3) {
+        throw(ArgumentError('Wrong length for the list to decode as an engagement'));
+      }
+
+      arg.add((
+        e[0] as String,
+        e[1] as String,
+        WeaponRange.values.byName(e[2]),
+      ));
+    }
+
+    return EngagementsManager(arg);
+  }
+
+  List<List<String>> toJson() {
+    var ret = <List<String>>[];
+
+    for(var e in _engagements.entries) {
+      ret.add([
+        e.key.pair.$1,
+        e.key.pair.$2,
+        e.value.name,
+      ]);
+    }
+
+    return ret;
+  }
 }
