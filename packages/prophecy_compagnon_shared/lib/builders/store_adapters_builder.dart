@@ -18,12 +18,12 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:build/build.dart';
 import 'package:glob/glob.dart';
-import 'package:prophecy_compagnon_shared/builders/store_adapter_generators.dart';
+import 'package:prophecy_compagnon_shared/builders/store_adapters_generator.dart';
 import 'package:source_gen/source_gen.dart' show LibraryReader;
 
 Builder registerStoreAdaptersBuilder(BuilderOptions options) {
   var defaults = BuilderOptions({
-    'output': 'lib/register_store_adapters.dart'
+    'output': 'lib/classes/storage/register_store_adapters.dart'
   });
 
   var opts = options.overrideWith(defaults);
@@ -65,7 +65,7 @@ class RegisterStoreAdaptersBuilder implements Builder {
 
     functionBuffer.write('}\n');
     buffer.write('\n');
-    buffer.write('import "classes/storage/storage.dart";');
+    buffer.write('import "package:prophecy_compagnon_shared/classes/storage/storage.dart";');
     buffer.write('\n\n');
     buffer.write(functionBuffer.toString());
 

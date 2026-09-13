@@ -21,8 +21,8 @@ import 'package:go_router/go_router.dart';
 import 'package:prophecy_compagnon_mj/ui/app_routes.dart';
 import 'package:prophecy_compagnon_mj/ui/main_page.dart';
 import 'package:prophecy_compagnon_shared/classes/session/register_entity_effects.dart';
+import 'package:prophecy_compagnon_shared/classes/storage/register_store_adapters.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/storage.dart';
-import 'package:prophecy_compagnon_shared/register_store_adapters.dart';
 
 final _goRouter = GoRouter(
   routes: [

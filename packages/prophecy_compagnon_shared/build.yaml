@@ -6,9 +6,9 @@ targets:
 
 builders:
   register_store_adapters:
-    import: "package:prophecy_compagnon_shared/builders/store_adapter_builders.dart"
+    import: "package:prophecy_compagnon_shared/builders/store_adapters_builder.dart"
     builder_factories: ["registerStoreAdaptersBuilder"]
-    build_extensions: {"lib/$lib$": ["lib/register_store_adapters.dart"]}
+    build_extensions: {"lib/$lib$": ["lib/classes/storage/register_store_adapters.dart"]}
     auto_apply: root_package
     build_to: source
   register_entity_effects:

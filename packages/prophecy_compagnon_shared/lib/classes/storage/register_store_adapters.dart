@@ -19,7 +19,7 @@ import "package:prophecy_compagnon_shared/classes/session/game_session.dart";
 import "package:prophecy_compagnon_shared/classes/star.dart";
 import "package:prophecy_compagnon_shared/classes/table.dart";
 
-import "classes/storage/storage.dart";
+import "package:prophecy_compagnon_shared/classes/storage/storage.dart";
 
 void registerStoreAdapters() {
   DataStorage.registerStoreAdapter(
