@@ -12,7 +12,9 @@ GameSession _$GameSessionFromJson(Map<String, dynamic> json) => GameSession(
   scenario: Scenario.fromJson(json['scenario'] as Map<String, dynamic>),
   startDate: KorDate.fromJson(json['start_date'] as Map<String, dynamic>),
   scenarioDay: (json['scenario_day'] as num?)?.toInt(),
-  dayHour: (json['day_hour'] as num?)?.toInt() ?? 0,
+  time: json['time'] == null
+      ? null
+      : KorTime.fromJson(json['time'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$GameSessionToJson(GameSession instance) =>
@@ -22,5 +24,5 @@ Map<String, dynamic> _$GameSessionToJson(GameSession instance) =>
       'scenario': instance.scenario.toJson(),
       'start_date': instance.startDate.toJson(),
       'scenario_day': instance.scenarioDay,
-      'day_hour': instance.dayHour,
+      'time': instance.time.toJson(),
     };

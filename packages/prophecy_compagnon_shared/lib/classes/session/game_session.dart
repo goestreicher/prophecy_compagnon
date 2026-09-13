@@ -71,13 +71,14 @@ class GameSession extends ChangeNotifier {
     required this.scenario,
     required this.startDate,
     int? scenarioDay,
-    this.dayHour = 0,
+    KorTime? time,
     SessionDays? sessionDays,
     SessionEncounter? encounter,
     SessionGameBoard? board,
     EntityEffectManager? effectManager,
   })
     : uuid = uuid ?? const Uuid().v4().toString(),
+      time = time ?? KorTime(hour: 0, minute: 0),
       encounter = ValueNotifier<SessionEncounter?>(encounter),
       board = board ?? SessionGameBoard(),
       effectManager = effectManager ?? EntityEffectManager()
@@ -110,7 +111,7 @@ class GameSession extends ChangeNotifier {
 
   KorDate startDate;
   late int scenarioDay;
-  late int dayHour;
+  KorTime time;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
     late SessionDays sessionDays;
@@ -142,25 +143,28 @@ class GameSession extends ChangeNotifier {
 
   set day(int d) {
     scenarioDay = d;
-    dayHour = 0;
+    time = KorTime(hour: 0, minute: 0);
     notifyListeners();
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
-    int get hour => dayHour;
+    int get hour => time.hour;
 
   set hour(int h) {
-    dayHour = h;
+    time.hour = h;
+    time.minute = 0;
     notifyListeners();
   }
 
   void nextHour() {
-    if(dayHour == 23) {
+    if(time.hour == 23) {
       scenarioDay += 1;
-      dayHour = 0;
+      time.hour = 0;
+      time.minute = 0;
     }
     else {
-      dayHour += 1;
+      time.hour += 1;
+      time.minute = 0;
     }
     notifyListeners();
   }
