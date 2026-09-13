@@ -15,10 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:uuid/uuid.dart';
+
+part 'entity_action.g.dart';
 
 enum SessionEncounterEntityActionStage {
   none,
@@ -28,6 +31,7 @@ enum SessionEncounterEntityActionStage {
   executed,
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class SessionEncounterEntityAction {
   SessionEncounterEntityAction({
     String? uuid,
@@ -65,4 +69,10 @@ class SessionEncounterEntityAction {
 
     return true;
   }
+
+  factory SessionEncounterEntityAction.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterEntityActionFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$SessionEncounterEntityActionToJson(this);
 }
