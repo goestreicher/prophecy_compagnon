@@ -15,9 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 
+part 'turn.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class SessionEncounterTurn {
   SessionEncounterTurn({
     required this.actions,
@@ -87,4 +91,10 @@ class SessionEncounterTurn {
       );
     }
   }
+
+  factory SessionEncounterTurn.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterTurnFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$SessionEncounterTurnToJson(this);
 }
