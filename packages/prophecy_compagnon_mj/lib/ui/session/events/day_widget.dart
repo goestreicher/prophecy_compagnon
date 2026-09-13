@@ -414,7 +414,6 @@ class _EventWidgetTitleState extends State<_EventWidgetTitle> {
                 realizationRange = widget.range;
               }
 
-              // TODO: manage events realized over a single day
               setState(() {
                 session.sessionDays.markEventAsRealized(
                   widget.range,

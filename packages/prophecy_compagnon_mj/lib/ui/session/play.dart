@@ -205,7 +205,11 @@ class _PlayPageTitle extends StatelessWidget {
         }
       }
       else if(action == _DayEndAction.offsetUnrealized) {
-        // TODO
+        for(var originalRange in unrealized.keys) {
+          for(var event in unrealized[originalRange]!) {
+            session.sessionDays.offsetEvent(originalRange, event.uuid);
+          }
+        }
       }
     }
 

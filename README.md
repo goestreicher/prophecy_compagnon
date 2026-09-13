@@ -8,6 +8,7 @@ Pretty much a WiP, not stable at the moment
 
 ## Creation part
 
+- [ ] Add events dependency and use this info to update dependents when realizing / offsetting
 - [ ] Add dates in the factions leaders and members?
 - [ ] Link factions (and places) titles to NPCs
 

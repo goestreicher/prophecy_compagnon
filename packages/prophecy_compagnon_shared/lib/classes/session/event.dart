@@ -251,6 +251,34 @@ class SessionDays extends ChangeNotifier {
     notifyListeners();
   }
 
+  void offsetEvent(DayRange originalRange, String uuid, { int offsetBy = 1 }) {
+    if(!_days.containsKey(originalRange)) return;
+
+    var event = _days[originalRange]!.event(uuid);
+    if(event == null) return;
+
+    var targetRange = DayRange(
+      start: originalRange.start + offsetBy,
+      end: originalRange.end + offsetBy,
+    );
+
+    var category = _days[originalRange]!.eventCategory(uuid)!;
+
+    if(!_days.containsKey(targetRange)) {
+      _days[targetRange] = SessionDayEvents();
+    }
+    _days[targetRange]!.add(
+      category,
+      event,
+    );
+
+
+    _days[originalRange]!.remove(uuid);
+    if(!_remapped.containsKey(uuid)) {
+      _remapped[uuid] = originalRange;
+    }
+  }
+
   List<SessionEvent> unrealized(DayRange range) =>
       _days[range]?.unrealized() ?? <SessionEvent>[];
 
