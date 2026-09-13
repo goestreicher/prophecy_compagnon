@@ -85,7 +85,9 @@ class _SessionEncounterEntitiesInitiativeWidgetState extends State<SessionEncoun
         .where((EntityBase e) => e.canAct())
     );
 
-    // TODO: get count of unused actions in the previous turn
+    if(widget.encounter.currentTurn != null) {
+      unusedActions.addAll(widget.encounter.currentTurn!.unusedActions());
+    }
   }
 
   @override

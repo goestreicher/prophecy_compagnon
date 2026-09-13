@@ -58,6 +58,26 @@ class SessionEncounterTurn {
   Iterable<SessionEncounterEntityAction> actionsForRank(int rank) => actions
       .where((SessionEncounterEntityAction a) => a.rank == rank);
 
+  Map<String, int> unusedActions() {
+    var actions = filteredActions(
+        (SessionEncounterEntityAction a) =>
+            a.stage == SessionEncounterEntityActionStage.none
+            || a.stage == SessionEncounterEntityActionStage.assigned
+    );
+    var ret = <String, int>{};
+
+    for(var a in actions) {
+      if(!ret.containsKey(a.entity.id)) {
+        ret[a.entity.id] = 1;
+      }
+      else {
+        ret[a.entity.id] = ret[a.entity.id]! + 1;
+      }
+    }
+
+    return ret;
+  }
+
   void _onEntityHealthStatusChanged(EntityBase entity) {
     if(!entity.canAct()) {
       actions.removeWhere(
