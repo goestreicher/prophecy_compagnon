@@ -17,11 +17,15 @@
 
 import 'dart:ui';
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/movement_path.dart';
 
+part 'movement.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class CombatActionAssignedMovement extends CombatAction {
   CombatActionAssignedMovement({
     required super.entityId,
@@ -34,8 +38,16 @@ class CombatActionAssignedMovement extends CombatAction {
 
   final CombatActionMovementType movementType;
   final double distanceMultiplier;
+
+  factory CombatActionAssignedMovement.fromJson(Map<String, dynamic> json) =>
+      _$CombatActionAssignedMovementFromJson(json);
+
+  @override
+  Map<String, dynamic> combatActionToJson() =>
+      _$CombatActionAssignedMovementToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class CombatActionMovement extends CombatActionAssignedMovement {
   CombatActionMovement({
     required super.entityId,
@@ -90,4 +102,11 @@ class CombatActionMovement extends CombatActionAssignedMovement {
 
     return ret;
   }
+
+  factory CombatActionMovement.fromJson(Map<String, dynamic> json) =>
+      _$CombatActionMovementFromJson(json);
+
+  @override
+  Map<String, dynamic> combatActionToJson() =>
+      _$CombatActionMovementToJson(this);
 }

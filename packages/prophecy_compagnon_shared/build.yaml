@@ -17,3 +17,9 @@ builders:
     build_extensions: {"lib/$lib$": ["lib/classes/session/register_entity_effects.dart"]}
     auto_apply: root_package
     build_to: source
+  register_combat_actions:
+    import: "package:prophecy_compagnon_shared/builders/combat_actions_builder.dart"
+    builder_factories: ["registerCombatActionsBuilder"]
+    build_extensions: {"lib/$lib$": ["lib/classes/session/encounter/register_combat_actions.dart"]}
+    auto_apply: root_package
+    build_to: source

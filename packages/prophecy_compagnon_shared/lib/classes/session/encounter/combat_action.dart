@@ -18,6 +18,8 @@
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
 
+typedef CombatActionJsonFactory = CombatAction Function(Map<String, dynamic>);
+
 abstract class CombatAction {
   CombatAction({
     required this.entityId,
@@ -33,5 +35,26 @@ abstract class CombatAction {
   final bool interpolate;
   final List<EntityEffect> effects;
 
+  Map<String, dynamic> combatActionToJson();
+
   CombatAction? lerp(int rank, double x) => null;
+
+  factory CombatAction.fromJson(Map<String, dynamic> json) {
+    if(!json.containsKey('_type')) {
+      throw(ArgumentError('Missing "_type" key in JSON'));
+    }
+    return _combatActionFactories[json['_type']]!(json);
+  }
+
+  Map<String, dynamic> toJson() {
+    var ret = combatActionToJson();
+    ret['_type'] = runtimeType.toString();
+    return ret;
+  }
+
+  static void registerCombatActionJsonFactory(String name, CombatActionJsonFactory factory) =>
+      _combatActionFactories[name] = factory;
+
+  static Map<String, CombatActionJsonFactory> _combatActionFactories =
+      <String, CombatActionJsonFactory>{};
 }

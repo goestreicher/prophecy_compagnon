@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
