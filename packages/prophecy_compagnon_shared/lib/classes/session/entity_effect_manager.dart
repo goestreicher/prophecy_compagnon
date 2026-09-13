@@ -15,11 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
 
+part 'entity_effect_manager.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class EntityEffectManager {
-  EntityEffectManager()
-    : entityEffects = <String, List<EntityEffect>>{};
+  EntityEffectManager({
+    Map<String, List<EntityEffect>>? entityEffects,
+  })
+    : entityEffects = entityEffects ?? <String, List<EntityEffect>>{};
 
   final Map<String, List<EntityEffect>> entityEffects;
 
@@ -29,4 +35,10 @@ class EntityEffectManager {
     }
     entityEffects[entityId]!.add(effect);
   }
+
+  factory EntityEffectManager.fromJson(Map<String, dynamic> json) =>
+      _$EntityEffectManagerFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$EntityEffectManagerToJson(this);
 }
