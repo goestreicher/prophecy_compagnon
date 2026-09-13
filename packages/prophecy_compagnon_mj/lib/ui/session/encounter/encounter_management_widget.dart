@@ -19,6 +19,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/encounter/entities_initiative.dart';
 import 'package:prophecy_compagnon_mj/ui/session/encounter/map_deployment_widget.dart';
 import 'package:prophecy_compagnon_mj/ui/session/encounter/turn_management_widget.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_instance.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item_map.dart';
@@ -121,9 +122,9 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
         stage = TextSpan(
           text: 'Tour ${encounter.currentTurnNumber}',
         );
-      default:
+      case SessionEncounterStatus.finished:
         stage = TextSpan(
-          text: 'non géré !',
+          text: 'Terminée',
         );
     }
 
@@ -200,15 +201,86 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
           TurnManagementWidget(
             turn: encounter.currentTurn!,
             onTurnFinished: () async {
-              // TODO: check if there are still NPCs alive and end the encounter if not
+              var allNpcsDead = encounter.npcs.every(
+                  (EntityInstance npc) => npc.healthStatus.has(EntityHealthStatusFlag.dead)
+              );
+              if(allNpcsDead) {
+                setState(() {
+                  encounter.status = SessionEncounterStatus.finished;
+                  updateEncounterStatus();
+                });
+                return;
+              }
+
               var startNextTurn = await startNewTurn();
 
-              // TODO: if the user cancels, ask if they want to stop the encounter
+              while(!startNextTurn) {
+                if(!context.mounted) return;
+                var continueEncounter = await showDialog<bool>(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) => SimpleDialog(
+                    title: const Text('Terminer la rencontre ?'),
+                    children: [
+                      SimpleDialogOption(
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop(false);
+                        },
+                        child: const Text(
+                          'Oui, terminer la rencontre'
+                        ),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop(true);
+                        },
+                        child: const Text(
+                            'Non, continuer la rencontre'
+                        ),
+                      ),
+                    ],
+                  )
+                );
+                if(!context.mounted) return;
+
+                continueEncounter ??= true;
+                if(!continueEncounter) {
+                  setState(() {
+                    encounter.status = SessionEncounterStatus.finished;
+                    updateEncounterStatus();
+                  });
+                  return;
+                }
+
+                startNextTurn = await startNewTurn();
+              }
 
               setState(() {
                 // no-op but required to trigger a redraw
               });
             },
+          ),
+        if(encounter.status == SessionEncounterStatus.finished)
+          Row(
+            spacing: 8.0,
+            children: [
+              IconButton.filled(
+                onPressed: () async {
+                  setState(() {
+                    widget.map.freeMovementEnabled = true;
+                    widget.session.encounter.value = null;
+                  });
+                },
+                icon: Icon(Icons.stop),
+                padding: const EdgeInsets.all(4.0),
+                constraints: const BoxConstraints(),
+              ),
+              Text(
+                'Terminer la rencontre',
+                style: theme.textTheme.titleLarge!
+                    .copyWith(color: Colors.white),
+              )
+            ],
           ),
       ],
     );

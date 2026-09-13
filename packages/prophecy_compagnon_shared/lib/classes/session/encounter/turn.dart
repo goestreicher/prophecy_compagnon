@@ -15,14 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 
 class SessionEncounterTurn {
   SessionEncounterTurn({
     required this.actions,
-  });
+  })
+  {
+    var ranks = ranksWithActionFilter((SessionEncounterEntityAction a) => true)
+      .toList()
+      ..sort((int a, int b) => b - a);
+    currentRank = ranks.isNotEmpty ? ranks.first : -1;
+
+    Set<String> listenedIds = {};
+    for(var a in actions) {
+      if(listenedIds.contains(a.entity.id)) continue;
+      a.entity.healthStatus.addListener(
+          () => _onEntityHealthStatusChanged(a.entity)
+      );
+      listenedIds.add(a.entity.id);
+    }
+  }
 
   final List<SessionEncounterEntityAction> actions;
+  late int currentRank;
 
   Iterable<SessionEncounterEntityAction> filteredActions(
       bool Function(SessionEncounterEntityAction) filter
@@ -40,4 +57,14 @@ class SessionEncounterTurn {
 
   Iterable<SessionEncounterEntityAction> actionsForRank(int rank) => actions
       .where((SessionEncounterEntityAction a) => a.rank == rank);
+
+  void _onEntityHealthStatusChanged(EntityBase entity) {
+    if(!entity.canAct()) {
+      actions.removeWhere(
+          (SessionEncounterEntityAction a) =>
+              a.entity.id == entity.id
+              && a.rank < currentRank
+      );
+    }
+  }
 }

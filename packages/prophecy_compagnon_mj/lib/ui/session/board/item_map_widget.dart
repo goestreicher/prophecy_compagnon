@@ -53,18 +53,22 @@ class SessionBoardItemMapWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var session = context.read<GameSession>();
 
-    Widget rightSide;
-    if(map.encounter != null) {
-      rightSide = EncounterManagementWidget(
-        session: session,
-        map: map,
-      );
-    }
-    else {
-      rightSide = MapDeploymentWidget(
-        session: session,
-      );
-    }
+    Widget rightSide = ListenableBuilder(
+      listenable: session.encounter,
+      builder: (BuildContext context, Widget? child) {
+        if(session.encounter.value != null) {
+          return EncounterManagementWidget(
+            session: session,
+            map: map,
+          );
+        }
+        else {
+          return MapDeploymentWidget(
+            session: session,
+          );
+        }
+      }
+    );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

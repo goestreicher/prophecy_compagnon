@@ -51,7 +51,6 @@ class TurnManagementWidget extends StatefulWidget {
 
 class _TurnManagementWidgetState extends State<TurnManagementWidget> {
   late StreamSubscription<SessionMessage> subscription;
-  late int rank;
   final List<SessionEncounterEntityAction> actions = <SessionEncounterEntityAction>[];
   final List<SessionEncounterEntityAction> approvedActions = <SessionEncounterEntityAction>[];
   final List<CombatAction> interpolatedActions = <CombatAction>[];
@@ -67,8 +66,6 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
         .where((SessionMessage m) => m is SessionEncounterTurnMessage)
         .listen(onTurnMessage);
 
-
-    rank = getHighestRank();
     setupRank();
   }
 
@@ -92,7 +89,11 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
   }
 
   bool hasInterpolatedActions() =>
-      interpolatedActions.where((CombatAction a) => a.rank == rank).isNotEmpty;
+      interpolatedActions
+          .where(
+            (CombatAction a) => a.rank == widget.turn.currentRank
+          )
+          .isNotEmpty;
 
   void executeRankActions() {
     // TODO: display a dialog to order the approved and interpolated actions execution
@@ -104,7 +105,7 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
       a.stage = SessionEncounterEntityActionStage.executed;
     }
 
-    for(var a in interpolatedActions.where((CombatAction a) => a.rank == rank)) {
+    for(var a in interpolatedActions.where((CombatAction a) => a.rank == widget.turn.currentRank)) {
       executeRankAction(a);
     }
   }
@@ -117,16 +118,16 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
     executeRankActions();
 
     do {
-      rank -= 1;
+      widget.turn.currentRank -= 1;
       setupRank();
 
       // If there are only interpolated actions, execute them now
       if(actions.isEmpty && approvedActions.isEmpty && hasInterpolatedActions()) {
         executeRankActions();
       }
-    } while(actions.isEmpty && rank > 0);
+    } while(actions.isEmpty && widget.turn.currentRank > 0);
 
-    if(rank == 0) {
+    if(widget.turn.currentRank == 0) {
       widget.onTurnFinished();
     }
   }
@@ -135,10 +136,10 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
     activeActionUuid = null;
     actions.clear();
     approvedActions.clear();
-    interpolatedActions.removeWhere((CombatAction a) => a.rank > rank);
+    interpolatedActions.removeWhere((CombatAction a) => a.rank > widget.turn.currentRank);
 
     actions.addAll(
-        widget.turn.actionsForRank(rank)
+        widget.turn.actionsForRank(widget.turn.currentRank)
             .where(
                 (SessionEncounterEntityAction a) =>
                     a.stage == SessionEncounterEntityActionStage.none
@@ -155,7 +156,7 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
         spacing: 8.0,
         children: [
           Text(
-            'Rang $rank',
+            'Rang ${widget.turn.currentRank}',
             style: TextStyle(color: Colors.white),
           ),
           for(var a in actions)
