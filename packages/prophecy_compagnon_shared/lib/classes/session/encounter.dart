@@ -55,6 +55,22 @@ class SessionEncounter with ChangeNotifier {
   }
   SessionEncounterStatus _status;
 
+  void removePlayerCharacter(String id) {
+    characters.removeWhere((PlayerCharacter e) => e.id == id);
+  }
+
+  void removeNpc(String id) {
+    npcs.removeWhere(
+      (EntityInstance e) {
+        if(e.id == id) {
+          EntityInstanceStore().delete(e);
+          return true;
+        }
+        return false;
+      }
+    );
+  }
+
   int get currentTurnNumber => turns.isEmpty ? 0 : turns.length;
 
   SessionEncounterTurn? get currentTurn => turns.isEmpty ? null : turns.last;

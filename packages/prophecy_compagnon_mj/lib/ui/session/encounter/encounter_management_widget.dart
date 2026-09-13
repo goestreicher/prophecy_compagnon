@@ -162,8 +162,8 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
             deployed: deployed,
             showDeployed: false,
             onEntityRemoved: (String id) {
-              encounter.characters.removeWhere((PlayerCharacter p) => p.id == id);
-              encounter.npcs.removeWhere((EntityInstance i) => i.id == id);
+              encounter.removePlayerCharacter(id);
+              encounter.removeNpc(id);
               setState(() {
                 deployed.remove(id);
                 updateEncounterStatus();
