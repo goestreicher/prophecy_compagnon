@@ -20,6 +20,8 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prophecy_compagnon_mj/ui/app_routes.dart';
 import 'package:prophecy_compagnon_mj/ui/main_page.dart';
+import 'package:prophecy_compagnon_shared/classes/session/board/register_board_items.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/register_combat_actions.dart';
 import 'package:prophecy_compagnon_shared/classes/session/register_entity_effects.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/register_store_adapters.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/storage.dart';
@@ -40,6 +42,8 @@ void main() async {
   await DataStorage.instance.init();
   registerStoreAdapters();
   registerEntityEffects();
+  registerCombatActions();
+  registerSessionBoardItems();
   runApp(const ProphecyCompanionApp());
 }
 
