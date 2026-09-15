@@ -48,11 +48,11 @@ class GenericImage {
   String source;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
-    ExportableBinaryData? binary; // TODO: conditionally include this in JSON
+    ExportableBinaryData? binary;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
     int? width;
-  
+
   @JsonKey(includeFromJson: false, includeToJson: false)
     int? height;
 
@@ -95,9 +95,19 @@ class GenericImage {
     return this;
   }
 
-  factory GenericImage.fromJson(Map<String, dynamic> json) =>
-      _$GenericImageFromJson(json);
+  factory GenericImage.fromJson(Map<String, dynamic> json) {
+    var ret = _$GenericImageFromJson(json);
+    if(ret.sourceType == GenericImageSourceType.memory && json['binary'] != null) {
+      ret.binary = ExportableBinaryData.fromJson(json['binary']!);
+    }
+    return ret;
+  }
 
-  Map<String, dynamic> toJson() =>
-      _$GenericImageToJson(this);
+  Map<String, dynamic> toJson() {
+    var ret = _$GenericImageToJson(this);
+    if(sourceType == GenericImageSourceType.memory && binary != null) {
+      ret['binary'] = binary!.toJson();
+    }
+    return ret;
+  }
 }
