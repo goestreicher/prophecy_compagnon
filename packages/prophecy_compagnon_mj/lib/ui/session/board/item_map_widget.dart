@@ -334,7 +334,7 @@ class _MapActionWidgetState extends State<_MapActionWidget> {
             );
           }
         ),
-        if(currentMovement != null)
+        if(currentMovementRequestMessage != null)
           Positioned(
             bottom: 10.0,
             left: 10.0,
@@ -349,7 +349,7 @@ class _MapActionWidgetState extends State<_MapActionWidget> {
                   spacing: 8.0,
                   children: [
                     Text(
-                      'Déplacement : ${(currentMovement!.length / widget.map.background.pixelsPerMeter).toStringAsFixed(2)} m',
+                      'Déplacement : ${((currentMovement?.length ?? 0.0) / widget.map.background.pixelsPerMeter).toStringAsFixed(2)} m',
                       style: TextStyle(
                         color: Colors.white,
                       ),
