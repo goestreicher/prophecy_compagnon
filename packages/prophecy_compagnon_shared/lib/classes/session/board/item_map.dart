@@ -77,7 +77,9 @@ class SessionBoardItemMap extends SessionBoardItem {
         encounter: context.encounter,
       )
       ..transformation = _matrix4FromJson(
-        json['transformation'] as List<double>?,
+        ((json['transformation'] as List<dynamic>?) ?? <dynamic>[])
+          .map((dynamic d) => d as double)
+          .toList(),
       )
       ..freeMovementEnabled = json['free_movement_enabled'] as bool;
 

@@ -67,7 +67,7 @@ class SessionMapEntityItem extends SessionMapItem {
     return SessionMapEntityItem(
       x: json['x'] as double?,
       y: json['y'] as double?,
-      entity: context.entity((json['entityId'] as String))!,
+      entity: context.entity((json['entity_id'] as String))!,
     );
   }
 
@@ -76,7 +76,7 @@ class SessionMapEntityItem extends SessionMapItem {
     return {
       'x': x,
       'y': y,
-      'entityId': entity.id,
+      'entity_id': entity.id,
     };
   }
 

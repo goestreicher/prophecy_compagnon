@@ -126,7 +126,9 @@ class GameSession extends ChangeNotifier {
   EntityEffectManager effectManager;
 
   EntityBase? entity(String id) {
+    print('$id - ${table.players.length}');
     for(var e in table.players) {
+      print('  * ${e.id} <> $id');
       if(e.id == id) return e;
     }
     for(var e in (encounter.value?.npcs ?? <EntityBase>[])) {
@@ -204,19 +206,21 @@ class GameSession extends ChangeNotifier {
       );
     }
 
-    if(json['encounter'] != null) {
-      ret.encounter.value = SessionEncounter.fromJson(
-        json['encounter'],
-        (String id) => ret.entity(id),
+    ret.table.loadPlayers().then((_) {
+      if(json['encounter'] != null) {
+        ret.encounter.value = SessionEncounter.fromJson(
+          json['encounter'],
+              (String id) => ret.entity(id),
+        );
+      }
+
+      var context = SessionContextRetriever(
+        entity: (String id) => ret.entity(id),
+        encounter: ret.encounter.value,
       );
-    }
 
-    var context = SessionContextRetriever(
-      entity: (String id) => ret.entity(id),
-      encounter: ret.encounter.value,
-    );
-
-    ret.board = SessionGameBoard.fromJson(json['board'], context);
+      ret.board = SessionGameBoard.fromJson(json['board'], context);
+    });
 
     return ret;
   }

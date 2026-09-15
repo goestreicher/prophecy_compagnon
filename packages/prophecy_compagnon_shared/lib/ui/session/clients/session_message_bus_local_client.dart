@@ -33,8 +33,6 @@ class SessionCommandBusLocalClient extends SessionMessageBusClient {
 
   @override
   Future<GameSession?> connect() async {
-    var s = await GameSessionStore().get(sessionUuid);
-
     var response = await publishAndWaitForResponse(
       SessionRequestMaster(
         source: uuid,
@@ -44,10 +42,7 @@ class SessionCommandBusLocalClient extends SessionMessageBusClient {
     );
 
     if(response.status == SessionMessageResponseStatus.accepted) {
-      if(s != null) {
-        await s.table.loadPlayers();
-      }
-      session = s;
+      session = await GameSessionStore().get(sessionUuid);
     }
     else {
       // TODO: throw an exception here; custom class?

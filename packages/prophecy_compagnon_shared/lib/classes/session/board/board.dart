@@ -67,8 +67,8 @@ class SessionGameBoard with IterableMixin<SessionBoardItem>, ChangeNotifier {
       SessionContextRetriever context,
   ) {
     return SessionGameBoard(
-      items: (json['items'] as List<Map<String, dynamic>>? ?? <Map<String, dynamic>>[])
-          .map((Map<String, dynamic> m) => SessionBoardItem.fromJson(m, context))
+      items: (json['items'] as List<dynamic>? ?? <dynamic>[])
+          .map((dynamic m) => SessionBoardItem.fromJson(m as Map<String, dynamic>, context))
           .toList(),
       selected: json['selected'],
     );
