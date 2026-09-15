@@ -126,9 +126,7 @@ class GameSession extends ChangeNotifier {
   EntityEffectManager effectManager;
 
   EntityBase? entity(String id) {
-    print('$id - ${table.players.length}');
     for(var e in table.players) {
-      print('  * ${e.id} <> $id');
       if(e.id == id) return e;
     }
     for(var e in (encounter.value?.npcs ?? <EntityBase>[])) {
