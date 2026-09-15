@@ -29,7 +29,6 @@ enum SessionEncounterStatus {
   finished,
 }
 
-// TODO: make this exportable to JSON
 class SessionEncounter with ChangeNotifier {
   SessionEncounter({
     required this.name,
