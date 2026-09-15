@@ -55,6 +55,6 @@ abstract class CombatAction {
   static void registerCombatActionJsonFactory(String name, CombatActionJsonFactory factory) =>
       _combatActionFactories[name] = factory;
 
-  static Map<String, CombatActionJsonFactory> _combatActionFactories =
+  static final Map<String, CombatActionJsonFactory> _combatActionFactories =
       <String, CombatActionJsonFactory>{};
 }

@@ -56,6 +56,6 @@ abstract class EntityEffect {
   static void registerEntityEffectJsonFactory(String name, EntityEffectJsonFactory factory) =>
       _effectFactories[name] = factory;
 
-  static Map<String, EntityEffectJsonFactory> _effectFactories =
+  static final Map<String, EntityEffectJsonFactory> _effectFactories =
       <String, EntityEffectJsonFactory>{};
 }
