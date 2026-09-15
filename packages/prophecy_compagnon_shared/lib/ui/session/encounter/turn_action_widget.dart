@@ -73,7 +73,15 @@ class TurnActionWidget extends StatelessWidget {
       );
     }
     else {
-      if(!isActive) {
+      if(locked) {
+        bottomRow.add(
+          Text(
+            'Planification',
+            style: theme.textTheme.bodySmall,
+          )
+        );
+      }
+      else if(!isActive) {
         bottomRow.add(
           Text(
             'Cliquer pour activer',

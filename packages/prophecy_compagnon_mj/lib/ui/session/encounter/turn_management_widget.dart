@@ -163,6 +163,7 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
             TurnActionWidget(
               action: a,
               isActive: a.uuid == activeActionUuid,
+              locked: a.uuid ==  planningActionUuid,
               onSetActive: () {
                 setState(() {
                   activeActionUuid = a.uuid;
