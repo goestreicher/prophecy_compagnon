@@ -16,21 +16,17 @@
  */
 
 import 'package:material_ui/material_ui.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_description.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/finder.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
-import 'package:prophecy_compagnon_shared/classes/session/entity_effects/health_status.dart';
-import 'package:prophecy_compagnon_shared/ui/entity/pill_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/button_renderer.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/menu_renderer.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/delay_action.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_effect.dart';
 
 class TurnActionWidget extends StatelessWidget {
   const TurnActionWidget({
@@ -170,13 +166,6 @@ class TurnActionWidget extends StatelessWidget {
       }
     }
 
-    var combatStatuses = <String>[];
-    for(var s in EntityCombatStatusFlag.values) {
-      if(action.entity.combatStatus.has(s)) {
-        combatStatuses.add(s.label);
-      }
-    }
-
     var child = InkWell(
       onTap: (isActive || locked) ? null : onSetActive,
       child: Padding(
@@ -184,29 +173,10 @@ class TurnActionWidget extends StatelessWidget {
         child: Column(
           spacing: 8.0,
           children: [
-            Row(
-              spacing: 8.0,
-              children: [
-                EntityPillWidget(
-                  entity: action.entity,
-                  width: 40,
-                  height: 40,
-                ),
-                Column(
-                  children: [
-                    Text(
-                      action.entity.name,
-                      style: theme.textTheme.titleLarge!
-                        .copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    if(combatStatuses.isNotEmpty)
-                      Text(
-                        'Statut de combat : ${combatStatuses.join(", ")}',
-                        style: theme.textTheme.bodySmall,
-                      ),
-                  ],
-                ),
-              ],
+            EntityStatusWidget(
+              entity: action.entity,
+              iconWidth: 40.0,
+              iconHeight: 40.0
             ),
             Row(
               spacing: 8.0,

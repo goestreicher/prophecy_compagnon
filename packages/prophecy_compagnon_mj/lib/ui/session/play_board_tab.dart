@@ -140,7 +140,6 @@ class _PlayBoardSideBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    var session = context.watch<GameSession>();
 
     return ListView.builder(
       itemCount: items.length + 1,
