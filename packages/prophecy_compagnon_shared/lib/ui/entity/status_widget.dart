@@ -17,6 +17,7 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/pill_widget.dart';
@@ -59,7 +60,11 @@ class EntityStatusWidget extends StatelessWidget {
               listenable: entity.healthStatus,
               builder: (BuildContext context, Widget? child) {
                 var healthStatuses = <String>[];
-                // TODO: loop
+                for(var s in EntityHealthStatusFlag.values) {
+                  if(entity.healthStatus.has(s)) {
+                    healthStatuses.add(s.label);
+                  }
+                }
 
                 String healthStatus;
                 if(healthStatuses.isNotEmpty) {
