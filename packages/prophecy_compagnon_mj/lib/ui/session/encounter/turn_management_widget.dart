@@ -20,6 +20,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/encounter/execute_rank_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/turn.dart';
 import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
@@ -34,6 +35,7 @@ import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/sel
 import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/set_combat_action.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_position_status.dart';
 
 class TurnManagementWidget extends StatefulWidget {
   const TurnManagementWidget({
@@ -391,6 +393,35 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
             interpolatedActions.add(
               m.combatAction.lerp(action.rank - i, x)!
             );
+          }
+        }
+      }
+
+      // If the entity has no more actions left, and if there was a movement
+      // action assigned, then reset its position to the one it had at the
+      // start of the turn. The final position will be set during actions
+      // execution.
+      var actionsLeft = actions
+        .where(
+          (SessionEncounterEntityAction a) =>
+            a.entity.id == action.entity.id
+            && (
+                a.stage == SessionEncounterEntityActionStage.none
+                || a.stage == SessionEncounterEntityActionStage.assigned
+            )
+        );
+      if(actionsLeft.isEmpty) {
+        for(var a in interpolatedActions.where((CombatAction a) => a.entityId == action.entity.id)) {
+          if(a is CombatActionMovement) {
+            SessionMessageBusClient.instance?.publish(
+              SessionEntityPositionStatusMessage(
+                mapId: a.mapId,
+                entityId: a.entityId,
+                x: a.path.segments.first.start.dx,
+                y: a.path.segments.first.start.dy,
+              )
+            );
+            break;
           }
         }
       }

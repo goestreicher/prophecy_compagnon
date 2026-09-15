@@ -366,12 +366,6 @@ class _MapActionWidgetState extends State<_MapActionWidget> {
                               )
                             );
 
-                            moveItemTo(
-                              currentMovingItem!,
-                              currentMovement!.segments.first.start.dx,
-                              currentMovement!.segments.first.start.dy,
-                            );
-
                             currentMovementRequestMessage = null;
                           }
                           else {
