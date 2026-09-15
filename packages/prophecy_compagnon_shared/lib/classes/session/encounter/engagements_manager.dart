@@ -20,7 +20,7 @@ import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/string_pair_map_key.dart';
 
 class EngagementsManager {
-  EngagementsManager(List<(String, String, WeaponRange)>? engagements)
+  EngagementsManager({ List<(String, String, WeaponRange)>? engagements })
     : _engagements = <StringPairMapKey, WeaponRange>{}
   {
     for(var rec in engagements ?? []) {
@@ -89,7 +89,7 @@ class EngagementsManager {
       ));
     }
 
-    return EngagementsManager(arg);
+    return EngagementsManager(engagements: arg);
   }
 
   List<List<String>> toJson() {

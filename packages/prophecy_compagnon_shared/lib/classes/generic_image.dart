@@ -48,11 +48,13 @@ class GenericImage {
   String source;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
-  ExportableBinaryData? binary; // TODO: conditionally include this in JSON
+    ExportableBinaryData? binary; // TODO: conditionally include this in JSON
+
   @JsonKey(includeFromJson: false, includeToJson: false)
-  int? width;
+    int? width;
+  
   @JsonKey(includeFromJson: false, includeToJson: false)
-  int? height;
+    int? height;
 
   Future<void> load() async {
     try {

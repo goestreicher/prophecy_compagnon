@@ -25,6 +25,7 @@ import 'package:prophecy_compagnon_shared/classes/session/board/board.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
 import 'package:prophecy_compagnon_shared/classes/session/entity_effect_manager.dart';
 import 'package:prophecy_compagnon_shared/classes/session/event.dart';
+import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/storable.dart';
 import 'package:prophecy_compagnon_shared/classes/table.dart';
 import 'package:uuid/uuid.dart';
@@ -116,17 +117,13 @@ class GameSession extends ChangeNotifier {
   @JsonKey(includeFromJson: false, includeToJson: false)
     late SessionDays sessionDays;
 
-  // TODO: add this to JSON
   @JsonKey(includeFromJson: false, includeToJson: false)
     ValueNotifier<SessionEncounter?> encounter;
 
-  // TODO: add this to JSON
   @JsonKey(includeFromJson: false, includeToJson: false)
     SessionGameBoard board;
 
-  // TODO: add this to JSON
-  @JsonKey(includeFromJson: false, includeToJson: false)
-    EntityEffectManager effectManager;
+  EntityEffectManager effectManager;
 
   EntityBase? entity(String id) {
     for(var e in table.players) {
@@ -207,6 +204,20 @@ class GameSession extends ChangeNotifier {
       );
     }
 
+    if(json['encounter'] != null) {
+      ret.encounter.value = SessionEncounter.fromJson(
+        json['encounter'],
+        (String id) => ret.entity(id),
+      );
+    }
+
+    var context = SessionContextRetriever(
+      entity: (String id) => ret.entity(id),
+      encounter: ret.encounter.value,
+    );
+
+    ret.board = SessionGameBoard.fromJson(json['board'], context);
+
     return ret;
   }
 
@@ -214,6 +225,8 @@ class GameSession extends ChangeNotifier {
     var ret = _$GameSessionToJson(this);
 
     ret['session_days'] = sessionDays.toJson();
+    ret['encounter'] = encounter.value?.toJson();
+    ret['board'] = board.toJson();
 
     return ret;
   }

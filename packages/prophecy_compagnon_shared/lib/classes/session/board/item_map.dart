@@ -24,6 +24,7 @@ import 'package:prophecy_compagnon_shared/classes/place_map.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/item.dart';
+import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 import 'package:prophecy_compagnon_shared/classes/string_pair_map_key.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
 
@@ -31,11 +32,11 @@ class SessionBoardItemMap extends SessionBoardItem {
   SessionBoardItemMap({
     required super.title,
     required this.background,
-    Map<String, SessionMapItem>? items,
+    SessionBoardItemMapItems? items,
     this.encounter,
   })
     : _bgImage = GenericImage.memory(binary: background.exportableBinaryData!),
-      items = SessionBoardItemMapItems(items: items ?? <String, SessionMapItem>{}),
+      items = items ?? SessionBoardItemMapItems(),
       freeMovementEnabled = true
   {
     distances = MapDistances(this.items);
@@ -60,11 +61,44 @@ class SessionBoardItemMap extends SessionBoardItem {
   @override get removable =>
     (encounter == null || encounter!.status == SessionEncounterStatus.finished);
 
+  factory SessionBoardItemMap.fromJson(
+      Map<String, dynamic> json,
+      SessionContextRetriever context
+  ) =>
+      SessionBoardItemMap(
+        title: json['title'] as String,
+        background: PlaceMap.fromJson(
+          json['background'] as Map<String, dynamic>,
+        ),
+        items: SessionBoardItemMapItems.fromJson(
+          ((json['items'] as Map<String, dynamic>?) ?? <String, dynamic>{}),
+          context,
+        ),
+        encounter: context.encounter,
+      )
+      ..transformation = _matrix4FromJson(
+        json['transformation'] as List<double>?,
+      )
+      ..freeMovementEnabled = json['free_movement_enabled'] as bool;
+
   @override
-  Map<String, dynamic> toJson() {
-    // TODO
-    return <String, dynamic>{};
-  }
+  Map<String, dynamic> boardItemToJson() =>
+      <String, dynamic>{
+        'title': title,
+        'background': background.toJson(),
+        'items': items.toJson(),
+        'transformation': _matrix4ToJson(transformation),
+        'free_movement_enabled': freeMovementEnabled,
+      };
+}
+
+vm.Matrix4? _matrix4FromJson(List<double>? l) =>
+    l == null ? null : vm.Matrix4.fromList(l);
+
+List<double> _matrix4ToJson(vm.Matrix4? m) {
+  var ret = List<double>.generate(16, (int i) => 0.0);
+  m?.copyIntoArray(ret);
+  return ret;
 }
 
 class MapDistances {
@@ -127,9 +161,9 @@ class MapDistances {
 
 class SessionBoardItemMapItems with IterableMixin<MapEntry<String, SessionMapItem>>, ChangeNotifier {
   SessionBoardItemMapItems({
-    Map<String, SessionMapItem> items = const <String, SessionMapItem>{}
+    Map<String, SessionMapItem>? items
   })
-    : _items = items;
+    : _items = items ?? <String, SessionMapItem>{};
 
   @override
   Iterator<MapEntry<String, SessionMapItem>> get iterator => _items.entries.iterator;
@@ -147,6 +181,34 @@ class SessionBoardItemMapItems with IterableMixin<MapEntry<String, SessionMapIte
   void operator []=(String k, SessionMapItem v) {
     _items[k] = v;
     notifyListeners();
+  }
+
+  factory SessionBoardItemMapItems.fromJson(
+      Map<String, dynamic> json,
+      SessionContextRetriever context,
+  ) {
+    return SessionBoardItemMapItems(
+      items: Map.fromEntries(
+        json.entries
+          .map(
+            (MapEntry<String, dynamic> e) =>
+              MapEntry<String, SessionMapItem>(
+                e.key,
+                SessionMapItem.fromJson(e.value as Map<String, dynamic>, context)
+              )
+          )
+      )
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return Map.fromEntries(
+      _items.entries
+        .map(
+          (MapEntry<String, SessionMapItem> e) =>
+            MapEntry<String, dynamic>(e.key, e.value.toJson())
+        )
+    );
   }
 
   final Map<String, SessionMapItem> _items;

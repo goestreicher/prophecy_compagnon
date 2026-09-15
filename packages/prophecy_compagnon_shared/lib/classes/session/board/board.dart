@@ -19,9 +19,15 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item.dart';
+import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 
 class SessionGameBoard with IterableMixin<SessionBoardItem>, ChangeNotifier {
-  SessionGameBoard();
+  SessionGameBoard({
+    List<SessionBoardItem>? items,
+    int? selected,
+  })
+    : _board = items ?? <SessionBoardItem>[],
+      _selected = selected;
 
   @override
   Iterator<SessionBoardItem> get iterator =>
@@ -56,5 +62,25 @@ class SessionGameBoard with IterableMixin<SessionBoardItem>, ChangeNotifier {
   }
   int? _selected;
 
-  final List<SessionBoardItem> _board = <SessionBoardItem>[];
+  factory SessionGameBoard.fromJson(
+      Map<String, dynamic> json,
+      SessionContextRetriever context,
+  ) {
+    return SessionGameBoard(
+      items: (json['items'] as List<Map<String, dynamic>>? ?? <Map<String, dynamic>>[])
+          .map((Map<String, dynamic> m) => SessionBoardItem.fromJson(m, context))
+          .toList(),
+      selected: json['selected'],
+    );
+  }
+
+  Map<String, dynamic> toJson() =>
+      {
+        'items': _board
+            .map((SessionBoardItem i) => i.toJson())
+            .toList(),
+        'selected': _selected,
+      };
+
+  final List<SessionBoardItem> _board;
 }

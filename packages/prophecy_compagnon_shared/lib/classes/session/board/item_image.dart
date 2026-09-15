@@ -20,6 +20,7 @@ import 'dart:typed_data';
 import 'package:prophecy_compagnon_shared/classes/exportable_binary_data.dart';
 import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item.dart';
+import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 
 class SessionBoardItemImage extends SessionBoardItem {
   SessionBoardItemImage({
@@ -45,9 +46,21 @@ class SessionBoardItemImage extends SessionBoardItem {
 
   GenericImage content;
 
+  factory SessionBoardItemImage.fromJson(
+      Map<String, dynamic> json,
+      SessionContextRetriever context
+  ) =>
+      SessionBoardItemImage(
+        title: json['title'] as String,
+        removable: json['removable'] as bool? ?? true,
+        content: GenericImage.fromJson(json['content'] as Map<String, dynamic>),
+      );
+
   @override
-  Map<String, dynamic> toJson() {
-    // TODO
-    return <String, dynamic>{};
-  }
+  Map<String, dynamic> boardItemToJson() =>
+      <String, dynamic>{
+        'title': title,
+        'removable': removable,
+        'content': content.toJson(),
+      };
 }

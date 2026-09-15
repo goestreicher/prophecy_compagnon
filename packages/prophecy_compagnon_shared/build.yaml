@@ -23,3 +23,15 @@ builders:
     build_extensions: {"lib/$lib$": ["lib/classes/session/encounter/register_combat_actions.dart"]}
     auto_apply: root_package
     build_to: source
+  register_session_board_items:
+    import: "package:prophecy_compagnon_shared/builders/session_board_items_builder.dart"
+    builder_factories: ["registerSessionBoardItemsBuilder"]
+    build_extensions: {"lib/$lib$": ["lib/classes/session/board/register_board_items.dart"]}
+    auto_apply: root_package
+    build_to: source
+  register_session_map_items:
+    import: "package:prophecy_compagnon_shared/builders/session_map_items_builder.dart"
+    builder_factories: ["registerSessionMapItemsBuilder"]
+    build_extensions: {"lib/$lib$": ["lib/classes/session/map/register_map_items.dart"]}
+    auto_apply: root_package
+    build_to: source

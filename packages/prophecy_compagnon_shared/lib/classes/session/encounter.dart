@@ -16,7 +16,7 @@
  */
 
 import 'package:flutter/foundation.dart';
-import 'package:prophecy_compagnon_shared/classes/combat.dart';
+import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_instance.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/engagements_manager.dart';
@@ -36,11 +36,11 @@ class SessionEncounter with ChangeNotifier {
     required this.characters,
     required this.npcs,
     List<SessionEncounterTurn>? turns,
-    List<(String, String, WeaponRange)>? engagements,
+    EngagementsManager? engagements,
   })
     : _status = SessionEncounterStatus.positioning,
       turns = turns ?? <SessionEncounterTurn>[],
-      engagements = EngagementsManager(engagements);
+      engagements = engagements ?? EngagementsManager();
 
   final String name;
   final List<PlayerCharacter> characters;
@@ -74,4 +74,50 @@ class SessionEncounter with ChangeNotifier {
   int get currentTurnNumber => turns.isEmpty ? 0 : turns.length;
 
   SessionEncounterTurn? get currentTurn => turns.isEmpty ? null : turns.last;
+
+  factory SessionEncounter.fromJson(
+      Map<String, dynamic> json,
+      EntityBase? Function(String) pcRetriever,
+  ) {
+    var characters = <PlayerCharacter>[];
+    for(var id in json['characters'] as List) {
+      var c = pcRetriever(id);
+      if(c != null && c is PlayerCharacter) {
+        characters.add(c);
+      }
+    }
+
+    EngagementsManager? engagements;
+    if(json['engagements'] != null) {
+      engagements = EngagementsManager.fromJson(json['engagements'] as List);
+    }
+
+    var ret = SessionEncounter(
+      name: json['name'],
+      characters: characters,
+      npcs: json['npcs']
+          .map((dynamic e) => EntityInstance.fromJson(e as Map<String, dynamic>)),
+      turns: (json['turns'] as List)
+          .map((dynamic j) => SessionEncounterTurn.fromJson(j as Map<String, dynamic>))
+          .toList(),
+      engagements: engagements,
+    );
+
+    ret.status = SessionEncounterStatus.values.byName(json['status']);
+
+    return ret;
+  }
+
+  Map<String, dynamic> toJson() {
+    var ret = <String, dynamic>{};
+
+    ret['status'] = status.name;
+    ret['name'] = name;
+    ret['characters'] = characters.map((PlayerCharacter e) => e.id);
+    ret['npcs'] = npcs.map((EntityInstance e) => e.toJson());
+    ret['turns'] = turns.map((SessionEncounterTurn t) => t.toJson());
+    ret['engagements'] = engagements.toJson();
+
+    return ret;
+  }
 }
