@@ -15,12 +15,53 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class DiceThrowModifier {
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
+
+abstract class DiceThrowModifier {
   DiceThrowModifier({
+    required this.type,
     required this.label,
     required this.value,
+    this.matcher,
   });
 
+  final DiceThrowModifierType type;
   final String label;
   final int value;
+  final DiceThrowMatcher? matcher;
+
+  String get suffix;
+
+  String get id => '${type.name}.$suffix';
+}
+
+class OneOffDiceThrowModifier extends DiceThrowModifier {
+  OneOffDiceThrowModifier({
+    required super.type,
+    required super.label,
+    required super.value,
+    required this.name,
+  });
+
+  String name;
+
+  @override
+  String get suffix => name;
+}
+
+class EquipmentDiceThrowModifier extends DiceThrowModifier {
+  EquipmentDiceThrowModifier({
+    required super.type,
+    required super.label,
+    required super.value,
+    super.matcher,
+    required this.equipment,
+  });
+
+  final Equipment equipment;
+
+  @override
+  String get suffix => '${equipment.runtimeType.toString()}.${equipment.uuid()}';
 }

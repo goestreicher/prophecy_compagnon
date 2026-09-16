@@ -356,8 +356,8 @@ class InjuryManager {
     return deathCount >= deathLevel.capacity;
   }
 
-  int getMalus() {
-    var malus = 0;
+  Injury? getHighestInjuryLevel() {
+    Injury? highestRank;
     var currentInjuryRanks = _injuries.keys.toList()..sort(
         (Injury a, Injury b) => a.rank - b.rank
     );
@@ -374,11 +374,12 @@ class InjuryManager {
       if(highestLevel == null) {
         throw ArgumentError('Pas de niveau de blessure trouvé pour le rang infligé $highestRank');
       }
-      malus = highestLevel.type.malus;
     }
 
-    return malus;
+    return highestRank;
   }
+
+  int getMalus() => getHighestInjuryLevel()?.malus ?? 0;
 
   Map<String, dynamic> toJson() {
     var levels = <Map<String, dynamic>>[];

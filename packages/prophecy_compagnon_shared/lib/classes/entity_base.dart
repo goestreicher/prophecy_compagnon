@@ -21,6 +21,7 @@ import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/combat.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_favor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
@@ -210,25 +211,46 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
 
   int damageMalus() => injuries.manager.getMalus();
 
+  final Map<String, DiceThrowModifier> _throwModifiers =
+      <String, DiceThrowModifier>{};
+
+  void addThrowModifier(DiceThrowModifier mod) {
+    _throwModifiers[mod.id] = mod;
+  }
+
+  void removeThrowModifier(String id) {
+    _throwModifiers.remove(id);
+  }
+
   List<DiceThrowModifier> throwModifiers(DiceThrowRequest request) {
     var ret = <DiceThrowModifier>[];
 
     if(damageMalus() > 0) {
       ret.add(
-        DiceThrowModifier(
+        OneOffDiceThrowModifier(
+          type: DiceThrowModifierType.damageMalus,
           label: 'Malus de dégâts',
           value: -damageMalus(),
+          name: injuries.manager.getHighestInjuryLevel()!.name,
         )
       );
     }
 
     if(healthStatus.has(EntityHealthStatusFlag.stunned)) {
       ret.add(
-        DiceThrowModifier(
+        OneOffDiceThrowModifier(
+          type: DiceThrowModifierType.healthStatus,
           label: 'Étourdi',
           value: -10,
+          name: EntityHealthStatusFlag.stunned.name,
         )
       );
+    }
+
+    for(var mod in _throwModifiers.values) {
+      if(mod.matcher == null || mod.matcher!.matches(request)) {
+        ret.add(mod);
+      }
     }
 
     // TODO: manage bonuses and temporary effects

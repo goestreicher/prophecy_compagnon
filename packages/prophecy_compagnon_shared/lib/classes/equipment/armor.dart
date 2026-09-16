@@ -16,7 +16,11 @@
  */
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
@@ -265,15 +269,31 @@ class Armor extends EquipableItem implements ProtectionProvider {
     super.alias,
     super.quality,
     super.metal,
-  });
-
-  Armor.create({
-    required super.model,
-    super.alias,
-    super.quality,
-    super.metal,
   })
-    : _uuid = const Uuid().v4().toString();
+  {
+    _diceThrowModifier = EquipmentDiceThrowModifier(
+      type: DiceThrowModifierType.movementPenalty,
+      label: 'Encombrement (${model.name})',
+      value: (model as ArmorModel).penalty,
+      matcher: SkillFamilyDiceThrowMatcher(
+        family: SkillFamily.mouvement,
+      ),
+      equipment: this,
+    );
+  }
+
+  factory Armor.create({
+    required EquipmentModel model,
+    String? alias,
+    EquipmentQuality quality = EquipmentQuality.normal,
+    EquipmentMetal metal = EquipmentMetal.none,
+  }) => Armor(
+          const Uuid().v4().toString(),
+          model: model,
+          alias: alias,
+          quality: quality,
+          metal: metal,
+        );
 
   final String _uuid;
 
@@ -289,6 +309,9 @@ class Armor extends EquipableItem implements ProtectionProvider {
 
     if(owner is EntityBase) {
       owner.addProtectionProvider(this);
+      if((model as ArmorModel).penalty < 0) {
+        owner.addThrowModifier(_diceThrowModifier);
+      }
     }
   }
 
@@ -298,9 +321,12 @@ class Armor extends EquipableItem implements ProtectionProvider {
 
     if(owner is EntityBase) {
       owner.removeProtectionProvider(this);
+      owner.removeThrowModifier(_diceThrowModifier.id);
     }
   }
 
   @override
   int protection() => (model as ArmorModel).protection;
+
+  late final EquipmentDiceThrowModifier _diceThrowModifier;
 }

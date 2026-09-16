@@ -17,8 +17,12 @@
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/combat.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/base.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
@@ -248,15 +252,31 @@ class Shield extends EquipableItem implements ProtectionProvider, DamageProvider
     super.alias,
     super.quality,
     super.metal,
-  });
-
-  Shield.create({
-    required super.model,
-    super.alias,
-    super.quality,
-    super.metal,
   })
-    : _uuid = const Uuid().v4().toString();
+  {
+    _diceThrowModifier = EquipmentDiceThrowModifier(
+      type: DiceThrowModifierType.movementPenalty,
+      label: 'Encombrement (${model.name})',
+      value: (model as ShieldModel).penalty,
+      matcher: SkillFamilyDiceThrowMatcher(
+        family: SkillFamily.mouvement,
+      ),
+      equipment: this,
+    );
+  }
+
+  factory Shield.create({
+    required EquipmentModel model,
+    String? alias,
+    EquipmentQuality quality = EquipmentQuality.normal,
+    EquipmentMetal metal = EquipmentMetal.none,
+  }) => Shield(
+          const Uuid().v4().toString(),
+          model: model,
+          alias: alias,
+          quality: quality,
+          metal: metal,
+        );
 
   final String _uuid;
 
@@ -274,6 +294,10 @@ class Shield extends EquipableItem implements ProtectionProvider, DamageProvider
       owner.addProtectionProvider(this);
       owner.addDamageProvider(WeaponRange.contact, this);
       owner.addDamageProvider(WeaponRange.melee, this);
+
+      if((model as ShieldModel).penalty < 0) {
+        owner.addThrowModifier(_diceThrowModifier);
+      }
     }
   }
 
@@ -284,6 +308,7 @@ class Shield extends EquipableItem implements ProtectionProvider, DamageProvider
     if(owner is EntityBase) {
       owner.removeProtectionProvider(this);
       owner.removeDamageProvider(this);
+      owner.removeThrowModifier(_diceThrowModifier.id);
     }
   }
 
@@ -298,4 +323,6 @@ class Shield extends EquipableItem implements ProtectionProvider, DamageProvider
             : 0,
         throws: throws
       ).toInt();
+
+  late final EquipmentDiceThrowModifier _diceThrowModifier;
 }

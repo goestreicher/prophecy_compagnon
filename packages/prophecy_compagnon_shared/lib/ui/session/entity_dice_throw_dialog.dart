@@ -20,6 +20,7 @@ import 'dart:math';
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
@@ -107,9 +108,11 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
            ) == DiceThrowResultType.criticalSuccess
     ) {
       ret.add(
-        DiceThrowModifier(
+        OneOffDiceThrowModifier(
+          type: DiceThrowModifierType.criticalDiceThrow,
           label: 'Réussite critique',
           value: 5,
+          name: 'success',
         )
       );
     }
