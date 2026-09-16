@@ -665,7 +665,15 @@ class _SingleSkillWidgetState extends State<_SingleSkillWidget> {
     var ageMaxValue = 0;
     switch(model.age!) {
       case PlayerCharacterWizardAge.enfant:
-        ageMaxValue = 6;
+        if(
+            (model.advantages ?? <CharacterAdvantage>[])
+              .any((CharacterAdvantage a) => a.advantage == Advantage.precoce)
+        ) {
+          ageMaxValue = 8;
+        }
+        else {
+          ageMaxValue = 6;
+        }
       case PlayerCharacterWizardAge.adolescent:
         ageMaxValue = 7;
       case PlayerCharacterWizardAge.adulte:
