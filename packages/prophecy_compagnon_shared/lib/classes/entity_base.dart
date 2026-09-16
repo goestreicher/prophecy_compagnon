@@ -179,7 +179,10 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
             ),
           ]);
         }
-        else if(combatStatus.has(EntityCombatStatusFlag.onGround)) {
+        else if(
+            combatStatus.has(EntityCombatStatusFlag.onGround)
+            && !combatStatus.has(EntityCombatStatusFlag.grappled)
+        ) {
           // TODO: create action for the entity to get back up
         }
     }
@@ -231,14 +234,6 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     // TODO: manage bonuses and temporary effects
 
     return ret;
-  }
-
-  int actionMalus() {
-    var malus = damageMalus();
-    if(healthStatus.has(EntityHealthStatusFlag.stunned)) {
-      malus += 10;
-    }
-    return malus;
   }
 
   @override

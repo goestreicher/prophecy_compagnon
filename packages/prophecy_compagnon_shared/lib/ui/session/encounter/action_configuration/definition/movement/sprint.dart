@@ -25,11 +25,12 @@ import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/entity_effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/definition/action_configuration.dart';
+import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
 import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/action/dice_throw_request.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/assign_combat_action.dart';
@@ -39,7 +40,6 @@ import 'package:prophecy_compagnon_shared/ui/session/messages/map/get_movement_p
 import 'package:prophecy_compagnon_shared/ui/session/messages/responses/action/movement_path_result.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_effect.dart';
 
 class ActionConfigurationMovementSprint extends ActionConfiguration {
   ActionConfigurationMovementSprint();
@@ -106,15 +106,26 @@ class ActionConfigurationMovementSprint extends ActionConfiguration {
       // TODO: manage duration
       var evaluation = evaluateDiceThrow(bundle);
       if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
-        messageBus.publish(
-          SessionEntitySetEffectMessage(
-            broadcastIncludesSelf: true,
-            entityId: action.entity.id,
-            effect: EffectSetCombatStatus(
-              status: EntityCombatStatusFlag.onGround,
+        var setResponse = await messageBus.publishAndWaitForResponse(
+          SessionEncounterTurnSetCombatActionMessage(
+            destination: SessionMessage.masterIdentifier,
+            actionUuid: action.uuid,
+            combatAction: CombatActionEffect(
+              entityId: action.entity.id,
+              rank: action.rank,
+              effects: [
+                EffectSetCombatStatus(
+                  status: EntityCombatStatusFlag.onGround,
+                )
+              ]
             )
           )
         );
+
+        if(setResponse.status != SessionMessageResponseStatus.accepted) {
+          // TODO: display a message
+          return;
+        }
 
         return;
       }

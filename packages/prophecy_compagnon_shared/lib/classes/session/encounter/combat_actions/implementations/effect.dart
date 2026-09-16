@@ -15,12 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
+import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
 
-abstract class CombatActionDescription {
-  CombatActionDescription({
-    required this.type,
-  });
+part 'effect.g.dart';
 
-  CombatActionType type;
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class CombatActionEffect extends CombatAction {
+  CombatActionEffect({
+    required super.entityId,
+    required super.rank,
+    required super.effects,
+  })
+    : super(type: CombatActionType.effect);
+
+  factory CombatActionEffect.fromJson(Map<String, dynamic> json) =>
+      _$CombatActionEffectFromJson(json);
+
+  @override
+  Map<String, dynamic> combatActionToJson() =>
+      _$CombatActionEffectToJson(this);
 }

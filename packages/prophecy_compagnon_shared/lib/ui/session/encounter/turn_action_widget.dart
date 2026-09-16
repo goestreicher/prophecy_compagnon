@@ -23,6 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_actio
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/button_renderer.dart';
+import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/instantiate.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/menu_renderer.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/delay_action.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
@@ -164,7 +165,7 @@ class TurnActionWidget extends StatelessWidget {
                   ),
                   ActionConfigurationButtonRenderer(
                     action: action,
-                    actionConfiguration: actionDescription.instantiate(),
+                    actionConfiguration: instantiateActionConfiguration(actionDescription)!,
                   )
                 ],
               )
@@ -222,7 +223,7 @@ class _ActionTypeMenu extends StatelessWidget {
         for(var i in items)
           ActionConfigurationMenuRenderer(
             action: action,
-            actionConfiguration: i.instantiate(),
+            actionConfiguration: instantiateActionConfiguration(i)!,
           ),
       ],
       builder: (BuildContext context, MenuController controller, Widget? child) {

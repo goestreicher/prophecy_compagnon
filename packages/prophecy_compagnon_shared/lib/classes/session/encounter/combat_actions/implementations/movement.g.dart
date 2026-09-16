@@ -33,6 +33,7 @@ const _$CombatActionMovementTypeEnumMap = {
   CombatActionMovementType.simple: 'simple',
   CombatActionMovementType.run: 'run',
   CombatActionMovementType.sprint: 'sprint',
+  CombatActionMovementType.getUp: 'getUp',
 };
 
 CombatActionMovement _$CombatActionMovementFromJson(

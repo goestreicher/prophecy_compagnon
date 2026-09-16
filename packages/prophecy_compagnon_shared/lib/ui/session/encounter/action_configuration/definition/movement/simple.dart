@@ -20,7 +20,7 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actio
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/definition/action_configuration.dart';
+import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/set_combat_action.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/map/get_movement_path.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/responses/action/movement_path_result.dart';
