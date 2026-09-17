@@ -64,6 +64,7 @@ enum Disadvantage {
       )
     ],
   ),
+  // TODO: manage the second part of this disadvantage
   complexeDInferiorite(
     title: "Complexe d'infériorité",
     description: "Désabusé, le personnage ne croit plus guère en ses capacités. Face à une situation particulièrement délicate, il se sentira irrémédiablement faible et incompétent. Ce Désavantage fonctionne de deux manières. Tout d’abord, le personnage reçoit une Difficulté supplémentaire de 5 à tous les jets qu’il tentera au cours d’une situation de crise (empêcher un compagnon de tomber au fond d’un gouffre, atteindre d’une flèche un ennemi sur le point de tuer un compagnon, etc.). Ensuite, le meneur de jeu peut décider que le personnage est tout simplement incapable d'accomplir une action capitale.\nDans ce cas, le personnage gagne automatiquement deux Points d’Expérience et voit ses Points de Chance remonter à leur niveau maximum (bien qu’il soit impossible d’utiliser des Points de Chance pour tenter de réussir cette action). Le Complexe d’infériorité peut disparaître si le personnage réussit une action particulièrement importante pour sa survie ou celle de son groupe.",
@@ -185,7 +186,7 @@ enum Disadvantage {
     requireDetails: true,
     unique: false,
   ),
-  // TODO: manage this capacity
+  // Managed in evaluate_dice_throw.dart:_dispatchGainedLuckProficiencyMessages
   malchance(
     title: 'Malchance',
     description: "Avec ce Désavantage, le personnage s’expose à deux types d’inconvénients. Tout d’abord, il ne regagne qu’un seul Point de Chance (au lieu de 2) lors d’un êchec critique. Ensuite, comme la Malchance se manifeste toujours quand la situation est délicate, le meneur de jeu peut, deux fois par partie, demander au joueur de relancer les dés d’une action réussie. Si ce second jet est raté, le personnage ne regagne bien évidemment aucun Point de Chance…",

@@ -23,6 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/boolean.da
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/request_context.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
@@ -96,6 +97,7 @@ enum Advantage {
     cost: [3],
     type: AdvantageType.general
   ),
+  // Managed in evaluate_dice_throw.dart:_dispatchGainedLuckProficiencyMessages
   chance(
     title: 'Chance',
     description: "Cet Avantage permet au personnage de récupérer un Point de Chance supplémentaire à chaque action ratée (soit 2 pour un échec normal et 3 pour un échec critique).",
@@ -141,7 +143,15 @@ enum Advantage {
     title: 'Confidences',
     description: "Le personnage a la faculté d’inspirer la confiance et de provoquer le dialogue. Cet Avantage donne un bonus de 5 à tous les jets de Communication portant sur des informations que son interlocuteur tient à garder secrètes. Attention : cet Avantage ne permet pas d'obtenir spontanément des informations vitales (position de l’armée ennemie, son appartenance à une secte humaniste ou fataliste, révéler un secret draconique, etc.). Au sein du groupe, les compagnons du personnage auront de plus tendance à se confier à lui et à lui demander conseil en cas de problème.",
     cost: [3],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    throwModifierConfigurations: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 5,
+        alwaysApply: false,
+        matcher: SkillFamilyDiceThrowMatcher(family: SkillFamily.communication),
+      ),
+    ]
   ),
   // TODO: manage this capacity
   corpsAguerri(
@@ -240,7 +250,6 @@ enum Advantage {
     cost: [3],
     type: AdvantageType.general
   ),
-  // TODO: manage this capacity
   resistanceALaMagie(
     title: 'Résistance à la magie',
     description: "Certains humains possèdent une résistance à la magie qui les protège de nombreux effets. Lorsqu’il choisit cet Avantage, le joueur doit décider entre les deux facultés suivantes. Soit il obtient une protection efficace contre tous les sortilèges d’une Sphère précise, auquel cas son jet de résistance bénéficiera d’un bonus de 8, soit une protection moindre mais contre toutes les Sphères, auquel cas le bonus est de 2.\nCette résistance n’influe pas sur les capacités surnaturelles du personnage (Techniques, bénéfices, Faveurs, Privilèges) ou le lancement de ses propres sortilèges. En revanche, cette résistance s'applique à tous les effets de sorts (et uniquement des sorts) lui étant lancés, qu’ils soient bénéfiques ou néfastes.\nCet Avantage ne peut être sélectionné qu’une seule fois.",
@@ -248,6 +257,7 @@ enum Advantage {
     type: AdvantageType.general,
     requireDetails: true,
     detailsGenerator: _resistanceALaMagieGenerator,
+    throwModifierBuilder: _resistanceALaMagieThrowModifierBuilder,
   ),
   salamandre(
     title: "Salamandre",
@@ -270,7 +280,6 @@ enum Advantage {
       )
     ],
   ),
-  // TODO: manage this capacity
   sensAccru(
     title: 'Sens accru',
     description: "L'un des sens du personnage est particulièrement développé. Tous ses jets de perception utilisant ce sens gagnent un bonus de 3.\nCet Avantage peut être choisi plusieurs fois, mais à chaque fois pour un sens différent (vue, ouïe, odorat, goût, toucher).",
@@ -328,7 +337,7 @@ enum Advantage {
     type: AdvantageType.general,
     reservedCastes: [Caste.commercant]
   ),
-  // TODO: manage this capacity
+  // Managed in evaluate_dice_throw.dart:_dispatchGainedLuckProficiencyMessages
   chanceInouie(
     title: 'Chance inouïe',
     description: "La Chance inouïe permet à l’enfant de défier les lois de la probabilité et de réussir miraculeusement les actions qu’il était sur le point de rater. Que son jet soit raté ou réussi, le joueur peut dépenser des Points de Chance pour obtenir des NR (c’est l'exception qui confirme la règle de dépense des Points de Chance).",
@@ -340,8 +349,9 @@ enum Advantage {
     title: 'Empathie naturelle',
     description: "Cet Avantage permet au personnage de “sentir” son environnement comme s’il pouvait établir un contact empathique avec les éléments qui l’entourent. Cette faculté lui permet de ressentir des impressions, des émotions, des peurs. Cet Avantage s'utilise avec un jet de Mental + Empathie contre une Difficulté variable, en fonction de l’action entreprise. Pour ressentir des émotions sur des animaux et des créatures dénuées d'intelligence, la Difficulté est de 10. Sur des êtres intelligents, la Difficulté passe à 15. Le meneur de jeu se réserve le droit de faire effectuer à la cible un jet de Mental + Volonté contre une Difficulté de 15, s’il estime que cette dernière cherche à masquer ses émotions. Ce jet est alors un jet d'opposition.",
     cost: [4],
-    type: AdvantageType.enfant
+    type: AdvantageType.enfant,
   ),
+  // TODO: manage this capacity
   faeGardienne(
       title: 'Faë gardienne',
       description: "L'enfant a attiré l'attention d'une faë qui veille sur lui. Elle ne se révèlera jamais franchement, mais laissera des signes discrets de son attachement. Outre des interventions matérielles mineures (déplacer un petit objet, dérober une épingle à cheveux qui lui plaît…), la faë peut dépenser des points de magie comme des points de Chance en plus de ceux de l'enfant. Ce pouvoir n'est pas automatique et la faë est toujours gérée par le MJ. La faë regagne ses points de magie tous les jours de la Nature ou dans les sites élémentaires.",
@@ -413,14 +423,14 @@ enum Advantage {
       ),
     ],
   ),
-  // TODO: manage this capacity
   habileteReconnue(
     title: 'Habileté reconnue',
     description: "L'apprentissage et l’expérience ont permis au personnage de se forger la maîtrise parfaite d’une certaine catégorie de Compétences. Lorsqu'il choisit cet Avantage, le joueur doit désigner l’un des huit groupes de Compétences (Combat, Manipulation, Théorie, etc.). Pour tous les jets qu’il effectuera avec une Compétence de ce groupe ET l’Attribut Majeur correspondant, il gagnera un bonus de 1 sur son jet. Par exemple : donner un coup d'épée (Physique + Combat), négocier le prix d’un objet (Social + Communication), etc. Ce bonus ne s'applique pas si le jet met en cause un Attribut et une Compétence de catégorie différente (Mental + Combat ou Manuel + Combat, par exemple). Cette Habileté reconnue peut s'appliquer aux Disciplines de magie, auquel cas, chacune se voit gratifiée d’un bonus de 1 au jet.\nCet Avantage ne peut être choisi qu’une seule fois.",
     cost: [5],
     type: AdvantageType.ancien,
     requireDetails: true,
-    detailsGenerator: _habileteReconnueGenerator,
+    detailsGenerator: _skillFamilyGenerator,
+    throwModifierBuilder: _habileteReconnueThrowModifierBuilder,
   ),
   // TODO: manage this capacity
   objetDePredilection(
@@ -438,7 +448,7 @@ enum Advantage {
     type: AdvantageType.ancien,
     requireDetails: true,
     detailsGenerator: _techniquePersonnelleGenerator,
-  )
+  ),
   ;
 
   final String title;
@@ -487,12 +497,14 @@ List<String> _artInterditGenerator() => [
   Skill.mecanismes.title,
 ];
 
-List<String> _habileteReconnueGenerator() => SkillFamily.values
-    .map((SkillFamily f) => f.title)
-    .toList();
+List<String> _skillFamilyGenerator() =>
+    SkillFamily.values
+        .map((SkillFamily f) => f.title)
+        .toList();
 
+final String _resistanceALaMagieAllSpheres = "Toutes les Sphères";
 List<String> _resistanceALaMagieGenerator() => _magicSphereNames()
-    ..add("Toutes les Sphères");
+    ..add(_resistanceALaMagieAllSpheres);
 
 List<String> _techniquePersonnelleGenerator() => Skill.values
     .map((Skill s) => s.title)
@@ -508,4 +520,93 @@ Widget _characterOrFactionAutocompleteWidget(BuildContext context, void Function
       ResourceLinkType.faction
     ]
   );
+}
+
+List<DiceThrowModifier> _resistanceALaMagieThrowModifierBuilder(DiceThrowModifierBuilderArgs args) {
+  /*
+      Certains humains possèdent une résistance à la magie qui les protège de
+      nombreux effets. Lorsqu’il choisit cet Avantage, le joueur doit décider
+      entre les deux facultés suivantes. Soit il obtient une protection efficace
+      contre tous les sortilèges d’une Sphère précise, auquel cas son jet de
+      résistance bénéficiera d’un bonus de 8, soit une protection moindre mais
+      contre toutes les Sphères, auquel cas le bonus est de 2.
+      Cette résistance n’influe pas sur les capacités surnaturelles du
+      personnage (Techniques, bénéfices, Faveurs, Privilèges) ou le lancement de
+      ses propres sortilèges. En revanche, cette résistance s'applique à tous
+      les effets de sorts (et uniquement des sorts) lui étant lancés, qu’ils
+      soient bénéfiques ou néfastes.
+      Cet Avantage ne peut être sélectionné qu’une seule fois.
+   */
+  int value;
+  if(args.details == _resistanceALaMagieAllSpheres) {
+    value = 2;
+  }
+  else {
+    MagicSphere? sphere;
+
+    for (var s in MagicSphere.values) {
+      if (s.title == args.details) {
+        sphere = s;
+      }
+    }
+
+    if(sphere == null) {
+      throw(ArgumentError('Sphère inconnue : "${args.details}"'));
+    }
+
+    value = 8;
+  }
+
+  return [
+    AdvantageDiceThrowModifier(
+      type: DiceThrowModifierType.difficulty,
+      label: 'Résistance à la Magie - ${args.details} (Avantage)',
+      value: value,
+      advantageSuffix: args.suffix,
+      matcher: ThrowRequestContextDiceThrowMatcher(context: DiceThrowRequestContext.resistance),
+    )
+  ];
+}
+
+List<DiceThrowModifier> _habileteReconnueThrowModifierBuilder(DiceThrowModifierBuilderArgs args) {
+  /*
+      L'apprentissage et l’expérience ont permis au personnage de se forger la
+      maîtrise parfaite d’une certaine catégorie de Compétences. Lorsqu'il
+      choisit cet Avantage, le joueur doit désigner l’un des huit groupes de
+      Compétences (Combat, Manipulation, Théorie, etc.). Pour tous les jets
+      qu’il effectuera avec une Compétence de ce groupe ET l’Attribut Majeur
+      correspondant, il gagnera un bonus de 1 sur son jet. Par exemple : donner
+      un coup d'épée (Physique + Combat), négocier le prix d’un objet (Social +
+      Communication), etc. Ce bonus ne s'applique pas si le jet met en cause un
+      Attribut et une Compétence de catégorie différente (Mental + Combat ou
+      Manuel + Combat, par exemple). Cette Habileté reconnue peut s'appliquer
+      aux Disciplines de magie, auquel cas, chacune se voit gratifiée d’un
+      bonus de 1 au jet.
+      Cet Avantage ne peut être choisi qu’une seule fois.
+   */
+  SkillFamily? family;
+  for(var f in SkillFamily.values) {
+    if(f.title == args.details) {
+      family = f;
+    }
+  }
+
+  if(family == null) {
+    throw(ArgumentError('Famille de compétences inconnue : "${args.details}"'));
+  }
+
+  return [
+    DisadvantageDiceThrowModifier(
+      type: DiceThrowModifierType.difficulty,
+      label: 'Habileté reconnue - ${args.details} (Avantage)',
+      value: 1,
+      disadvantageSuffix: args.suffix,
+      matcher: BooleanAndDiceThrowMatcher(
+        children: [
+          SkillFamilyDiceThrowMatcher(family: family),
+          AttributeDiceThrowMatcher(attribute: family.defaultAttribute),
+        ]
+      ),
+    )
+  ];
 }

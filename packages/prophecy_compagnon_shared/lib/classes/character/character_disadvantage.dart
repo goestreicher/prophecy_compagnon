@@ -88,6 +88,9 @@ class CharacterDisadvantages with IterableMixin<CharacterDisadvantage>, ChangeNo
   @override
   Iterator<CharacterDisadvantage> get iterator => _all.iterator;
 
+  bool has(Disadvantage disadvantage) =>
+      _all.any((CharacterDisadvantage d) => d.disadvantage == disadvantage);
+
   void add(CharacterDisadvantage d) {
     _all.add(d);
     notifyListeners();

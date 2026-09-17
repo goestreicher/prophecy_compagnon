@@ -15,11 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
+import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_property_status.dart';
 
@@ -29,12 +32,14 @@ class DiceThrowEvaluation {
     required this.criticalType,
     required this.margin,
     required this.nr,
+    required this.usedLuck,
   });
 
   DiceThrowResultType resultType;
   DiceThrowResultType criticalType;
   int margin;
   int nr;
+  bool usedLuck;
 }
 
 class EntityThrowBundle {
@@ -69,7 +74,12 @@ class EntityThrowBundle {
 
   int _margin(int threshold) => _total - threshold;
 
-  int _nr(int threshold) => _margin(threshold) ~/ 5;
+  int _nr(int threshold) =>
+      (result.luck ?? 0) > 0
+      && entity is HumanCharacter
+      && (entity as HumanCharacter).advantages.has(Advantage.chanceInouie)
+          ? 0
+          : _margin(threshold) ~/ 5;
 }
 
 DiceThrowEvaluation evaluateDiceThrow(
@@ -87,13 +97,13 @@ DiceThrowEvaluation evaluateDiceThrow(
     actorEvaluation.resultType = DiceThrowResultType.success;
   }
   _dispatchUsedLuckProficiencyMessages(actor);
-  _dispatchGainedLuckProficiencyMessages(actorEvaluation, actor.entity.id);
+  _dispatchGainedLuckProficiencyMessages(actorEvaluation, actor.entity);
 
   DiceThrowEvaluation? opposingEvaluation;
   if(opposing != null) {
     opposingEvaluation = _doEvaluation(opposing, actor._total);
     _dispatchUsedLuckProficiencyMessages(opposing);
-    _dispatchGainedLuckProficiencyMessages(opposingEvaluation, opposing.entity.id);
+    _dispatchGainedLuckProficiencyMessages(opposingEvaluation, opposing.entity);
   }
 
   return actorEvaluation;
@@ -126,7 +136,8 @@ DiceThrowEvaluation _doEvaluation(EntityThrowBundle actor, int difficulty) {
     resultType: resultType,
     criticalType: criticalType,
     margin: margin,
-    nr: nr
+    nr: nr,
+    usedLuck: (actor.result.luck ?? 0) > 0,
   );
 }
 
@@ -157,47 +168,53 @@ void _dispatchUsedLuckProficiencyMessages(EntityThrowBundle bundle) {
   }
 }
 
-void _dispatchGainedLuckProficiencyMessages(DiceThrowEvaluation evaluation, String entityId) {
+void _dispatchGainedLuckProficiencyMessages(DiceThrowEvaluation evaluation, EntityBase entity) {
   var messageBus = SessionMessageBusClient.instance;
   if(messageBus == null) return;
 
-  if(evaluation.criticalType == DiceThrowResultType.criticalSuccess) {
-    messageBus.publish(
-      SessionEntitySetPropertyMessage(
-        broadcastIncludesSelf: true,
-        entityId: entityId,
-        property: EntityMessageProperty.gainProficiencyPoints,
-        value: 2,
-      )
-    );
+  var luckGain = 0;
+  var proficiencyGain = 0;
+
+  if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
+    if(entity is HumanCharacter && entity.disadvantages.has(Disadvantage.malchance)) {
+      luckGain = 1;
+    }
+    else {
+      luckGain = 2;
+    }
   }
-  else if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
-    messageBus.publish(
-      SessionEntitySetPropertyMessage(
-        broadcastIncludesSelf: true,
-        entityId: entityId,
-        property: EntityMessageProperty.gainLuckPoints,
-        value: 2,
-      )
-    );
-  }
-  else if(evaluation.resultType == DiceThrowResultType.success) {
-    messageBus.publish(
-      SessionEntitySetPropertyMessage(
-        broadcastIncludesSelf: true,
-        entityId: entityId,
-        property: EntityMessageProperty.gainProficiencyPoints,
-        value: 1,
-      )
-    );
+  else if(evaluation.criticalType == DiceThrowResultType.criticalSuccess) {
+    proficiencyGain = 2;
   }
   else if(evaluation.resultType == DiceThrowResultType.fail) {
+    luckGain = 1;
+  }
+  else if(evaluation.resultType == DiceThrowResultType.success) {
+    proficiencyGain = 1;
+  }
+
+  if(luckGain > 0) {
+    if(entity is HumanCharacter && entity.advantages.has(Advantage.chance)) {
+      luckGain += 1;
+    }
+
     messageBus.publish(
       SessionEntitySetPropertyMessage(
         broadcastIncludesSelf: true,
-        entityId: entityId,
+        entityId: entity.id,
         property: EntityMessageProperty.gainLuckPoints,
-        value: 1,
+        value: luckGain,
+      )
+    );
+  }
+
+  if(proficiencyGain > 0) {
+    messageBus.publish(
+      SessionEntitySetPropertyMessage(
+        broadcastIncludesSelf: true,
+        entityId: entity.id,
+        property: EntityMessageProperty.gainProficiencyPoints,
+        value: proficiencyGain,
       )
     );
   }

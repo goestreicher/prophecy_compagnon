@@ -88,6 +88,9 @@ class CharacterAdvantages with IterableMixin<CharacterAdvantage>, ChangeNotifier
   @override
   Iterator<CharacterAdvantage> get iterator => _all.iterator;
 
+  bool has(Advantage advantage) =>
+      _all.any((CharacterAdvantage a) => a.advantage == advantage);
+
   void add(CharacterAdvantage a) {
     _all.add(a);
     notifyListeners();
