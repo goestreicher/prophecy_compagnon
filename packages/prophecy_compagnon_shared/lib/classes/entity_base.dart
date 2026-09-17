@@ -228,7 +228,8 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     if(damageMalus() > 0) {
       ret.add(
         OneOffDiceThrowModifier(
-          type: DiceThrowModifierType.damageMalus,
+          type: DiceThrowModifierType.malus,
+          family: DiceThrowModifierFamily.damage,
           label: 'Malus de dégâts',
           value: -damageMalus(),
           name: injuries.manager.getHighestInjuryLevel()!.name,
@@ -239,7 +240,8 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     if(healthStatus.has(EntityHealthStatusFlag.stunned)) {
       ret.add(
         OneOffDiceThrowModifier(
-          type: DiceThrowModifierType.healthStatus,
+          type: DiceThrowModifierType.malus,
+          family: DiceThrowModifierFamily.healthStatus,
           label: 'Étourdi',
           value: -10,
           name: EntityHealthStatusFlag.stunned.name,

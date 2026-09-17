@@ -17,13 +17,31 @@
 
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
 
+enum DiceThrowRequestType {
+  simple,
+  opposition,
+  ;
+}
+
+enum DiceThrowRequestContext {
+  none,
+  perception,
+  reaction,
+  resistance,
+  ;
+}
+
 class DiceThrowRequest {
   DiceThrowRequest({
+    required this.type,
+    required this.context,
     this.difficulty,
     required this.base,
     this.allowTendencies = true,
   });
 
+  final DiceThrowRequestType type;
+  final DiceThrowRequestContext context;
   final int? difficulty;
   final bool allowTendencies;
   final DiceThrowEntityBase base;

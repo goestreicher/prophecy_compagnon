@@ -272,7 +272,8 @@ class Armor extends EquipableItem implements ProtectionProvider {
   })
   {
     _diceThrowModifier = EquipmentDiceThrowModifier(
-      type: DiceThrowModifierType.movementPenalty,
+      type: DiceThrowModifierType.malus,
+      family: DiceThrowModifierFamily.movementPenalty,
       label: 'Encombrement (${model.name})',
       value: (model as ArmorModel).penalty,
       matcher: SkillFamilyDiceThrowMatcher(

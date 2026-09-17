@@ -15,21 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/attribute.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 
-abstract class DiceThrowEntityBase {
-  DiceThrowEntityBase();
+class DiceThrowEntityBaseAbility extends DiceThrowEntityAttribute {
+  DiceThrowEntityBaseAbility({
+    required super.attribute,
+    required this.ability,
+  });
 
-  bool canThrow(EntityBase entity) => true;
+  final Ability ability;
 
-  String get label;
-  int value(EntityBase entity);
+  @override
+  String get label => '${attribute.title} + ${ability.title}';
 
-  String baseLabel(EntityBase entity);
-  int baseValue(EntityBase entity);
+  @override
+  String componentLabel(EntityBase entity) => ability.title;
 
-  String componentLabel(EntityBase entity);
-  int componentValue(EntityBase entity);
+  @override
+  int componentValue(EntityBase entity) => entity.abilities[ability];
 
-  int difficultyModifier(EntityBase entity) => 0;
+  @override
+  int value(EntityBase entity) {
+    // TODO: manage bonuses
+    return entity.attributes[attribute] + entity.abilities[ability];
+  }
 }

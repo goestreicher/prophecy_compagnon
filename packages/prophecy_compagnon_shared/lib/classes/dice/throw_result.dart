@@ -16,6 +16,8 @@
  */
 
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 
 enum DiceThrowResultType {
   none(title: "Inconnu (pas de Difficulté)"),
@@ -43,6 +45,7 @@ class DiceThrowResult {
     this.proficiency,
     this.luck,
     this.criticalDie,
+    this.modifiers = const <DiceThrowModifier>[],
   })
   {
     if(!throwImpossible) {
@@ -74,6 +77,7 @@ class DiceThrowResult {
   final int? proficiency;
   final int? luck;
   final int? criticalDie;
+  final List<DiceThrowModifier> modifiers;
 
   int dieResult() {
     int die;
@@ -95,7 +99,17 @@ class DiceThrowResult {
     return die;
   }
 
-  int total() => dieResult() + (proficiency ?? 0) + (luck ?? 0);
+  int total() {
+    var sum = dieResult() + (proficiency ?? 0) + (luck ?? 0);
+
+    for(var m in modifiers) {
+      if(m.type == DiceThrowModifierType.bonus || m.type == DiceThrowModifierType.malus) {
+        sum += m.value;
+      }
+    }
+
+    return sum;
+  }
 
   DiceThrowResultType criticalType(int threshold) {
     if(dieResult() == 1 && criticalDie! > threshold) {

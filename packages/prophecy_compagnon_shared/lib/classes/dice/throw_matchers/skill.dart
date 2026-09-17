@@ -18,16 +18,16 @@
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 
-class SkillFamilyDiceThrowMatcher extends DiceThrowMatcher {
-  const SkillFamilyDiceThrowMatcher({ required this.family });
+class SkillDiceThrowMatcher extends DiceThrowMatcher {
+  const SkillDiceThrowMatcher({ required this.skill });
 
-  final SkillFamily family;
+  final Skill skill;
 
   @override
   bool matches(DiceThrowRequest request) {
     if(request.base is! DiceThrowEntityBaseSkill) return false;
-    return (request.base as DiceThrowEntityBaseSkill).skill?.family == family;
+    return (request.base as DiceThrowEntityBaseSkill).skill == skill;
   }
 }

@@ -24,6 +24,8 @@ import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
 import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/combat.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_favor.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_link.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
@@ -247,6 +249,29 @@ class HumanCharacter extends EntityBase with MagicUser {
   void gainProficiencyPoints(int v) {
     usedProficiency -= v;
     if(usedProficiency < 0) usedProficiency = 0;
+  }
+
+  @override
+  List<DiceThrowModifier> throwModifiers(DiceThrowRequest request) {
+    var ret = super.throwModifiers(request);
+
+    for(var a in advantages) {
+      for(var m in a.advantage.throwModifiers) {
+        if((m.matcher?.matches(request) ?? false)) {
+          ret.add(m);
+        }
+      }
+    }
+
+    for(var d in disadvantages) {
+      for(var m in d.disadvantage.throwModifiers) {
+        if((m.matcher?.matches(request) ?? false)) {
+          ret.add(m);
+        }
+      }
+    }
+
+    return ret;
   }
 
   static bool _staticInitialized = false;

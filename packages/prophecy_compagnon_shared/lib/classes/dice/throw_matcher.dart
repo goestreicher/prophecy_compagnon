@@ -18,7 +18,7 @@
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 
 abstract class DiceThrowMatcher {
-  DiceThrowMatcher();
+  const DiceThrowMatcher();
 
   bool matches(DiceThrowRequest request);
 }

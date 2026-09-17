@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/attribute.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_instance.dart';
@@ -23,7 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/entity/specialized_skill.dart'
 import 'package:prophecy_compagnon_shared/classes/entity/specialized_skill_instance.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 
-class DiceThrowEntityBaseSkill extends DiceThrowEntityBase {
+class DiceThrowEntityBaseSkill extends DiceThrowEntityAttribute {
   DiceThrowEntityBaseSkill({
     required super.attribute,
     this.skill,

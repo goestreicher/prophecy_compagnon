@@ -16,14 +16,18 @@
  */
 
 enum DiceThrowModifierType {
-  /*
-      Bonuses
-   */
+  bonus,
+  malus,
+  difficulty,
+  ;
+}
+
+enum DiceThrowModifierFamily {
+  advantage,
   criticalDiceThrow,
-  /*
-      Maluses
-   */
-  damageMalus,
+  damage,
+  disadvantage,
   healthStatus,
   movementPenalty,
+  ;
 }

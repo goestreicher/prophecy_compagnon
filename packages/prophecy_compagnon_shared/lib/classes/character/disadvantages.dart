@@ -18,6 +18,20 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/interdicts.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/ability.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/attribute.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/boolean.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/magic_skill.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/request_context.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
+import 'package:prophecy_compagnon_shared/classes/magic.dart';
 import 'package:prophecy_compagnon_shared/classes/resource_link/resource_link.dart';
 import 'package:prophecy_compagnon_shared/ui/resource_link_name_autocomplete_widget.dart';
 
@@ -63,12 +77,29 @@ enum Disadvantage {
     cost: [2],
     type: DisadvantageType.commun,
     requireDetails: true,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 3,
+        alwaysApply: false,
+        matcher: AttributeDiceThrowMatcher(
+          attribute: Attribute.social,
+        )
+      )
+    ],
   ),
   complexeDInferiorite(
     title: "Complexe d'infériorité",
     description: "Désabusé, le personnage ne croit plus guère en ses capacités. Face à une situation particulièrement délicate, il se sentira irrémédiablement faible et incompétent. Ce Désavantage fonctionne de deux manières. Tout d’abord, le personnage reçoit une Difficulté supplémentaire de 5 à tous les jets qu’il tentera au cours d’une situation de crise (empêcher un compagnon de tomber au fond d’un gouffre, atteindre d’une flèche un ennemi sur le point de tuer un compagnon, etc.). Ensuite, le meneur de jeu peut décider que le personnage est tout simplement incapable d'accomplir une action capitale.\nDans ce cas, le personnage gagne automatiquement deux Points d’Expérience et voit ses Points de Chance remonter à leur niveau maximum (bien qu’il soit impossible d’utiliser des Points de Chance pour tenter de réussir cette action). Le Complexe d’infériorité peut disparaître si le personnage réussit une action particulièrement importante pour sa survie ou celle de son groupe.",
     cost: [3],
-    type: DisadvantageType.commun
+    type: DisadvantageType.commun,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        alwaysApply: false,
+      )
+    ],
   ),
   curiositeMageVents(
     title: 'Curiosité (Mage des Vents)',
@@ -92,12 +123,28 @@ enum Disadvantage {
     cost: [3],
     type: DisadvantageType.commun,
     requireDetails: true,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        alwaysApply: false,
+      )
+    ],
   ),
+  // TODO: manage the second case with a bonus to the opponent
   emotif(
     title: 'Émotif',
     description: "Certains êtres humains ont une sensibilité tellement développée qu'ils supportent mal les situations de conflit, les visions d'horreur et les périodes de pression intenses. Confronté à une telle situation, le personnage perd son sang-froid et voit la Difficulté de tous ses jets de Volonté augmenter de 5. Les jets d’Intimidation, de Commandement et d’autres actions liées à l’Influence reçoivent un bonus de 2 lorsqu'ils sont employés sur ce personnage.",
     cost: [3],
-    type: DisadvantageType.commun
+    type: DisadvantageType.commun,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        alwaysApply: false,
+        matcher: AbilityDiceThrowMatcher(ability: Ability.volonte)
+      )
+    ],
   ),
   ennemi(
     title: 'Ennemi',
@@ -119,7 +166,16 @@ enum Disadvantage {
     title: 'Fragilité',
     description: "La santé du personnage est mauvaise, tout comme sa faculté de rétablissement, sa résistance aux poisons et son système immunitaire. Tous ses jets de résistance aux agressions extérieures (maladies, poisons, alcool, etc.) voient leur Difficulté augmenter de 5.",
     cost: [2],
-    type: DisadvantageType.commun
+    type: DisadvantageType.commun,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        matcher: ThrowRequestContextDiceThrowMatcher(
+          context: DiceThrowRequestContext.resistance,
+        )
+      )
+    ],
   ),
   instinctSuperieur(
     title: 'Instinct supérieur (Mage des Océans)',
@@ -144,6 +200,7 @@ enum Disadvantage {
     type: DisadvantageType.commun,
     reservedCastes: [Caste.mage]
   ),
+  // TODO: manage this with effects
   maladie(
     title: 'Maladie',
     description: "Le personnage a contracté par le passé une maladie chronique. Elle peut survenir par crise et se soigne difficilement. Les crises surviennent tous les 1D10 jours (le meneur de jeu tiendra le compte en secret). À 1 point, la maladie est bénigne (allergie, urticaire, etc.) et entraîne un malus de -1 pour la demi-journée. À 3 points, la maladie est sérieuse et génante (migraines, vertiges, ulcère, etc.). Elle entraîne un malus de -3 pour 1D10 heures. À 5 points, la mala die est sévère et handicapante (malaria, maladie du sommeil, etc.). Elle entraîne un malus de -5 pour 1D10 heures.\nCe Désavantage peut survenir plusieurs fois.",
@@ -152,12 +209,14 @@ enum Disadvantage {
     requireDetails: true,
     unique: false,
   ),
+  // TODO: manage this capacity
   malchance(
     title: 'Malchance',
     description: "Avec ce Désavantage, le personnage s’expose à deux types d’inconvénients. Tout d’abord, il ne regagne qu’un seul Point de Chance (au lieu de 2) lors d’un êchec critique. Ensuite, comme la Malchance se manifeste toujours quand la situation est délicate, le meneur de jeu peut, deux fois par partie, demander au joueur de relancer les dés d’une action réussie. Si ce second jet est raté, le personnage ne regagne bien évidemment aucun Point de Chance…",
     cost: [3],
     type: DisadvantageType.commun
   ),
+  // TODO: manage this capacity
   maledictionDeKezyr(
     title: 'Malédiction de Kezyr (Mage du Métal)',
     description: "Nenya rend plus difficile aux mages du métal l‘accès à la perfection magique. Lorsqu’un mage du métal obtient un Miracle (par un dé inférieur ou égal à la Sphère mise en oeuvre), il doit relancer une seconde fois ce test pour confirmer son Miracle. Si ce jet n’indique pas également un Miracle, le jet est simplement un 10 sur le dé du Dragon.\nPeut remplacer un Désavantage Commun obligatoire.",
@@ -165,6 +224,7 @@ enum Disadvantage {
     type: DisadvantageType.commun,
     reservedCastes: [Caste.mage]
   ),
+  // TODO: manage this capacity
   maledictionDeNenya(
     title: 'Malédiction de Nenya (Mage du Feu)',
     description: "Inactive chez les autres mages, cette malédiction apparaît durant les premières années de l’enseignement de la magie du feu. Les mages du feu l’ayant contractée sont considérés avec compassion par leurs frères d’armes et révérés pour leur courage à persister dans la Voie du feu. La vengeance de Nenya s’applique en rendant plus difficile leur relation avec les énergies magiques. Toute progression de leur Réserve, d’une Sphère ou d’une Discipline s’effectue comme s’ils possédaient un niveau d’un point supérieur. Passer de 8 à 9 coûte 10, comme s’ils passaient de 9 à 10.\nPeut remplacer un Désavantage Commun obligatoire.",
@@ -202,6 +262,7 @@ enum Disadvantage {
     requireDetails: true,
     unique: false,
   ),
+  // TODO: manage this capacity
   phobie(
     title: 'Phobie',
     description: "Le personnage a peur de quelque chose. Selon le coût du Désavantage, cela peut aller de la simple peur à la panique totale. Pour 1 point, cela peut être une peur liée à un mauvais souvenir ou une gêne passagère (vertige, claustrophobie, etc.). Le personnage subit un malus de -1 à toutes ses actions tant qu’il reste en présence du catalyseur. Pour 3 points, cette peur peut être liée à un environnement particulier (nuit, forêt, etc.) ou à des situations déjà subies par le passé (obscurité, foules, insectes, etc.). Le personnage subit un malus de -3 à toutes ses actions en présence du catalyseur et de -1 pendant une heure après l’avoir quitté. Pour 5 points, cette peur est liée à un traumatisme violent ou une vision récurrente (dragons, magie, etc.). Le personnage subit un malus de -5 à toutes ses actions en présence du catalyseur et de -3 durant une heure après l'avoir quitté du fait de sa panique.\nCe Désavantage ne se surmonte que progressivement. Le personnage retombe au stade inférieur à chaque dépense et ne s’en débarrassera qu’en surmontant le stade à 1.\nCe Désavantage peut survenir plusieurs fois.",
@@ -215,7 +276,22 @@ enum Disadvantage {
     description: "Habitué dès son plus jeune âge aux forêts et à la nature, le personnage se sent mal à l’aise dès qu’il franchit les portes d’une cité. Ce malaise constant se traduit par une phobie, des crises d'angoisse et une Difficulté supplémentaire de 3 à tous les jets de Social et de Magie du personnage.\nPeut remplacer un Désavantage Commun obligatoire.",
     cost: [4],
     type: DisadvantageType.commun,
-    reservedCastes: [Caste.mage]
+    reservedCastes: [Caste.mage],
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 3,
+        alwaysApply: false,
+        matcher: BooleanOrDiceThrowMatcher(
+          children: [
+            AttributeDiceThrowMatcher(attribute: Attribute.social),
+            MagicSkillDiceThrowMatcher(skill: MagicSkill.instinctive),
+            MagicSkillDiceThrowMatcher(skill: MagicSkill.invocatoire),
+            MagicSkillDiceThrowMatcher(skill: MagicSkill.sorcellerie),
+          ]
+        )
+      )
+    ],
   ),
   serment(
     title: 'Serment',
@@ -244,6 +320,7 @@ enum Disadvantage {
     type: DisadvantageType.rare,
     reservedCastes: [Caste.mage]
   ),
+  // TODO: manage this through effects (permanent)
   blessure(
     title: 'Blessure',
     description: "Suite à une bataille, le personnage a subi une blessure qui ne s’est jamais vraiment refermée. Quelles que soient ses valeurs de Résistance et de Volonté, le personnage perd définitivement une case d’égratignure et une case de blessure légère. Aucune tentative de soins, même magiques, ne peut rendre ces cercles perdus à ce personnage.\nCe Désavantage peut survenir plusieurs fois.",
@@ -253,10 +330,17 @@ enum Disadvantage {
   ),
   dependance(
     title: 'Dépendance',
-    description: "Le personnage a l'habitude de consommer une substance (drogue, alcool) qui provoque de cruelles souffrances en cas de manque. La Difficulté de toutes ses actions est alors augmentée de 8. Le meneur de jeu a toute liberté pour rappeler à l’ordre les joueurs qui “oublieraient” de combler leurs besoins.",
+    description: "Le personnage a l'habitude de consommer une substance (drogue, alcool) qui provoque de cruelles souffrances en cas de manque. La Difficulté de toutes ses actions est alors augmentée de 3. Le meneur de jeu a toute liberté pour rappeler à l’ordre les joueurs qui “oublieraient” de combler leurs besoins.",
     cost: [3],
     type: DisadvantageType.rare,
     requireDetails: true,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 3,
+        alwaysApply: false,
+      )
+    ],
   ),
   deviance(
     title: 'Déviance',
@@ -265,12 +349,20 @@ enum Disadvantage {
     type: DisadvantageType.rare,
     requireDetails: true,
   ),
+  // TODO: manage the dice throw to change the difficulty modifier
   echecRare(
     title: 'Échec',
     description: "Comme décrit précédemment (cf. Échec commun) si ce n’est que la Difficulté de tous les jets en rapport sera augmentée de 10. Il est possible d'accorder un jet (et un seul) de Mental + Volonté contre une Difficulté de 15 pour réduire cette augmentation à 5.",
     cost: [5],
     type: DisadvantageType.rare,
     requireDetails: true,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 10,
+        alwaysApply: false,
+      )
+    ],
   ),
   ennemiRare(
     title: 'Ennemi',
@@ -287,6 +379,7 @@ enum Disadvantage {
       cost: [0],
       type: DisadvantageType.rare
   ),
+  // TODO: manage this, depending on the skill families selected
   incompetence(
     title: 'Incompétence',
     description: "Il est parfois nécessaire de faire des sacrifices : ce Désavantage représente l'impasse que le personnage a faite sur une catégorie de Compétences (Combat, Mouvement, Théorie, etc.) au choix du joueur.\nLes Compétences de cette catégorie ne pourront être utilisées qu’avec une Difficulté augmentée de 5, quel que soit le type d'action. De plus, le niveau maximum que peut atteindre le personnage dans les Compétences de cette liste est réduit à 10.\nCe Désavantage peut survenir plusieurs fois, mais forcément pour des catégories de Compétences différentes.",
@@ -295,6 +388,7 @@ enum Disadvantage {
     requireDetails: true,
     unique: false,
   ),
+  // TODO: manage this, depending on the disadvantage level selected
   infirmite(
     title: 'Infirmité',
     description: "Le joueur doit définir le type d’infirmité dont souffre son personnage.\nPour 1 point, il peut s’agir d’un doigt, d’un ou de quelques orteils, d’un bout de narine, etc.\nPour 3 points, il peut s’agir d’un œil, des deux oreilles, d’une main ou d’un pied, etc. Tous les jets impliquant ces membres manquants (Perception, Manipulation) voient leur Difficulté augmenter de 5.\nPour 5 points, il peut s'agir des deux yeux, d’une jambe, d’un bras, de la langue, etc. Toutes les Difficultés des jets en rapport sont augmentées de 10. Dans certains cas, le jet est tout simplement impossible.",
@@ -306,7 +400,14 @@ enum Disadvantage {
     title: 'Maladresse',
     description: "Le personnage est maladroit, tout simplement. Ses jets de Manipulation voient leur Difficulté augmenter de 5. De plus, il lui arrivera très souvent de laisser tomber des objets fragiles, de perdre le contrôle de son arme, de lâcher la corde sur laquelle ses compagnons comptent pour gravir une paroi, etc.\nLe meneur de jeu peut donc utiliser ce Désavantage pour corser des situations ou interpréter des échecs critiques.",
     cost: [2],
-    type: DisadvantageType.rare
+    type: DisadvantageType.rare,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        matcher: SkillFamilyDiceThrowMatcher(family: SkillFamily.manipulation)
+      )
+    ],
   ),
   marqueAuFer(
     title: 'Marqué au fer',
@@ -319,7 +420,19 @@ enum Disadvantage {
     title: 'Mauvais œil',
     description: "Ce Désavantage transforme le personnage en croquemitaine, en monstre de légende qui fait peur aux enfants et inspire la méfiance. Quelque chose d’indéfinissable en lui provoque un mélange de peur, de suspicion et de dégoût. Tous les jets basés sur le relationnel (Communication et Influence) voient leur Difficulté augmenter de 5.\nDe plus, tous les membres du groupe le considéreront comme quelqu'un de “douteux”, à qui il ne faut jamais faire exagérément confiance.",
     cost: [3],
-    type: DisadvantageType.rare
+    type: DisadvantageType.rare,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        matcher: BooleanOrDiceThrowMatcher(
+          children: [
+            SkillFamilyDiceThrowMatcher(family: SkillFamily.communication),
+            SkillFamilyDiceThrowMatcher(family: SkillFamily.influence),
+          ]
+        )
+      )
+    ],
   ),
   personneACharge(
     title: 'Personne à charge',
@@ -337,6 +450,7 @@ enum Disadvantage {
     type: DisadvantageType.rare,
     requireDetails: true,
   ),
+  // TODO: manage this capacity
   traumatismeMental(
     title: 'Traumatisme mental (Mage du Feu)',
     description: "Un mage de Kroryn peut avoir gardé des séquelles mentales de son passage dans un Foyer. Au lieu de combattre ses rêves comme on le lui a enseigné, il les subit complètement. Le plus souvent, il s'agit de cauchemars récurrents, dont l'intensité augmente avec l'utilisation de la magie dans la journée. Un mage qui n'aura pas usé de ses pouvoirs dans la journée n'aura qu'un sommeil agité. Mais un mage qui aura abusé de son don, en utilisant plus de la moitié de ses points de magie dans la même journée, ne pourra fermer l'œil de la nuit et ne récupérera que la moitié des points de sa Réserve de Sphère de Volonté.\nPeut constituer d’office un désavantage Rare supplémentaire.",
@@ -355,7 +469,14 @@ enum Disadvantage {
     title: 'Chétif',
     description: "Le personnage a un petit retard de croissance. La Difficulté de toutes les actions liées à l’Attribut Physique est augmentée de 3.",
     cost: [5],
-    type: DisadvantageType.enfant
+    type: DisadvantageType.enfant,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 3,
+        matcher: AttributeDiceThrowMatcher(attribute: Attribute.physique),
+      )
+    ],
   ),
   curiosite(
     title: 'Curiosité',
@@ -387,6 +508,7 @@ enum Disadvantage {
     cost: [1],
     type: DisadvantageType.enfant
   ),
+  // TODO: manage this, there's not just one dice throw that would match
   naivete(
     title: 'Naïveté',
     description: "À l'inverse de la méfiance, la naïveté pousse le personnage à croire aveuglément tout ce qu'on lui dit, quand bien même on lui présenterait un terrible dragon du feu comme une créature bienveillante et protectrice.\nTous ses jets pour détecter un éventuel mensonge (avec la Compétence Psychologie, par exemple) voient leur Difficulté augmenter de 5.",
@@ -422,7 +544,14 @@ enum Disadvantage {
     title: 'Édenté',
     description: "Le personnage a perdu la majorité de ses dents. Il bafouille et mange ses mots, Il subit un malus de -3 en Communication et ne peut en aucun cas obtenir de Clé parfaite lors du lancement d’un sort utilisant la voix.",
     cost: [3],
-    type: DisadvantageType.ancien
+    type: DisadvantageType.ancien,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.malus,
+        value: -3,
+        matcher: SkillFamilyDiceThrowMatcher(family: SkillFamily.communication),
+      )
+    ],
   ),
   grincheux(
     title: 'Grincheux',
@@ -434,8 +563,16 @@ enum Disadvantage {
     title: 'Impotent',
     description: "Le personnage a de graves difficultés à se mouvoir seul. Il se déplace lentement et la station debout lui est pénible au-delà de quelques heures. Toutes ses actions dépendant de l’Attribut Physique (Combat et Mouvement) voient leurs Difficultés augmentées de 3.\nCe Désavantage ne peut être surmonté.",
     cost: [4],
-    type: DisadvantageType.ancien
+    type: DisadvantageType.ancien,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        matcher: AttributeDiceThrowMatcher(attribute: Attribute.physique),
+      )
+    ],
   ),
+  // TODO: manage this with effects
   maladeImaginaire(
     title: 'Malade imaginaire',
     description: "Le personnage est persuadé de souffrir de diverses afllictions irrégulières et parvient à s’en convaincre. Chaque matin, il jette 1D10 sous sa Volonté. Si son jet est supérieur ou égal à sa Caractéristique, il subit un malus de -1 à toutes ses actions pour la journée à cause de tous les désagréments et douleurs dus à sa “maladie”.",
@@ -452,25 +589,66 @@ enum Disadvantage {
     title: 'Rhumatismes',
     description: "Le personnage souffre de douleurs articulaires et osseuses qui sont déclenchées par l'humidité (marais, caves, pluie, brise matinale, etc.). À ces moments, ses actions dépendant des Attributs Physique et Manuel subissent un malus de -2.",
     cost: [3],
-    type: DisadvantageType.ancien
+    type: DisadvantageType.ancien,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.malus,
+        value: -2,
+        alwaysApply: false,
+        matcher: BooleanOrDiceThrowMatcher(
+          children: [
+            AttributeDiceThrowMatcher(attribute: Attribute.physique),
+            AttributeDiceThrowMatcher(attribute: Attribute.manuel),
+          ]
+        )
+      )
+    ],
   ),
   senile(
     title: 'Sénile',
     description: "Le personnage perd la tête. Il mélange ou oublie parfois des pans entiers de son passé ou de son savoir. Toutes ses actions impliquant la mémoire subissent un malus de -3.",
     cost: [4],
-    type: DisadvantageType.ancien
+    type: DisadvantageType.ancien,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.malus,
+        value: -3,
+        alwaysApply: false,
+        matcher: AttributeDiceThrowMatcher(attribute: Attribute.mental),
+      )
+    ],
   ),
   surdite(
     title: 'Surdité',
     description: "Le vieillard a de graves problèmes auditifs. Il est partiellement sourd et la Difficulté de tous ses jets de Perception auditive est augmentée de 5. Il ne peut guère entendre que ce qu’on lui crie.",
     cost: [3],
-    type: DisadvantageType.ancien
+    type: DisadvantageType.ancien,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        alwaysApply: false,
+        matcher: ThrowRequestContextDiceThrowMatcher(
+          context: DiceThrowRequestContext.perception,
+        )
+      )
+    ],
   ),
   vueDefaillante(
     title: 'Vue défaillante',
     description: "Le vieillard souffre de graves troubles oculaires, dus à son âge et à son état de santé général. La Difficulté de tous ses jets de Perception visuelle est augmentée de 5 et sa vue défaillante rendra pénible la lecture et l'observation prolongées.",
     cost: [2],
-    type: DisadvantageType.ancien
+    type: DisadvantageType.ancien,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        alwaysApply: false,
+        matcher: ThrowRequestContextDiceThrowMatcher(
+          context: DiceThrowRequestContext.perception,
+        )
+      )
+    ],
   )
   ;
 
@@ -481,8 +659,22 @@ enum Disadvantage {
   final bool requireDetails;
   final List<Caste> reservedCastes;
   final bool unique;
+  final List<DiceThrowModifierConfiguration> throwModifiersConfiguration;
   final List<String> Function()? detailsGenerator;
   final Widget Function(BuildContext, void Function(String))? detailsOverlay;
+
+  List<DiceThrowModifier> get throwModifiers => throwModifiersConfiguration
+      .map(
+        (DiceThrowModifierConfiguration cfg) => DisadvantageDiceThrowModifier(
+          type: cfg.type,
+          label: '$title (Désavantage)',
+          value: cfg.value,
+          matcher: cfg.matcher,
+          alwaysApply: cfg.alwaysApply,
+          disadvantage: this,
+        )
+    )
+    .toList();
 
   const Disadvantage({
     required this.title,
@@ -492,6 +684,7 @@ enum Disadvantage {
     this.requireDetails = false,
     this.reservedCastes = const <Caste>[],
     this.unique = true,
+    this.throwModifiersConfiguration = const <DiceThrowModifierConfiguration>[],
     this.detailsGenerator,
     this.detailsOverlay,
   });

@@ -17,6 +17,11 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
@@ -83,7 +88,16 @@ enum Advantage {
     title: 'Agilité',
     description: "Le personnage est particulièrement agile et bénéficie d’un bonus de 2 à toutes ses actions de mouvement : escalader, se déplacer silencieusement, grimper à une corde, etc.",
     cost: [3],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 2,
+        matcher: SkillFamilyDiceThrowMatcher(
+          family: SkillFamily.mouvement,
+        )
+      )
+    ],
   ),
   allie(
     title: 'Allié',
@@ -98,7 +112,8 @@ enum Advantage {
     title: 'Ambidextre',
     description: "Cet Avantage permet au personnage d'utiliser ses deux mains indifféremment. Le fait d’être ambidextre ne permet en aucun cas d'effectuer deux attaques pour un dé d'action.\nLors d’un combat à deux armes, il permettra de réduire le malus lié à la mauvaise main.",
     cost: [3],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    // TODO: add dice throw modifier, depends on how attacks are managed
   ),
   armeDuMaitre(
     title: 'Arme du maître',
@@ -106,6 +121,7 @@ enum Advantage {
     cost: [2],
     type: AdvantageType.general,
     requireDetails: true,
+    // TODO: add dice throw modifier, depends on how attacks are managed
   ),
   augureFavorable(
     title: 'Augure favorable',
@@ -123,7 +139,30 @@ enum Advantage {
     title: 'Charme',
     description: "Le personnage dispose d’un charme naturel qui augmente ses facultés de séduction, de dialogue et de communication. Tous ses jets basés sur le relationnel (Baratin ou Psychologie) bénéficient d’un bonus de 2 et ceux de Séduction d’un bonus de 5.",
     cost: [1],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 2,
+        matcher: SkillDiceThrowMatcher(
+          skill: Skill.baratin,
+        )
+      ),
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 2,
+        matcher: SkillDiceThrowMatcher(
+          skill: Skill.psychologie,
+        )
+      ),
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 5,
+        matcher: SkillDiceThrowMatcher(
+          skill: Skill.seduction,
+        )
+      ),
+    ],
   ),
   codeDeTruands(
     title: 'Code de truands',
@@ -137,12 +176,14 @@ enum Advantage {
     cost: [3],
     type: AdvantageType.general
   ),
+  // TODO: manage this capacity
   corpsAguerri(
     title: 'Corps aguerri',
     description: "Cet Avantage permet au personnage de résister à la douleur et à la fatigue découlant de ses blessures. En réussissant un jet de Mental + Volonté contre une Difficulté de 15, il peut réduire de (1 + NR) points les malus liés à ses Seuils de blessure, et cela pour toute la durée du combat, après quoi ils s'appliquent de nouveau normalement. Ce jet ne s’effectue qu’une fois par combat.",
     cost: [3],
     type: AdvantageType.general
   ),
+  // TODO: manage this capacity
   droiture(
     title: 'Droiture',
     description: "L'honneur et le respect sont des valeurs fondamentales aux yeux du personnage. Ses certitudes sont telles que ses interlocuteurs peuvent sentir sa droiture. La Présence du personnage est augmentée de 2 lors de tous les jets basés sur l'honneur, le courage et le moral.",
@@ -219,6 +260,7 @@ enum Advantage {
     reservedCastes: [Caste.artisan],
     unique: false,
   ),
+  // TODO: manage this capacity
   prestance(
     title: 'Prestance',
     description: "Le prestige du personnage et l’expérience qu’il a acquis donnent à sa parole un poids évident lors des discussions. Chaque fois qu’il tentera une action sociale liée à son charisme, telle que faire aboutir une discussion, exposer un point de vue ou orienter une prise de décision, son Attribut Social sera augmenté de 2.",
@@ -231,6 +273,7 @@ enum Advantage {
     cost: [3],
     type: AdvantageType.general
   ),
+  // TODO: manage this capacity
   resistanceALaMagie(
     title: 'Résistance à la magie',
     description: "Certains humains possèdent une résistance à la magie qui les protège de nombreux effets. Lorsqu’il choisit cet Avantage, le joueur doit décider entre les deux facultés suivantes. Soit il obtient une protection efficace contre tous les sortilèges d’une Sphère précise, auquel cas son jet de résistance bénéficiera d’un bonus de 8, soit une protection moindre mais contre toutes les Sphères, auquel cas le bonus est de 2.\nCette résistance n’influe pas sur les capacités surnaturelles du personnage (Techniques, bénéfices, Faveurs, Privilèges) ou le lancement de ses propres sortilèges. En revanche, cette résistance s'applique à tous les effets de sorts (et uniquement des sorts) lui étant lancés, qu’ils soient bénéfiques ou néfastes.\nCet Avantage ne peut être sélectionné qu’une seule fois.",
@@ -244,12 +287,14 @@ enum Advantage {
     cost: [6],
     type: AdvantageType.general,
   ),
+  // TODO: manage this capacity
   santeDeFer(
     title: 'Santé de fer',
     description: "Cet Avantage confère au personnage une capacité de résistance aux maladies et aux agressions extérieures. Tous ses jets de résistance pour lutter contre les maladies, les poisons ou toutes autres substances nocives bénéficient d’un bonus de 5.\nDe plus, l'organisme du personnage lui permet de mieux bénéficier des soins.\nIl est toujours considéré comme ayant atteint un Seuil de blessure inférieur à celui où il se trouve actuellement pour déterminer la Difficulté du jet de soins.\nPar exemple, si le personnage est en blessure fatale, les soins et les tentatives pour stopper d’éventuelles hémorragies seront effectués comme s’il n’avait atteint que le Seuil de blessures graves.\nCet Avantage n’annule pas les malus liés aux Seuils de blessure.",
     cost: [4],
     type: AdvantageType.general
   ),
+  // TODO: manage this capacity
   sensAccru(
     title: 'Sens accru',
     description: "L'un des sens du personnage est particulièrement développé. Tous ses jets de perception utilisant ce sens gagnent un bonus de 3.\nCet Avantage peut être choisi plusieurs fois, mais à chaque fois pour un sens différent (vue, ouïe, odorat, goût, toucher).",
@@ -263,20 +308,35 @@ enum Advantage {
     title: "Sens de l'orientation",
     description: "Grâce à cet Avantage, le personnage peut toujours se repérer. Il sait avec certitude si certains endroits se trouvent devant, derrière, à gauche ou à droite, vers le nord, le sud, etc. Ceci se traduit par un bonus de 3 à ses jets d’Orientation (en milieu naturel) et de Vie en cité (dans une ville).",
     cost: [1],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    throwModifiersConfiguration: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 3,
+        matcher: SkillDiceThrowMatcher(skill: Skill.orientation),
+      ),
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 3,
+        matcher: SkillDiceThrowMatcher(skill: Skill.vieEnCite),
+      ),
+    ]
   ),
+  // TODO: manage this capacity
   sensEnAlerte(
     title: 'Sens en alerte',
     description: "Cet Avantage permet au personnage d’être toujours en alerte et, lors des combats, de garder une vue d'ensemble des événements, de façon à pouvoir intervenir au meilleur moment.\nAu premier tour de chaque combat, le joueur lance un dé supplémentaire pour déterminer le rang d’Initiative des actions de son personnage - il choisit ensuite les meilleurs résultats, en conservant un nombre de dés égal à son nombre d'actions.",
     cost: [3],
     type: AdvantageType.general
   ),
+  // TODO: manage this capacity
   statutSocial(
     title: 'Statut social',
     description: "Le personnage est connu à l’intérieur de sa caste, quel que soit son Statut. Cet Avantage augmente sa Renommée de 2 points pour toutes les actions liées à l'influence hiérarchique (obtenir des informations, négocier un marché, faire aboutir une demande, demander de l’aide, etc.).",
     cost: [2],
     type: AdvantageType.general
   ),
+  // TODO: manage this capacity
   surprise(
     title: 'Surprise',
     description: "Permet au personnage de gagner un bonus de +5 sur le jet de sa première action d’un tour, ou, au contraire, d’imposer un malus de +5 à la Difficulté du premier jet d’action de son adversaire. Ce Privilège n’est applicable que sur le jet correspondant à la première action du personnage ou de son adversaire - une seule fois par combat, donc. Il peut s’utiliser plusieurs fois sur une même personne, mais toujours seulement une fois par combat (à la première action).",
@@ -284,12 +344,14 @@ enum Advantage {
     type: AdvantageType.general,
     reservedCastes: [Caste.commercant]
   ),
+  // TODO: manage this capacity
   chanceInouie(
     title: 'Chance inouïe',
     description: "La Chance inouïe permet à l’enfant de défier les lois de la probabilité et de réussir miraculeusement les actions qu’il était sur le point de rater. Que son jet soit raté ou réussi, le joueur peut dépenser des Points de Chance pour obtenir des NR (c’est l'exception qui confirme la règle de dépense des Points de Chance).",
     cost: [3],
     type: AdvantageType.enfant
   ),
+  // TODO: manage this capacity
   empathieNaturelle(
     title: 'Empathie naturelle',
     description: "Cet Avantage permet au personnage de “sentir” son environnement comme s’il pouvait établir un contact empathique avec les éléments qui l’entourent. Cette faculté lui permet de ressentir des impressions, des émotions, des peurs. Cet Avantage s'utilise avec un jet de Mental + Empathie contre une Difficulté variable, en fonction de l’action entreprise. Pour ressentir des émotions sur des animaux et des créatures dénuées d'intelligence, la Difficulté est de 10. Sur des êtres intelligents, la Difficulté passe à 15. Le meneur de jeu se réserve le droit de faire effectuer à la cible un jet de Mental + Volonté contre une Difficulté de 15, s’il estime que cette dernière cherche à masquer ses émotions. Ce jet est alors un jet d'opposition.",
@@ -302,12 +364,14 @@ enum Advantage {
       cost: [3],
       type: AdvantageType.enfant
   ),
+  // TODO: manage this capacity
   fetiche(
     title: 'Fétiche',
     description: "Les enfants aiment croire que certains objets qui leur sont chers possèdent des pouvoirs magiques, ainsi qu’une personnalité propre. Tant qu’il porte cet objet sur lui, le personnage voit son Attribut Chance augmenter de 1. Si l’objet est perdu, volé ou détruit, le personnage sombre immédiatement dans une période de morosité qui durera une vingtaine de jours, et durant laquelle le personnage ne pourra plus regagner qu’un seul Point de Chance à chaque action ratée, quel que soit le type d’échec. Il sera également très irritable et aura nettement moins confiance en lui. L'Avantage est définitivement perdu dès la disparition du fétiche, et il est impossible de le remplacer.",
     cost: [1],
     type: AdvantageType.enfant
   ),
+  // TODO: manage this capacity
   instinctProtecteur(
     title: 'Instinct protecteur',
     description: "L'enfant provoque au sein du groupe un instinct de protection. Lorsqu’il est en danger (combat, chute imminente, noyade, etc.), l’un de ses compagnons se porte immanquablement à son secours. Pour ce faire, le sauveur bénéficie d’un bonus de 3 à UNE action destinée à le tirer d'affaire (parer une attaque fatale, rattraper la corde qui glisse, plonger à son secours, etc.) une fois par jour. Le joueur est en droit de réclamer l'assistance d’un des personnages si la situation l’exige. Le meneur de jeu pourra, en dernier recours, désigner un personnage si aucun ne réagit spontanément.",
@@ -328,6 +392,7 @@ enum Advantage {
     requireDetails: true,
     detailsGenerator: _artInterditGenerator,
   ),
+  // TODO: manage this capacity
   conviction(
     title: 'Conviction',
     description: "Cet Avantage permet au personnage de rester de marbre face à des attaques, des tentatives d’intimidation et des situations où ses principes seraient mis en cause. Cet Avantage confère un bonus de 5 à tous les jets de Social et de Volonté basés sur l’intimidation, le chantage ou le harcèlement psychologique.",
@@ -340,6 +405,7 @@ enum Advantage {
     cost: [3],
     type: AdvantageType.ancien
   ),
+  // TODO: manage this capacity
   habileteReconnue(
     title: 'Habileté reconnue',
     description: "L'apprentissage et l’expérience ont permis au personnage de se forger la maîtrise parfaite d’une certaine catégorie de Compétences. Lorsqu'il choisit cet Avantage, le joueur doit désigner l’un des huit groupes de Compétences (Combat, Manipulation, Théorie, etc.). Pour tous les jets qu’il effectuera avec une Compétence de ce groupe ET l’Attribut Majeur correspondant, il gagnera un bonus de 1 sur son jet. Par exemple : donner un coup d'épée (Physique + Combat), négocier le prix d’un objet (Social + Communication), etc. Ce bonus ne s'applique pas si le jet met en cause un Attribut et une Compétence de catégorie différente (Mental + Combat ou Manuel + Combat, par exemple). Cette Habileté reconnue peut s'appliquer aux Disciplines de magie, auquel cas, chacune se voit gratifiée d’un bonus de 1 au jet.\nCet Avantage ne peut être choisi qu’une seule fois.",
@@ -348,6 +414,7 @@ enum Advantage {
     requireDetails: true,
     detailsGenerator: _habileteReconnueGenerator,
   ),
+  // TODO: manage this capacity
   objetDePredilection(
     title: 'Object de prédilection',
     description: "Le personnage possède un objet de prédilection (il ne peut pas s’agir d’une arme). Le personnage gagne un bonus de 2 à chaque fois qu’il utilise cet objet. Si l’objet est perdu, volé ou détruit, le personnage perd définitivement cet Avantage.\nCet Avantage ne peut être choisi qu’une seule fois.",
@@ -355,6 +422,7 @@ enum Advantage {
     type: AdvantageType.ancien,
     requireDetails: true,
   ),
+  // TODO: manage this capacity
   techniquePersonnelle(
     title: 'Technique personnelle',
     description: "Grâce à cet Avantage, le personnage a développé une technique totalement inédite. Cette technique est applicable au combat, à l'artisanat, à la magie, à la diplomatie, etc. Le personnage peut choisir d’utiliser différemment ses Points de Maîtrise. En annonçant AVANT son jet cette dépense, il peut dépenser 3 points pour obtenir un NR automatique qu’il pourra faire valoir si son jet est, bien sûr, réussi. Le personnage peut toujours utiliser ses Points de Maîtrise non utilisés par ce biais de façon conventionnelle. Par exemple, Yhunn, légendaire Maître de la caste des combattants, utilise sa technique personnelle. Son Attribut Physique est de 9, sa Compétence d’Armes tranchantes est de 15 et il a 10 Points de Maîtrise. Son score de base est de 9 + 15 soit 24. La Difficulté est de 15 mais il veut impressionner son adversaire. Il dépense donc 1 Point de Maîtrise pour arriver à 25 et en dépense 9 autres pour obtenir trois NR automatiques. Il obtient un 6 sur son jet de dé. Son score final est de 31. Il obtient ainsi trois NR grâce à son jet auxquels il ajoute les trois NR automatiques. Il arrive à un impressionnant résultat final de six NR.\nCet Avantage ne peut être sélectionné qu'une fois.",
@@ -372,8 +440,22 @@ enum Advantage {
   final bool requireDetails;
   final List<Caste> reservedCastes;
   final bool unique;
+  final List<DiceThrowModifierConfiguration> throwModifiersConfiguration;
   final List<String> Function()? detailsGenerator;
   final Widget Function(BuildContext, void Function(String))? detailsOverlay;
+
+  List<DiceThrowModifier> get throwModifiers => throwModifiersConfiguration
+    .map(
+      (DiceThrowModifierConfiguration cfg) => AdvantageDiceThrowModifier(
+        type: cfg.type,
+        label: '$title (Avantage)',
+        value: cfg.value,
+        matcher: cfg.matcher,
+        alwaysApply: cfg.alwaysApply,
+        advantage: this,
+      )
+    )
+    .toList();
 
   const Advantage({
     required this.title,
@@ -383,6 +465,7 @@ enum Advantage {
     this.requireDetails = false,
     this.reservedCastes = const <Caste>[],
     this.unique = true,
+    this.throwModifiersConfiguration = const <DiceThrowModifierConfiguration>[],
     this.detailsGenerator,
     this.detailsOverlay,
   });

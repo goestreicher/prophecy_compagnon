@@ -255,7 +255,8 @@ class Shield extends EquipableItem implements ProtectionProvider, DamageProvider
   })
   {
     _diceThrowModifier = EquipmentDiceThrowModifier(
-      type: DiceThrowModifierType.movementPenalty,
+      type: DiceThrowModifierType.malus,
+      family: DiceThrowModifierFamily.movementPenalty,
       label: 'Encombrement (${model.name})',
       value: (model as ShieldModel).penalty,
       matcher: SkillFamilyDiceThrowMatcher(

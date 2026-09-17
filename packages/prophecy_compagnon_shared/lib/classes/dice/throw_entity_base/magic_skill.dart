@@ -16,29 +16,35 @@
  */
 
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/magic.dart';
 
-class DiceThrowEntityBaseAbility extends DiceThrowEntityBase {
-  DiceThrowEntityBaseAbility({
-    required super.attribute,
-    required this.ability,
+class DiceThrowEntityBaseMagicSkill extends DiceThrowEntityBase {
+  DiceThrowEntityBaseMagicSkill({
+    required this.skill,
+    required this.sphere,
   });
 
-  final Ability ability;
+  final MagicSkill skill;
+  final MagicSphere sphere;
+
+  // TODO: override canThrow to return false if the character does not have the skill and sphere?
 
   @override
-  String get label => '${attribute.title} + ${ability.title}';
+  String get label => '${skill.title} + ${sphere.title}';
 
   @override
-  String componentLabel(EntityBase entity) => ability.title;
+  int value(EntityBase entity) => baseValue(entity) + componentValue(entity);
 
   @override
-  int componentValue(EntityBase entity) => entity.abilities[ability];
+  String baseLabel(EntityBase entity) => skill.title;
 
   @override
-  int value(EntityBase entity) {
-    // TODO: manage bonuses
-    return entity.attributes[attribute] + entity.abilities[ability];
-  }
+  int baseValue(EntityBase entity) => entity.magic.skills.get(skill);
+
+  @override
+  String componentLabel(EntityBase entity) => sphere.title;
+
+  @override
+  int componentValue(EntityBase entity) => entity.magic.spheres.get(sphere);
 }

@@ -15,19 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 
-class SkillFamilyDiceThrowMatcher extends DiceThrowMatcher {
-  const SkillFamilyDiceThrowMatcher({ required this.family });
+class BooleanOrDiceThrowMatcher extends DiceThrowMatcher {
+  const BooleanOrDiceThrowMatcher({ required this.children });
 
-  final SkillFamily family;
+  final List<DiceThrowMatcher> children;
 
   @override
-  bool matches(DiceThrowRequest request) {
-    if(request.base is! DiceThrowEntityBaseSkill) return false;
-    return (request.base as DiceThrowEntityBaseSkill).skill?.family == family;
-  }
+  bool matches(DiceThrowRequest request) =>
+      children.any((DiceThrowMatcher m) => m.matches(request));
+}
+
+class BooleanAndDiceThrowMatcher extends DiceThrowMatcher {
+  const BooleanAndDiceThrowMatcher({ required this.children });
+
+  final List<DiceThrowMatcher> children;
+
+  @override
+  bool matches(DiceThrowRequest request) =>
+      children.every((DiceThrowMatcher m) => m.matches(request));
 }
