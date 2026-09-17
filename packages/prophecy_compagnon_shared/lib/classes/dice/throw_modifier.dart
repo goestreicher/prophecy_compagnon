@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
-import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
@@ -83,14 +81,14 @@ class AdvantageDiceThrowModifier extends DiceThrowModifier {
     required super.value,
     super.matcher,
     super.alwaysApply,
-    required this.advantage,
+    required this.advantageSuffix,
   })
     : super(family: DiceThrowModifierFamily.advantage);
 
-  final Advantage advantage;
+  final String advantageSuffix;
 
   @override
-  String get suffix => advantage.name;
+  String get suffix => advantageSuffix;
 }
 
 class DisadvantageDiceThrowModifier extends DiceThrowModifier {
@@ -100,12 +98,12 @@ class DisadvantageDiceThrowModifier extends DiceThrowModifier {
     required super.value,
     super.matcher,
     super.alwaysApply,
-    required this.disadvantage,
+    required this.disadvantageSuffix,
   })
     : super(family: DiceThrowModifierFamily.disadvantage);
 
-  final Disadvantage disadvantage;
+  final String disadvantageSuffix;
 
   @override
-  String get suffix => disadvantage.name;
+  String get suffix => disadvantageSuffix;
 }

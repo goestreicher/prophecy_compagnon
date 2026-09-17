@@ -16,18 +16,34 @@
  */
 
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+
+class DiceThrowModifierBuilderArgs {
+  const DiceThrowModifierBuilderArgs({
+    required this.cost,
+    required this.details,
+    required this.suffix,
+  });
+
+  final int cost;
+  final String details;
+  final String suffix;
+}
+
+typedef DiceThrowModifierBuilder =
+    List<DiceThrowModifier> Function(DiceThrowModifierBuilderArgs);
 
 class DiceThrowModifierConfiguration {
   const DiceThrowModifierConfiguration({
     required this.type,
-    required this.value,
+    this.value,
     this.matcher,
     this.alwaysApply = true,
   });
 
   final DiceThrowModifierType type;
-  final int value;
+  final int? value;
   final DiceThrowMatcher? matcher;
   final bool alwaysApply;
 }

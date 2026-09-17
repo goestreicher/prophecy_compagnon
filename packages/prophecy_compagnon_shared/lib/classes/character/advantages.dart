@@ -17,11 +17,17 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/ability.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/attribute.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/boolean.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/request_context.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
@@ -38,45 +44,6 @@ enum AdvantageType {
   const AdvantageType({ required this.title });
 }
 
-List<String> _magicSphereNames() => MagicSphere.values
-    .map((MagicSphere s) => s.title)
-    .toList();
-
-List<String> _senseNames() => [
-    "Vue",
-    "Ouïe",
-    "Goût",
-    "Odorat",
-    "Toucher"
-  ];
-
-List<String> _artInterditGenerator() => [
-    Skill.armesMecaniques.title,
-    Skill.chirurgie.title,
-    Skill.explosifs.title,
-    Skill.mecanismes.title,
-  ];
-
-List<String> _habileteReconnueGenerator() => SkillFamily.values
-    .map((SkillFamily f) => f.title)
-    .toList();
-
-List<String> _techniquePersonnelleGenerator() => Skill.values
-    .map((Skill s) => s.title)
-    .toList();
-
-Widget _characterOrFactionAutocompleteWidget(BuildContext context, void Function(String) onInput) {
-  return resourceLinkNameAutocompleteWidget(
-    context,
-    onInput,
-    [
-      ResourceLinkType.npc,
-      ResourceLinkType.pc,
-      ResourceLinkType.faction
-    ]
-  );
-}
-
 enum Advantage {
   adopteParLAssemblee(
     title: "Adopté par l'Assemblée",
@@ -89,7 +56,7 @@ enum Advantage {
     description: "Le personnage est particulièrement agile et bénéficie d’un bonus de 2 à toutes ses actions de mouvement : escalader, se déplacer silencieusement, grimper à une corde, etc.",
     cost: [3],
     type: AdvantageType.general,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.bonus,
         value: 2,
@@ -140,7 +107,7 @@ enum Advantage {
     description: "Le personnage dispose d’un charme naturel qui augmente ses facultés de séduction, de dialogue et de communication. Tous ses jets basés sur le relationnel (Baratin ou Psychologie) bénéficient d’un bonus de 2 et ceux de Séduction d’un bonus de 5.",
     cost: [1],
     type: AdvantageType.general,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.bonus,
         value: 2,
@@ -280,6 +247,7 @@ enum Advantage {
     cost: [5],
     type: AdvantageType.general,
     requireDetails: true,
+    detailsGenerator: _resistanceALaMagieGenerator,
   ),
   salamandre(
     title: "Salamandre",
@@ -287,12 +255,20 @@ enum Advantage {
     cost: [6],
     type: AdvantageType.general,
   ),
-  // TODO: manage this capacity
+  // TODO: manage the second part about healing throws
   santeDeFer(
     title: 'Santé de fer',
     description: "Cet Avantage confère au personnage une capacité de résistance aux maladies et aux agressions extérieures. Tous ses jets de résistance pour lutter contre les maladies, les poisons ou toutes autres substances nocives bénéficient d’un bonus de 5.\nDe plus, l'organisme du personnage lui permet de mieux bénéficier des soins.\nIl est toujours considéré comme ayant atteint un Seuil de blessure inférieur à celui où il se trouve actuellement pour déterminer la Difficulté du jet de soins.\nPar exemple, si le personnage est en blessure fatale, les soins et les tentatives pour stopper d’éventuelles hémorragies seront effectués comme s’il n’avait atteint que le Seuil de blessures graves.\nCet Avantage n’annule pas les malus liés aux Seuils de blessure.",
     cost: [4],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    throwModifierConfigurations: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 5,
+        alwaysApply: false,
+        matcher: ThrowRequestContextDiceThrowMatcher(context: DiceThrowRequestContext.resistance),
+      )
+    ],
   ),
   // TODO: manage this capacity
   sensAccru(
@@ -303,13 +279,21 @@ enum Advantage {
     requireDetails: true,
     unique: false,
     detailsGenerator: _senseNames,
+    throwModifierConfigurations: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 3,
+        alwaysApply: false,
+        matcher: ThrowRequestContextDiceThrowMatcher(context: DiceThrowRequestContext.perception),
+      )
+    ],
   ),
   sensDeLOrientation(
     title: "Sens de l'orientation",
     description: "Grâce à cet Avantage, le personnage peut toujours se repérer. Il sait avec certitude si certains endroits se trouvent devant, derrière, à gauche ou à droite, vers le nord, le sud, etc. Ceci se traduit par un bonus de 3 à ses jets d’Orientation (en milieu naturel) et de Vie en cité (dans une ville).",
     cost: [1],
     type: AdvantageType.general,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.bonus,
         value: 3,
@@ -392,18 +376,42 @@ enum Advantage {
     requireDetails: true,
     detailsGenerator: _artInterditGenerator,
   ),
-  // TODO: manage this capacity
   conviction(
     title: 'Conviction',
     description: "Cet Avantage permet au personnage de rester de marbre face à des attaques, des tentatives d’intimidation et des situations où ses principes seraient mis en cause. Cet Avantage confère un bonus de 5 à tous les jets de Social et de Volonté basés sur l’intimidation, le chantage ou le harcèlement psychologique.",
     cost: [2],
-    type: AdvantageType.ancien
+    type: AdvantageType.ancien,
+    throwModifierConfigurations: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 5,
+        alwaysApply: false,
+        matcher: BooleanOrDiceThrowMatcher(
+          children: [
+            AttributeDiceThrowMatcher(attribute: Attribute.social),
+            AbilityDiceThrowMatcher(ability: Ability.volonte),
+          ]
+        )
+      )
+    ]
   ),
   culture(
     title: 'Culture',
     description: "Cet Avantage procure au personnage une connaissance restreinte de tous les sujets théoriques auxquels il peut être confronté. Il permet d’obtenir un bonus de 1 à tous les jets de Mental + Compétence de Théorie.",
     cost: [3],
-    type: AdvantageType.ancien
+    type: AdvantageType.ancien,
+    throwModifierConfigurations: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 1,
+        matcher: BooleanAndDiceThrowMatcher(
+          children: [
+            AttributeDiceThrowMatcher(attribute: Attribute.mental),
+            SkillFamilyDiceThrowMatcher(family: SkillFamily.theorie),
+          ],
+        ),
+      ),
+    ],
   ),
   // TODO: manage this capacity
   habileteReconnue(
@@ -440,22 +448,10 @@ enum Advantage {
   final bool requireDetails;
   final List<Caste> reservedCastes;
   final bool unique;
-  final List<DiceThrowModifierConfiguration> throwModifiersConfiguration;
+  final List<DiceThrowModifierConfiguration> throwModifierConfigurations;
+  final DiceThrowModifierBuilder? throwModifierBuilder;
   final List<String> Function()? detailsGenerator;
   final Widget Function(BuildContext, void Function(String))? detailsOverlay;
-
-  List<DiceThrowModifier> get throwModifiers => throwModifiersConfiguration
-    .map(
-      (DiceThrowModifierConfiguration cfg) => AdvantageDiceThrowModifier(
-        type: cfg.type,
-        label: '$title (Avantage)',
-        value: cfg.value,
-        matcher: cfg.matcher,
-        alwaysApply: cfg.alwaysApply,
-        advantage: this,
-      )
-    )
-    .toList();
 
   const Advantage({
     required this.title,
@@ -465,8 +461,51 @@ enum Advantage {
     this.requireDetails = false,
     this.reservedCastes = const <Caste>[],
     this.unique = true,
-    this.throwModifiersConfiguration = const <DiceThrowModifierConfiguration>[],
+    this.throwModifierConfigurations = const <DiceThrowModifierConfiguration>[],
+    this.throwModifierBuilder,
     this.detailsGenerator,
     this.detailsOverlay,
   });
+}
+
+List<String> _magicSphereNames() => MagicSphere.values
+    .map((MagicSphere s) => s.title)
+    .toList();
+
+List<String> _senseNames() => [
+  "Vue",
+  "Ouïe",
+  "Goût",
+  "Odorat",
+  "Toucher"
+];
+
+List<String> _artInterditGenerator() => [
+  Skill.armesMecaniques.title,
+  Skill.chirurgie.title,
+  Skill.explosifs.title,
+  Skill.mecanismes.title,
+];
+
+List<String> _habileteReconnueGenerator() => SkillFamily.values
+    .map((SkillFamily f) => f.title)
+    .toList();
+
+List<String> _resistanceALaMagieGenerator() => _magicSphereNames()
+    ..add("Toutes les Sphères");
+
+List<String> _techniquePersonnelleGenerator() => Skill.values
+    .map((Skill s) => s.title)
+    .toList();
+
+Widget _characterOrFactionAutocompleteWidget(BuildContext context, void Function(String) onInput) {
+  return resourceLinkNameAutocompleteWidget(
+    context,
+    onInput,
+    [
+      ResourceLinkType.npc,
+      ResourceLinkType.pc,
+      ResourceLinkType.faction
+    ]
+  );
 }

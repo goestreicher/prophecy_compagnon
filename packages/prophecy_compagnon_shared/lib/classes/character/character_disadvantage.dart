@@ -20,20 +20,57 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
+import 'package:uuid/uuid.dart';
 
 part 'character_disadvantage.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class CharacterDisadvantage {
   CharacterDisadvantage({
+    String? uuid,
     required this.disadvantage,
     required this.cost,
     required this.details,
-  });
+  })
+    : uuid = uuid ?? Uuid().v4().toString();
 
+  final String uuid;
   final Disadvantage disadvantage;
   final int cost;
   final String details;
+
+  List<DiceThrowModifier> buildThrowModifiers() {
+    var ret = <DiceThrowModifier>[];
+    var disadvantageSuffix = '${disadvantage.name}.$uuid';
+
+    if(disadvantage.throwModifierBuilder != null) {
+      ret.addAll(
+        disadvantage.throwModifierBuilder!(
+          DiceThrowModifierBuilderArgs(
+            cost: cost,
+            details: details,
+            suffix: disadvantageSuffix,
+          )
+        )
+      );
+    }
+    else {
+      for(var cfg in disadvantage.throwModifierConfigurations) {
+        ret.add(
+          DisadvantageDiceThrowModifier(
+            type: cfg.type,
+            label: '${disadvantage.title}${details.isEmpty ? "" : " - $details"} (Désavantage)',
+            value: cfg.value!,
+            disadvantageSuffix: disadvantageSuffix,
+          )
+        );
+      }
+    }
+
+    return ret;
+  }
 
   factory CharacterDisadvantage.fromJson(Map<String, dynamic> json) =>
       _$CharacterDisadvantageFromJson(json);

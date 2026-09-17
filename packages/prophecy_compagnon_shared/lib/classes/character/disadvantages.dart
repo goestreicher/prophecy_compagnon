@@ -46,30 +46,6 @@ enum DisadvantageType {
   const DisadvantageType({ required this.title });
 }
 
-List<String> _interdictsGenerator() {
-  var ret = <String>[];
-  for(var c in Caste.values) {
-    ret.addAll(
-      CasteInterdict.values
-          .where((CasteInterdict i) => i.caste == c)
-          .map((CasteInterdict i) => '${c.title} : ${i.title}')
-    );
-  }
-  return ret;
-}
-
-Widget _characterOrFactionAutocompleteWidget(BuildContext context, void Function(String) onInput) {
-  return resourceLinkNameAutocompleteWidget(
-      context,
-      onInput,
-      [
-        ResourceLinkType.npc,
-        ResourceLinkType.pc,
-        ResourceLinkType.faction
-      ]
-  );
-}
-
 enum Disadvantage {
   anomalie(
     title: 'Anomalie',
@@ -77,7 +53,7 @@ enum Disadvantage {
     cost: [2],
     type: DisadvantageType.commun,
     requireDetails: true,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 3,
@@ -93,7 +69,7 @@ enum Disadvantage {
     description: "Désabusé, le personnage ne croit plus guère en ses capacités. Face à une situation particulièrement délicate, il se sentira irrémédiablement faible et incompétent. Ce Désavantage fonctionne de deux manières. Tout d’abord, le personnage reçoit une Difficulté supplémentaire de 5 à tous les jets qu’il tentera au cours d’une situation de crise (empêcher un compagnon de tomber au fond d’un gouffre, atteindre d’une flèche un ennemi sur le point de tuer un compagnon, etc.). Ensuite, le meneur de jeu peut décider que le personnage est tout simplement incapable d'accomplir une action capitale.\nDans ce cas, le personnage gagne automatiquement deux Points d’Expérience et voit ses Points de Chance remonter à leur niveau maximum (bien qu’il soit impossible d’utiliser des Points de Chance pour tenter de réussir cette action). Le Complexe d’infériorité peut disparaître si le personnage réussit une action particulièrement importante pour sa survie ou celle de son groupe.",
     cost: [3],
     type: DisadvantageType.commun,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 5,
@@ -123,7 +99,7 @@ enum Disadvantage {
     cost: [3],
     type: DisadvantageType.commun,
     requireDetails: true,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 5,
@@ -137,7 +113,7 @@ enum Disadvantage {
     description: "Certains êtres humains ont une sensibilité tellement développée qu'ils supportent mal les situations de conflit, les visions d'horreur et les périodes de pression intenses. Confronté à une telle situation, le personnage perd son sang-froid et voit la Difficulté de tous ses jets de Volonté augmenter de 5. Les jets d’Intimidation, de Commandement et d’autres actions liées à l’Influence reçoivent un bonus de 2 lorsqu'ils sont employés sur ce personnage.",
     cost: [3],
     type: DisadvantageType.commun,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 5,
@@ -167,7 +143,7 @@ enum Disadvantage {
     description: "La santé du personnage est mauvaise, tout comme sa faculté de rétablissement, sa résistance aux poisons et son système immunitaire. Tous ses jets de résistance aux agressions extérieures (maladies, poisons, alcool, etc.) voient leur Difficulté augmenter de 5.",
     cost: [2],
     type: DisadvantageType.commun,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 5,
@@ -277,7 +253,7 @@ enum Disadvantage {
     cost: [4],
     type: DisadvantageType.commun,
     reservedCastes: [Caste.mage],
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 3,
@@ -334,7 +310,7 @@ enum Disadvantage {
     cost: [3],
     type: DisadvantageType.rare,
     requireDetails: true,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 3,
@@ -356,7 +332,7 @@ enum Disadvantage {
     cost: [5],
     type: DisadvantageType.rare,
     requireDetails: true,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 10,
@@ -379,7 +355,6 @@ enum Disadvantage {
       cost: [0],
       type: DisadvantageType.rare
   ),
-  // TODO: manage this, depending on the skill families selected
   incompetence(
     title: 'Incompétence',
     description: "Il est parfois nécessaire de faire des sacrifices : ce Désavantage représente l'impasse que le personnage a faite sur une catégorie de Compétences (Combat, Mouvement, Théorie, etc.) au choix du joueur.\nLes Compétences de cette catégorie ne pourront être utilisées qu’avec une Difficulté augmentée de 5, quel que soit le type d'action. De plus, le niveau maximum que peut atteindre le personnage dans les Compétences de cette liste est réduit à 10.\nCe Désavantage peut survenir plusieurs fois, mais forcément pour des catégories de Compétences différentes.",
@@ -387,21 +362,23 @@ enum Disadvantage {
     type: DisadvantageType.rare,
     requireDetails: true,
     unique: false,
+    detailsGenerator: _skillFamilyGenerator,
+    throwModifierBuilder: _incompetenceThrowModifierBuilder,
   ),
-  // TODO: manage this, depending on the disadvantage level selected
   infirmite(
     title: 'Infirmité',
     description: "Le joueur doit définir le type d’infirmité dont souffre son personnage.\nPour 1 point, il peut s’agir d’un doigt, d’un ou de quelques orteils, d’un bout de narine, etc.\nPour 3 points, il peut s’agir d’un œil, des deux oreilles, d’une main ou d’un pied, etc. Tous les jets impliquant ces membres manquants (Perception, Manipulation) voient leur Difficulté augmenter de 5.\nPour 5 points, il peut s'agir des deux yeux, d’une jambe, d’un bras, de la langue, etc. Toutes les Difficultés des jets en rapport sont augmentées de 10. Dans certains cas, le jet est tout simplement impossible.",
     cost: [1,3,5],
     type: DisadvantageType.rare,
     requireDetails: true,
+    throwModifierBuilder: _infirmiteThrowModifierBuilder,
   ),
   maladresse(
     title: 'Maladresse',
     description: "Le personnage est maladroit, tout simplement. Ses jets de Manipulation voient leur Difficulté augmenter de 5. De plus, il lui arrivera très souvent de laisser tomber des objets fragiles, de perdre le contrôle de son arme, de lâcher la corde sur laquelle ses compagnons comptent pour gravir une paroi, etc.\nLe meneur de jeu peut donc utiliser ce Désavantage pour corser des situations ou interpréter des échecs critiques.",
     cost: [2],
     type: DisadvantageType.rare,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 5,
@@ -421,7 +398,7 @@ enum Disadvantage {
     description: "Ce Désavantage transforme le personnage en croquemitaine, en monstre de légende qui fait peur aux enfants et inspire la méfiance. Quelque chose d’indéfinissable en lui provoque un mélange de peur, de suspicion et de dégoût. Tous les jets basés sur le relationnel (Communication et Influence) voient leur Difficulté augmenter de 5.\nDe plus, tous les membres du groupe le considéreront comme quelqu'un de “douteux”, à qui il ne faut jamais faire exagérément confiance.",
     cost: [3],
     type: DisadvantageType.rare,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 5,
@@ -470,7 +447,7 @@ enum Disadvantage {
     description: "Le personnage a un petit retard de croissance. La Difficulté de toutes les actions liées à l’Attribut Physique est augmentée de 3.",
     cost: [5],
     type: DisadvantageType.enfant,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 3,
@@ -545,7 +522,7 @@ enum Disadvantage {
     description: "Le personnage a perdu la majorité de ses dents. Il bafouille et mange ses mots, Il subit un malus de -3 en Communication et ne peut en aucun cas obtenir de Clé parfaite lors du lancement d’un sort utilisant la voix.",
     cost: [3],
     type: DisadvantageType.ancien,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.malus,
         value: -3,
@@ -564,7 +541,7 @@ enum Disadvantage {
     description: "Le personnage a de graves difficultés à se mouvoir seul. Il se déplace lentement et la station debout lui est pénible au-delà de quelques heures. Toutes ses actions dépendant de l’Attribut Physique (Combat et Mouvement) voient leurs Difficultés augmentées de 3.\nCe Désavantage ne peut être surmonté.",
     cost: [4],
     type: DisadvantageType.ancien,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 5,
@@ -590,7 +567,7 @@ enum Disadvantage {
     description: "Le personnage souffre de douleurs articulaires et osseuses qui sont déclenchées par l'humidité (marais, caves, pluie, brise matinale, etc.). À ces moments, ses actions dépendant des Attributs Physique et Manuel subissent un malus de -2.",
     cost: [3],
     type: DisadvantageType.ancien,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.malus,
         value: -2,
@@ -609,7 +586,7 @@ enum Disadvantage {
     description: "Le personnage perd la tête. Il mélange ou oublie parfois des pans entiers de son passé ou de son savoir. Toutes ses actions impliquant la mémoire subissent un malus de -3.",
     cost: [4],
     type: DisadvantageType.ancien,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.malus,
         value: -3,
@@ -623,7 +600,7 @@ enum Disadvantage {
     description: "Le vieillard a de graves problèmes auditifs. Il est partiellement sourd et la Difficulté de tous ses jets de Perception auditive est augmentée de 5. Il ne peut guère entendre que ce qu’on lui crie.",
     cost: [3],
     type: DisadvantageType.ancien,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 5,
@@ -639,7 +616,7 @@ enum Disadvantage {
     description: "Le vieillard souffre de graves troubles oculaires, dus à son âge et à son état de santé général. La Difficulté de tous ses jets de Perception visuelle est augmentée de 5 et sa vue défaillante rendra pénible la lecture et l'observation prolongées.",
     cost: [2],
     type: DisadvantageType.ancien,
-    throwModifiersConfiguration: [
+    throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
         value: 5,
@@ -659,22 +636,10 @@ enum Disadvantage {
   final bool requireDetails;
   final List<Caste> reservedCastes;
   final bool unique;
-  final List<DiceThrowModifierConfiguration> throwModifiersConfiguration;
+  final List<DiceThrowModifierConfiguration> throwModifierConfigurations;
+  final DiceThrowModifierBuilder? throwModifierBuilder;
   final List<String> Function()? detailsGenerator;
   final Widget Function(BuildContext, void Function(String))? detailsOverlay;
-
-  List<DiceThrowModifier> get throwModifiers => throwModifiersConfiguration
-      .map(
-        (DiceThrowModifierConfiguration cfg) => DisadvantageDiceThrowModifier(
-          type: cfg.type,
-          label: '$title (Désavantage)',
-          value: cfg.value,
-          matcher: cfg.matcher,
-          alwaysApply: cfg.alwaysApply,
-          disadvantage: this,
-        )
-    )
-    .toList();
 
   const Disadvantage({
     required this.title,
@@ -684,8 +649,104 @@ enum Disadvantage {
     this.requireDetails = false,
     this.reservedCastes = const <Caste>[],
     this.unique = true,
-    this.throwModifiersConfiguration = const <DiceThrowModifierConfiguration>[],
+    this.throwModifierConfigurations = const <DiceThrowModifierConfiguration>[],
+    this.throwModifierBuilder,
     this.detailsGenerator,
     this.detailsOverlay,
   });
+}
+
+List<String> _interdictsGenerator() {
+  var ret = <String>[];
+  for(var c in Caste.values) {
+    ret.addAll(
+      CasteInterdict.values
+        .where((CasteInterdict i) => i.caste == c)
+        .map((CasteInterdict i) => '${c.title} : ${i.title}')
+    );
+  }
+  return ret;
+}
+
+Widget _characterOrFactionAutocompleteWidget(BuildContext context, void Function(String) onInput) {
+  return resourceLinkNameAutocompleteWidget(
+    context,
+    onInput,
+    [
+      ResourceLinkType.npc,
+      ResourceLinkType.pc,
+      ResourceLinkType.faction
+    ]
+  );
+}
+
+List<String> _skillFamilyGenerator() =>
+    SkillFamily.values
+      .map((SkillFamily f) => f.title)
+      .toList();
+
+List<DiceThrowModifier> _incompetenceThrowModifierBuilder(DiceThrowModifierBuilderArgs args) {
+  /*
+      Il est parfois nécessaire de faire des sacrifices : ce Désavantage
+      représente l'impasse que le personnage a faite sur une catégorie de
+      Compétences (Combat, Mouvement, Théorie, etc.) au choix du joueur.
+      Les Compétences de cette catégorie ne pourront être utilisées qu’avec une
+      Difficulté augmentée de 5, quel que soit le type d'action. De plus, le
+      niveau maximum que peut atteindre le personnage dans les Compétences de
+      cette liste est réduit à 10.\nCe Désavantage peut survenir plusieurs fois,
+      mais forcément pour des catégories de Compétences différentes.
+   */
+  SkillFamily? family;
+  for(var f in SkillFamily.values) {
+    if(f.title == args.details) {
+      family = f;
+    }
+  }
+
+  if(family == null) {
+    throw(ArgumentError('Famille de compétences inconnue : "${args.details}"'));
+  }
+
+  return [
+    DisadvantageDiceThrowModifier(
+      type: DiceThrowModifierType.difficulty,
+      label: 'Incompétence - ${args.details} (Désavantage)',
+      value: 5,
+      disadvantageSuffix: args.suffix,
+      matcher: SkillFamilyDiceThrowMatcher(family: family),
+    )
+  ];
+}
+
+List<DiceThrowModifier> _infirmiteThrowModifierBuilder(DiceThrowModifierBuilderArgs args) {
+  /*
+      Le joueur doit définir le type d’infirmité dont souffre son personnage.
+      Pour 1 point, il peut s’agir d’un doigt, d’un ou de quelques orteils, d’un
+      bout de narine, etc.
+      Pour 3 points, il peut s’agir d’un œil, des deux oreilles, d’une main ou
+      d’un pied, etc. Tous les jets impliquant ces membres manquants
+      (Perception, Manipulation) voient leur Difficulté augmenter de 5.
+      Pour 5 points, il peut s'agir des deux yeux, d’une jambe, d’un bras, de la
+      langue, etc. Toutes les Difficultés des jets en rapport sont augmentées de
+      10. Dans certains cas, le jet est tout simplement impossible.
+   */
+  int finalDifficulty;
+  if(args.cost == 1) {
+    finalDifficulty = 1;
+  }
+  else if(args.cost == 3) {
+    finalDifficulty = 5;
+  }
+  else {
+    finalDifficulty = 10;
+  }
+
+  return [
+    DisadvantageDiceThrowModifier(
+      type: DiceThrowModifierType.difficulty,
+      label: 'Infirmité - ${args.details} (Désavantage)',
+      value: finalDifficulty,
+      disadvantageSuffix: args.suffix,
+    )
+  ];
 }
