@@ -47,6 +47,9 @@ import 'package:prophecy_compagnon_shared/utils/text_utils.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
 
+import 'character/character_advantage.dart';
+import 'character/character_disadvantage.dart';
+
 part 'non_player_character.g.dart';
 
 class NonPlayerCharacterSummaryStore extends JsonStoreAdapter<NonPlayerCharacterSummary> {

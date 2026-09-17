@@ -18,7 +18,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
 import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
-import 'package:prophecy_compagnon_shared/classes/human_character.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_advantage.dart';
 import 'package:prophecy_compagnon_shared/ui/character/background/advantage_select_widget.dart';
 
 class AdvantagePickerDialog extends StatefulWidget {

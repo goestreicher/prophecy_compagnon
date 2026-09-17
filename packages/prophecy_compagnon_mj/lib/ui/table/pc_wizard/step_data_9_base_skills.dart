@@ -24,11 +24,11 @@ import 'package:prophecy_compagnon_mj/ui/table/pc_wizard/utils.dart';
 import 'package:prophecy_compagnon_shared/classes/calendar.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
 import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_advantage.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/shield.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/weapon.dart';
-import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
 import 'package:provider/provider.dart';
 

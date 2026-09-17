@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
@@ -46,6 +48,15 @@ class EntityThrowBundle {
   final DiceThrowRequest request;
   final DiceThrowResult result;
 
+  int? get _difficulty {
+    if(request.difficulty == null) return null;
+    var modSum = result.modifiers
+        .where((DiceThrowModifier m) => m.type == DiceThrowModifierType.difficulty)
+        .map((DiceThrowModifier m) => m.value)
+        .reduce((int a, int b) => a + b);
+    return request.difficulty! + modSum;
+  }
+
   int get _total {
     var sum = request.base.value(entity) + result.total();
 
@@ -71,7 +82,7 @@ DiceThrowEvaluation evaluateDiceThrow(
     throw(ArgumentError('One of "difficulty" or "opposing" must be set'));
   }
 
-  var actorEvaluation = _doEvaluation(actor, actor.request.difficulty ?? opposing!._total);
+  var actorEvaluation = _doEvaluation(actor, actor._difficulty ?? opposing!._total);
   if(opposing == null && actorEvaluation.resultType == DiceThrowResultType.none) {
     actorEvaluation.resultType = DiceThrowResultType.success;
   }

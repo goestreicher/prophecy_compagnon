@@ -20,7 +20,8 @@ import 'package:prophecy_compagnon_mj/ui/table/pc_wizard/enums.dart';
 import 'package:prophecy_compagnon_mj/ui/table/pc_wizard/model.dart';
 import 'package:prophecy_compagnon_mj/ui/table/pc_wizard/step_data.dart';
 import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
-import 'package:prophecy_compagnon_shared/classes/human_character.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_advantage.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_disadvantage.dart';
 import 'package:prophecy_compagnon_shared/ui/character/background/advantage_picker_dialog.dart';
 import 'package:provider/provider.dart';
 

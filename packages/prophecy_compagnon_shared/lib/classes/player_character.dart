@@ -18,6 +18,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/calendar.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/character_caste.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_advantage.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_disadvantage.dart';
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_favor.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_link.dart';

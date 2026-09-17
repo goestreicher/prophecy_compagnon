@@ -15,13 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:collection';
 
-import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/character_caste.dart';
-import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
-import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_advantage.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_disadvantage.dart';
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/combat.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
@@ -51,96 +49,6 @@ import 'package:prophecy_compagnon_shared/classes/object_source.dart';
 import 'package:prophecy_compagnon_shared/classes/place.dart';
 
 part 'human_character.g.dart';
-
-@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class CharacterDisadvantage {
-  CharacterDisadvantage({
-    required this.disadvantage,
-    required this.cost,
-    required this.details,
-  });
-
-  final Disadvantage disadvantage;
-  final int cost;
-  final String details;
-
-  factory CharacterDisadvantage.fromJson(Map<String, dynamic> json) => _$CharacterDisadvantageFromJson(json);
-  Map<String, dynamic> toJson() => _$CharacterDisadvantageToJson(this);
-}
-
-class CharacterDisadvantages with IterableMixin<CharacterDisadvantage>, ChangeNotifier {
-  CharacterDisadvantages(List<CharacterDisadvantage>? d)
-    : _all = d ?? <CharacterDisadvantage>[];
-
-  @override
-  Iterator<CharacterDisadvantage> get iterator => _all.iterator;
-
-  void add(CharacterDisadvantage d) {
-    _all.add(d);
-    notifyListeners();
-  }
-
-  void remove(CharacterDisadvantage d) {
-    if(_all.remove(d)) notifyListeners();
-  }
-
-  static CharacterDisadvantages fromJson(List<dynamic>? json) =>
-      CharacterDisadvantages(
-        json?.map<CharacterDisadvantage>(
-          (d) => CharacterDisadvantage.fromJson(d as Map<String, dynamic>)
-        ).toList()
-      );
-
-  static List<Map<String, dynamic>> toJson(CharacterDisadvantages all) =>
-      all.map((CharacterDisadvantage d) => d.toJson()).toList();
-
-  final List<CharacterDisadvantage> _all;
-}
-
-@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class CharacterAdvantage {
-  CharacterAdvantage({
-    required this.advantage,
-    required this.cost,
-    required this.details,
-  });
-
-  final Advantage advantage;
-  final int cost;
-  final String details;
-
-  factory CharacterAdvantage.fromJson(Map<String, dynamic> json) => _$CharacterAdvantageFromJson(json);
-  Map<String, dynamic> toJson() => _$CharacterAdvantageToJson(this);
-}
-
-class CharacterAdvantages with IterableMixin<CharacterAdvantage>, ChangeNotifier {
-  CharacterAdvantages(List<CharacterAdvantage>? a)
-      : _all = a ?? <CharacterAdvantage>[];
-
-  @override
-  Iterator<CharacterAdvantage> get iterator => _all.iterator;
-
-  void add(CharacterAdvantage a) {
-    _all.add(a);
-    notifyListeners();
-  }
-
-  void remove(CharacterAdvantage a) {
-    if(_all.remove(a)) notifyListeners();
-  }
-
-  static CharacterAdvantages fromJson(List<dynamic>? json) =>
-      CharacterAdvantages(
-          json?.map<CharacterAdvantage>(
-                  (a) => CharacterAdvantage.fromJson(a as Map<String, dynamic>)
-          ).toList()
-      );
-
-  static List<Map<String, dynamic>> toJson(CharacterAdvantages all) =>
-      all.map((CharacterAdvantage a) => a.toJson()).toList();
-
-  final List<CharacterAdvantage> _all;
-}
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class CharacterOrigin {

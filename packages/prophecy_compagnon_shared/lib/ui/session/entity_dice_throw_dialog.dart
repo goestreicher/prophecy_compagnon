@@ -56,6 +56,22 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
   int? humanDie;
   int? luck;
   int? criticalDie;
+  bool isCriticalSuccess = false;
+  Set<String> appliedModifiers = <String>{};
+  int difficultyModifiersTotal = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // By default, consider all modifiers applied
+    appliedModifiers.addAll(
+      widget.entity.throwModifiers(widget.request)
+        .map((DiceThrowModifier m) => m.id)
+    );
+
+    updateModifiersTotal();
+  }
 
   bool hasDieResult() {
     if(!diceThrowDone) {
@@ -89,6 +105,9 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
     proficiency: proficiency,
     luck: luck,
     criticalDie: criticalDie,
+    modifiers: modifiers()
+        .where((DiceThrowModifier m) => appliedModifiers.contains(m.id))
+        .toList(),
   );
 
   bool mustRollCritical() {
@@ -100,16 +119,11 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
   List<DiceThrowModifier> modifiers() {
     var ret = widget.entity.throwModifiers(widget.request);
 
-    if(
-        hasDieResult()
-        && criticalDie != null
-        && createResult().criticalType(
-              widget.request.base.componentValue(widget.entity)
-           ) == DiceThrowResultType.criticalSuccess
-    ) {
+    if(isCriticalSuccess) {
       ret.add(
         OneOffDiceThrowModifier(
-          type: DiceThrowModifierType.criticalDiceThrow,
+          type: DiceThrowModifierType.bonus,
+          family: DiceThrowModifierFamily.criticalDiceThrow,
           label: 'Réussite critique',
           value: 5,
           name: 'success',
@@ -120,18 +134,52 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
     return ret;
   }
 
+  void updateModifiersTotal() {
+    var difficultyTotal = 0;
+
+    for(var m in modifiers()) {
+      if(appliedModifiers.contains(m.id)) {
+        switch(m.type) {
+          case DiceThrowModifierType.malus:
+          case DiceThrowModifierType.bonus:
+            break;
+          case DiceThrowModifierType.difficulty:
+            difficultyTotal += m.value;
+        }
+      }
+    }
+
+    difficultyModifiersTotal = difficultyTotal;
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
 
-    var modifiersTotal = 0;
     var modifierRows = <Widget>[];
     for(var m in modifiers()) {
-      modifiersTotal += m.value;
-
       modifierRows.add(
         Row(
           children: [
+            if(!m.alwaysApply)
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if(appliedModifiers.contains(m.id)) {
+                      appliedModifiers.remove(m.id);
+                    }
+                    else {
+                      appliedModifiers.add(m.id);
+                    }
+                    updateModifiersTotal();
+                  });
+                },
+                child: Icon(
+                  appliedModifiers.contains(m.id)
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank,
+                ),
+              ),
             Text(m.label),
             Spacer(),
             _ValuePill(value: m.value),
@@ -143,10 +191,12 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
     String? totalText;
     var totalColor = Colors.indigo;
     if(hasDieResult()) {
+      var dieResult = createResult();
+
       if(mustRollCritical()) {
         if(
             criticalDie != null
-            && createResult().criticalType(
+            && dieResult.criticalType(
                   widget.request.base.componentValue(widget.entity)
                ) == DiceThrowResultType.criticalFail
         ) {
@@ -156,13 +206,13 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
       }
 
       if(totalText == null) {
-        var total = widget.request.base.value(widget.entity)
-            + createResult().total()
-            + modifiersTotal;
+        var total =
+            widget.request.base.value(widget.entity)
+            + createResult().total();
         totalText = total.toString();
 
         if(widget.request.difficulty != null) {
-          if(total >= widget.request.difficulty!) {
+          if(total >= (widget.request.difficulty! + difficultyModifiersTotal)) {
             totalColor = Colors.green;
           }
           else {
@@ -197,7 +247,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
           child: Text(
-            widget.request.difficulty.toString(),
+            (widget.request.difficulty! + difficultyModifiersTotal).toString(),
             style: theme.textTheme.headlineSmall!
               .copyWith(color: Colors.white),
           ),
@@ -245,7 +295,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '${widget.request.base.attribute.title} : ${widget.entity.attributes[widget.request.base.attribute]}',
+                                '${widget.request.base.baseLabel(widget.entity)} : ${widget.request.base.baseValue(widget.entity)}',
                                 style: theme.textTheme.bodySmall,
                               ),
                               Text(
@@ -416,6 +466,10 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
                                 onPressed: criticalDie != null ? null : () {
                                   setState(() {
                                     criticalDie = Random().nextInt(10) + 1;
+                                    var r = createResult();
+                                    if(r.criticalType(widget.request.base.componentValue(widget.entity)) == DiceThrowResultType.criticalSuccess) {
+                                      isCriticalSuccess = true;
+                                    }
                                   });
                                 },
                                 icon: Icon(CustomIcons.d10),

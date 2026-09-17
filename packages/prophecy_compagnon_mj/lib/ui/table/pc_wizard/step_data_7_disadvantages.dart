@@ -21,8 +21,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/table/pc_wizard/enums.dart';
 import 'package:prophecy_compagnon_mj/ui/table/pc_wizard/model.dart';
 import 'package:prophecy_compagnon_mj/ui/table/pc_wizard/step_data.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_disadvantage.dart';
 import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
-import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/ui/character/background/disadvantage_select_widget.dart';
 import 'package:provider/provider.dart';
 

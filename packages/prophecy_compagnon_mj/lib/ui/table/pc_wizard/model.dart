@@ -23,10 +23,11 @@ import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/career.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/character_caste.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/interdicts.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_advantage.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_disadvantage.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
-import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/classes/magic_spell.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
 

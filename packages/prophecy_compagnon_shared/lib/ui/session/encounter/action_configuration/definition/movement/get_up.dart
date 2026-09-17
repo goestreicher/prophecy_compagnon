@@ -16,7 +16,7 @@
  */
 
 import 'package:material_ui/material_ui.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base_ability.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
@@ -59,6 +59,8 @@ class ActionConfigurationMovementGetUp extends ActionConfiguration {
     // TODO: use the movement malus from the entity
     var difficulty = 0;
     var request = DiceThrowRequest(
+      type: DiceThrowRequestType.simple,
+      context: DiceThrowRequestContext.none,
       difficulty: difficulty,
       base: DiceThrowEntityBaseAbility(
         attribute: Attribute.physique,

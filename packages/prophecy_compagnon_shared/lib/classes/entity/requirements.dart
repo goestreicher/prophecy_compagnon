@@ -20,6 +20,7 @@ import 'package:prophecy_compagnon_shared/classes/caste/character_caste.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/interdicts.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/privileges.dart';
 import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_advantage.dart';
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_link.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
