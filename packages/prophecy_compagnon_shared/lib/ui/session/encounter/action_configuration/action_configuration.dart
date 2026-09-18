@@ -16,10 +16,10 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/action_planning.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/action_planning.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 
 abstract class ActionConfiguration {
   ActionConfiguration();

@@ -16,18 +16,18 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_description.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/finder.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/delay_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/button_renderer.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/instantiate.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/menu_renderer.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/delay_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
 
 class TurnActionWidget extends StatelessWidget {
   const TurnActionWidget({

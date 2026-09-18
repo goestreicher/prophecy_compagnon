@@ -23,8 +23,8 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_property_status.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_property_status.dart';
 
 class DiceThrowEvaluation {
   DiceThrowEvaluation({

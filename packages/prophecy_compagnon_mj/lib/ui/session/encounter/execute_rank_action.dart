@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_effect.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_position_status.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_position_status.dart';
 
 void executeRankAction(CombatAction action) {
   switch(action.type) {

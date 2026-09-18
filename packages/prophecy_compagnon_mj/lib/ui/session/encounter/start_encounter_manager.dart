@@ -22,12 +22,12 @@ import 'package:prophecy_compagnon_shared/classes/scenario/scenario_encounter.da
 import 'package:prophecy_compagnon_shared/classes/session/board/board.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item_map.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/action/start_pc_review.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/action/start_pc_review.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 
 class StartEncounterResult {
   StartEncounterResult({

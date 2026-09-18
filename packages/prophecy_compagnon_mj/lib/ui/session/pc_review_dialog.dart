@@ -17,11 +17,11 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/pc_review_result.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/equipment/edit_armor_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/equipment/edit_clothes_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/equipment/edit_jewels_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/equipment/edit_weapons_widget.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/responses/action/pc_review_result.dart';
 
 class PlayerCharacterReviewDialog extends StatefulWidget {
   const PlayerCharacterReviewDialog({ super.key, required this.characters });

@@ -19,23 +19,23 @@ import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/encounter/execute_rank_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/turn.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/session_encounter_turn.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/action_planning.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/assign_combat_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/delay_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/get_usable_actions.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/select_actions.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/set_combat_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_position_status.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_select_dialog.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/turn_action_widget.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/session_encounter_turn.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/action_planning.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/assign_combat_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/delay_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/get_usable_actions.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/select_actions.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/set_combat_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_position_status.dart';
 
 class TurnManagementWidget extends StatefulWidget {
   const TurnManagementWidget({

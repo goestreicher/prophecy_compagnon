@@ -18,6 +18,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/character_caste.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_advantage.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_disadvantage.dart';
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_favor.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_link.dart';
@@ -46,9 +48,6 @@ import 'package:prophecy_compagnon_shared/classes/storage/storable.dart';
 import 'package:prophecy_compagnon_shared/utils/text_utils.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
-
-import 'character/character_advantage.dart';
-import 'character/character_disadvantage.dart';
 
 part 'non_player_character.g.dart';
 

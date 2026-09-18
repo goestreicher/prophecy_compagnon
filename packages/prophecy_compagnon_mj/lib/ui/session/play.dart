@@ -22,13 +22,13 @@ import 'package:prophecy_compagnon_mj/ui/session/play_characters_tab.dart';
 import 'package:prophecy_compagnon_mj/ui/session/play_events_tab.dart';
 import 'package:prophecy_compagnon_mj/ui/session/session_connection_widget.dart';
 import 'package:prophecy_compagnon_shared/classes/calendar.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_local_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/event.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/set_state/datetime.dart';
 import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 import 'package:prophecy_compagnon_shared/ui/full_page_loading.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_local_client.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/set_state/datetime.dart';
 import 'package:provider/provider.dart';
 
 class SessionPlayPage extends StatefulWidget {

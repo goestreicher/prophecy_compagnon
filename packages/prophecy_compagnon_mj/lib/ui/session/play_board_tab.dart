@@ -20,10 +20,10 @@ import 'package:prophecy_compagnon_mj/ui/session/board/item_picker.dart';
 import 'package:prophecy_compagnon_mj/ui/session/board/item_widget.dart';
 import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/set_state/board.dart';
 import 'package:prophecy_compagnon_shared/ui/generic_image_widget.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/set_state/board.dart';
 import 'package:provider/provider.dart';
 
 const _sideBarPillWidth = 60.0;

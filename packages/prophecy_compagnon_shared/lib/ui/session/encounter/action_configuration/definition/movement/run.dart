@@ -16,19 +16,19 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/assign_combat_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/get_usable_actions.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/set_combat_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/map/get_movement_path.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/movement_path_result.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/assign_combat_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/get_usable_actions.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/encounter/turn/set_combat_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/map/get_movement_path.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/responses/action/movement_path_result.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
 
 class ActionConfigurationMovementRun extends ActionConfiguration {
   ActionConfigurationMovementRun();

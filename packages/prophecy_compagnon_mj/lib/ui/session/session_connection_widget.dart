@@ -21,16 +21,16 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/pc_review_dialog.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
-import 'package:prophecy_compagnon_shared/ui/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/action/dice_throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/action/start_pc_review.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/dice_throw_result.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/pc_review_result.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_property_status.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/action/dice_throw_request.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/action/start_pc_review.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/responses/action/dice_throw_result.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/responses/action/pc_review_result.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/session_message_response.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_effect.dart';
-import 'package:prophecy_compagnon_shared/ui/session/messages/status/entity_property_status.dart';
 
 class SessionConnectionWidget extends StatefulWidget {
   const SessionConnectionWidget({
