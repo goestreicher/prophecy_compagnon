@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:developer';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/combat.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_favor.dart';
@@ -439,7 +441,7 @@ class CreatureSummary extends ResourceBaseClass {
               // ignore:unused_local_variable
               var instance = CreatureSummary.fromJson(model);
             } catch (e, stacktrace) {
-              print('Error loading creature ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
+              log('Error loading creature ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
             }
           }
         }

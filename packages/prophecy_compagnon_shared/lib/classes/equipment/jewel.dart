@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:developer';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
@@ -195,7 +197,7 @@ class JewelModel extends EquipableItemModel {
             var instance = JewelModel.fromJson(model);
             _cache[instance.uuid] = instance;
           } catch (e, stacktrace) {
-            print('Error loading jewel ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
+            log('Error loading jewel ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
           }
         }
       }

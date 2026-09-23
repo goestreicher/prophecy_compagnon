@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:developer';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
@@ -170,7 +172,7 @@ class MagicGearModel extends EquipmentModel {
             var instance = MagicGearModel.fromJson(model);
             _cache[instance.uuid] = instance;
           } catch (e, stacktrace) {
-            print('Error loading magic gear ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
+            log('Error loading magic gear ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
           }
         }
       }

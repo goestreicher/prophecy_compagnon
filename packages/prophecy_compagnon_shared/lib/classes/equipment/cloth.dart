@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:developer';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
@@ -194,7 +196,7 @@ class ClothModel extends EquipableItemModel {
             var instance = ClothModel.fromJson(model);
             _cache[instance.uuid] = instance;
           } catch (e, stacktrace) {
-            print('Error loading cloth ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
+            log('Error loading cloth ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
           }
         }
       }

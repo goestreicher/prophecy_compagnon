@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:developer';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
 import 'package:prophecy_compagnon_shared/classes/object_location.dart';
@@ -161,7 +163,7 @@ class MagicSpell extends ResourceBaseClass {
           var spell = MagicSpell.fromJson(model);
           _spells[spell.name] = spell;
         } catch (e, stacktrace) {
-          print('Error loading spell ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
+          log('Error loading spell ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
         }
       }
     }

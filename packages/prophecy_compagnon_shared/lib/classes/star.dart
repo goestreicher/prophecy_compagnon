@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -252,7 +253,7 @@ class Star extends ResourceBaseClass {
               // ignore:unused_local_variable
               var instance = Star.fromJson(model);
             } catch (e, stacktrace) {
-              print('Error loading star ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
+              dev.log('Error loading star ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
             }
           }
         }

@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:developer';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/combat.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
@@ -208,7 +210,7 @@ class ShieldModel extends EquipableItemModel {
             var instance = ShieldModel.fromJson(model);
             _cache[instance.uuid] = instance;
           } catch (e, stacktrace) {
-            print('Error loading shield ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
+            log('Error loading shield ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
           }
         }
       }

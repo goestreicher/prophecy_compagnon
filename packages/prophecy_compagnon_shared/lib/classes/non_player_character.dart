@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/character_caste.dart';
@@ -321,7 +323,7 @@ class NonPlayerCharacterSummary extends ResourceBaseClass {
               // ignore:unused_local_variable
               var instance = NonPlayerCharacterSummary.fromJson(model);
             } catch (e, stacktrace) {
-              print('Error loading NPC ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
+              log('Error loading NPC ${model["name"]}: ${e.toString()}\n${stacktrace.toString()}');
             }
           }
         }
