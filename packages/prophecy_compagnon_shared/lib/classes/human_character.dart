@@ -28,6 +28,7 @@ import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/base.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/fervor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
@@ -99,6 +100,7 @@ class HumanCharacter extends EntityBase with MagicUser {
     super.magic,
     super.favors,
     super.fervor,
+    super.effects,
     super.image,
     super.icon,
     CharacterCaste? caste,
@@ -167,11 +169,57 @@ class HumanCharacter extends EntityBase with MagicUser {
     addNaturalWeapon(WeaponRange.contact, _naturalWeaponFists);
     addNaturalWeapon(WeaponRange.contact, _naturalWeaponFeet);
 
+    disadvantages.onDisadvantageAdded =
+        (CharacterDisadvantage d) {
+          for(var effect in d.buildEffects()) {
+            if(effect.active) {
+              effect.apply(this);
+            }
+            effects.add(effect);
+          }
+        };
+
+    disadvantages.onDisadvantageRemoved =
+        (CharacterDisadvantage d) {
+          for(var id in d.effectIds) {
+            var matching = effects.where((EntityEffect e) => e.id == id);
+            if(matching.isNotEmpty) {
+              if(matching.first.active) {
+                matching.first.unapply(this);
+              }
+              effects.remove(matching.first);
+            }
+          }
+        };
+
     for(var d in disadvantages) {
       for(var m in d.buildThrowModifiers()) {
         addThrowModifier(m);
       }
     }
+
+    advantages.onAdvantageAdded =
+        (CharacterAdvantage a) {
+          for(var effect in a.buildEffects()) {
+            if(effect.active) {
+              effect.apply(this);
+            }
+            effects.add(effect);
+          }
+        };
+
+    advantages.onAdvantageRemoved =
+        (CharacterAdvantage a) {
+          for(var id in a.effectIds) {
+            var matching = effects.where((EntityEffect e) => e.id == id);
+            if(matching.isNotEmpty) {
+              if(matching.first.active) {
+                matching.first.unapply(this);
+              }
+              effects.remove(matching.first);
+            }
+          }
+        };
 
     for(var a in advantages) {
       for(var m in a.buildThrowModifiers()) {
@@ -287,9 +335,17 @@ InjuryManager humanCharacterDefaultInjuries(EntityBase? entity, InjuryManager? s
 InjuryManager fullCharacterDefaultInjuries(EntityBase? entity, InjuryManager? source) {
   if(entity == null) return humanCharacterDefaultInjuries(entity, source);
 
-  return InjuryManager.getInjuryManagerForAbilities(
+  var manager = InjuryManager.getInjuryManagerForAbilities(
     resistance: entity.abilities.resistance,
     volonte: entity.abilities.volonte,
     source: source,
   );
+
+  for(var e in entity.effects.forTarget(EntityEffectTarget.injuryCapacity)) {
+    if(e.trigger == EntityEffectTrigger.permanent) {
+      e.apply(entity);
+    }
+  }
+
+  return manager;
 }

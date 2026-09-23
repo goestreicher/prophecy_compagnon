@@ -9,17 +9,23 @@ part of 'character_disadvantage.dart';
 CharacterDisadvantage _$CharacterDisadvantageFromJson(
   Map<String, dynamic> json,
 ) => CharacterDisadvantage(
+  uuid: json['uuid'] as String?,
   disadvantage: $enumDecode(_$DisadvantageEnumMap, json['disadvantage']),
   cost: (json['cost'] as num).toInt(),
   details: json['details'] as String,
+  effectIds: (json['effect_ids'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
 );
 
 Map<String, dynamic> _$CharacterDisadvantageToJson(
   CharacterDisadvantage instance,
 ) => <String, dynamic>{
+  'uuid': instance.uuid,
   'disadvantage': _$DisadvantageEnumMap[instance.disadvantage]!,
   'cost': instance.cost,
   'details': instance.details,
+  'effect_ids': instance.effectIds,
 };
 
 const _$DisadvantageEnumMap = {

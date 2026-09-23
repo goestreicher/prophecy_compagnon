@@ -33,7 +33,9 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/tur
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/set_combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/set_state/ticker.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_position_status.dart';
+import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_select_dialog.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/turn_action_widget.dart';
 
@@ -104,7 +106,18 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
         // Interpolated actions are executed separately
         executeRankAction(a.combatAction!);
       }
+
       a.stage = SessionEncounterEntityActionStage.executed;
+
+      SessionMessageBusClient.instance?.publish(
+        SessionTickerEventMessage(
+          event: TickerEvent(
+            type: TickerEventType.end,
+            unit: TickerEventUnit.action,
+            entityId: a.entity.id,
+          )
+        )
+      );
     }
 
     for(var a in interpolatedActions.where((CombatAction a) => a.rank == widget.turn.currentRank)) {

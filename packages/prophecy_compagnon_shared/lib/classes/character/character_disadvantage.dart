@@ -22,6 +22,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:uuid/uuid.dart';
 
 part 'character_disadvantage.g.dart';
@@ -33,13 +34,16 @@ class CharacterDisadvantage {
     required this.disadvantage,
     required this.cost,
     required this.details,
+    List<String>? effectIds,
   })
-    : uuid = uuid ?? Uuid().v4().toString();
+    : uuid = uuid ?? Uuid().v4().toString(),
+      effectIds = effectIds ?? <String>[];
 
   final String uuid;
   final Disadvantage disadvantage;
   final int cost;
   final String details;
+  final List<String> effectIds;
 
   List<DiceThrowModifier> buildThrowModifiers() {
     var ret = <DiceThrowModifier>[];
@@ -72,6 +76,24 @@ class CharacterDisadvantage {
     return ret;
   }
 
+  List<EntityEffect> buildEffects() {
+    var ret = <EntityEffect>[];
+
+    for(var cfg in disadvantage.effectConfigurations) {
+      var effect = cfg.create();
+      effectIds.add(effect.id);
+      ret.add(effect);
+    }
+
+    var builderArgs = EntityEffectBuilderArgs(cost: cost, details: details);
+    for(var effect in (disadvantage.effectBuilder?.call(builderArgs) ?? <EntityEffect>[])) {
+      effectIds.add(effect.id);
+      ret.add(effect);
+    }
+
+    return ret;
+  }
+
   factory CharacterDisadvantage.fromJson(Map<String, dynamic> json) =>
       _$CharacterDisadvantageFromJson(json);
 
@@ -81,9 +103,16 @@ class CharacterDisadvantage {
 
 class CharacterDisadvantages with IterableMixin<CharacterDisadvantage>, ChangeNotifier {
   CharacterDisadvantages(
-    List<CharacterDisadvantage>? d
+    List<CharacterDisadvantage>? d,
+    {
+      this.onDisadvantageAdded,
+      this.onDisadvantageRemoved,
+    }
   )
     : _all = d ?? <CharacterDisadvantage>[];
+
+  void Function(CharacterDisadvantage)? onDisadvantageAdded;
+  void Function(CharacterDisadvantage)? onDisadvantageRemoved;
 
   @override
   Iterator<CharacterDisadvantage> get iterator => _all.iterator;
@@ -93,11 +122,16 @@ class CharacterDisadvantages with IterableMixin<CharacterDisadvantage>, ChangeNo
 
   void add(CharacterDisadvantage d) {
     _all.add(d);
+    onDisadvantageAdded?.call(d);
     notifyListeners();
   }
 
   void remove(CharacterDisadvantage d) {
-    if(_all.remove(d)) notifyListeners();
+    if(_all.contains(d)) {
+      _all.remove(d);
+      onDisadvantageRemoved?.call(d);
+      notifyListeners();
+    }
   }
 
   static CharacterDisadvantages fromJson(List<dynamic>? json) =>

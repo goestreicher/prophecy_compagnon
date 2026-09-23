@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:math';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/interdicts.dart';
@@ -30,9 +32,14 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart'
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/global_dice_throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/injury_capacity.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
 import 'package:prophecy_compagnon_shared/classes/resource_link/resource_link.dart';
+import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 import 'package:prophecy_compagnon_shared/ui/resource_link_name_autocomplete_widget.dart';
 
 enum DisadvantageType {
@@ -177,7 +184,6 @@ enum Disadvantage {
     type: DisadvantageType.commun,
     reservedCastes: [Caste.mage]
   ),
-  // TODO: manage this with effects
   maladie(
     title: 'Maladie',
     description: "Le personnage a contracté par le passé une maladie chronique. Elle peut survenir par crise et se soigne difficilement. Les crises surviennent tous les 1D10 jours (le meneur de jeu tiendra le compte en secret). À 1 point, la maladie est bénigne (allergie, urticaire, etc.) et entraîne un malus de -1 pour la demi-journée. À 3 points, la maladie est sérieuse et génante (migraines, vertiges, ulcère, etc.). Elle entraîne un malus de -3 pour 1D10 heures. À 5 points, la mala die est sévère et handicapante (malaria, maladie du sommeil, etc.). Elle entraîne un malus de -5 pour 1D10 heures.\nCe Désavantage peut survenir plusieurs fois.",
@@ -185,6 +191,7 @@ enum Disadvantage {
     type: DisadvantageType.commun,
     requireDetails: true,
     unique: false,
+    effectBuilder: _maladieEntityEffectBuilder,
   ),
   // Managed in evaluate_dice_throw.dart:_dispatchGainedLuckProficiencyMessages
   malchance(
@@ -239,7 +246,6 @@ enum Disadvantage {
     requireDetails: true,
     unique: false,
   ),
-  // TODO: manage this capacity
   phobie(
     title: 'Phobie',
     description: "Le personnage a peur de quelque chose. Selon le coût du Désavantage, cela peut aller de la simple peur à la panique totale. Pour 1 point, cela peut être une peur liée à un mauvais souvenir ou une gêne passagère (vertige, claustrophobie, etc.). Le personnage subit un malus de -1 à toutes ses actions tant qu’il reste en présence du catalyseur. Pour 3 points, cette peur peut être liée à un environnement particulier (nuit, forêt, etc.) ou à des situations déjà subies par le passé (obscurité, foules, insectes, etc.). Le personnage subit un malus de -3 à toutes ses actions en présence du catalyseur et de -1 pendant une heure après l’avoir quitté. Pour 5 points, cette peur est liée à un traumatisme violent ou une vision récurrente (dragons, magie, etc.). Le personnage subit un malus de -5 à toutes ses actions en présence du catalyseur et de -3 durant une heure après l'avoir quitté du fait de sa panique.\nCe Désavantage ne se surmonte que progressivement. Le personnage retombe au stade inférieur à chaque dépense et ne s’en débarrassera qu’en surmontant le stade à 1.\nCe Désavantage peut survenir plusieurs fois.",
@@ -247,6 +253,7 @@ enum Disadvantage {
     type: DisadvantageType.commun,
     requireDetails: true,
     unique: false,
+    effectBuilder: _phobieEntityEffectBuilder,
   ),
   phobieDesCites(
     title: 'Phobie des cités (Mage de la Nature)',
@@ -297,13 +304,22 @@ enum Disadvantage {
     type: DisadvantageType.rare,
     reservedCastes: [Caste.mage]
   ),
-  // TODO: manage this through effects (permanent)
   blessure(
     title: 'Blessure',
     description: "Suite à une bataille, le personnage a subi une blessure qui ne s’est jamais vraiment refermée. Quelles que soient ses valeurs de Résistance et de Volonté, le personnage perd définitivement une case d’égratignure et une case de blessure légère. Aucune tentative de soins, même magiques, ne peut rendre ces cercles perdus à ce personnage.\nCe Désavantage peut survenir plusieurs fois.",
     cost: [5],
     type: DisadvantageType.rare,
     unique: false,
+    effectConfigurations: [
+      EntityEffectInjuryCapacityConfiguration(
+        name: 'Blessure (Désavantage)',
+        trigger: EntityEffectTrigger.permanent,
+        damage: {
+          Injury.scratch: -1,
+          Injury.light: -1,
+        }
+      )
+    ],
   ),
   dependance(
     title: 'Dépendance',
@@ -555,7 +571,14 @@ enum Disadvantage {
     title: 'Malade imaginaire',
     description: "Le personnage est persuadé de souffrir de diverses afllictions irrégulières et parvient à s’en convaincre. Chaque matin, il jette 1D10 sous sa Volonté. Si son jet est supérieur ou égal à sa Caractéristique, il subit un malus de -1 à toutes ses actions pour la journée à cause de tous les désagréments et douleurs dus à sa “maladie”.",
     cost: [2],
-    type: DisadvantageType.ancien
+    type: DisadvantageType.ancien,
+    effectConfigurations: [
+      // EntityEffectConfiguration(
+      //   name: 'Malade imaginaire (Désavantage)',
+      //   trigger: EntityEffectTrigger.request,
+      //   target: EntityEffectTarget.diceThrowGlobalModifier,
+      // )
+    ]
   ),
   nostalgieObsessionnelle(
     title: 'Nostalgie obsessionnelle',
@@ -639,6 +662,8 @@ enum Disadvantage {
   final bool unique;
   final List<DiceThrowModifierConfiguration> throwModifierConfigurations;
   final DiceThrowModifierBuilder? throwModifierBuilder;
+  final List<EntityEffectConfiguration> effectConfigurations;
+  final EntityEffectBuilder? effectBuilder;
   final List<String> Function()? detailsGenerator;
   final Widget Function(BuildContext, void Function(String))? detailsOverlay;
 
@@ -652,6 +677,8 @@ enum Disadvantage {
     this.unique = true,
     this.throwModifierConfigurations = const <DiceThrowModifierConfiguration>[],
     this.throwModifierBuilder,
+    this.effectConfigurations = const <EntityEffectConfiguration>[],
+    this.effectBuilder,
     this.detailsGenerator,
     this.detailsOverlay,
   });
@@ -750,4 +777,145 @@ List<DiceThrowModifier> _infirmiteThrowModifierBuilder(DiceThrowModifierBuilderA
       disadvantageSuffix: args.suffix,
     )
   ];
+}
+
+List<EntityEffect> _maladieEntityEffectBuilder(EntityEffectBuilderArgs args) {
+  /*
+      Le personnage a contracté par le passé une maladie chronique. Elle peut
+      survenir par crise et se soigne difficilement. Les crises surviennent tous
+      les 1D10 jours (le meneur de jeu tiendra le compte en secret).
+      À 1 point, la maladie est bénigne (allergie, urticaire, etc.) et entraîne
+      un malus de -1 pour la demi-journée.
+      À 3 points, la maladie est sérieuse et génante (migraines, vertiges,
+      ulcère, etc.). Elle entraîne un malus de -3 pour 1D10 heures.
+      À 5 points, la mala die est sévère et handicapante (malaria, maladie du
+      sommeil, etc.). Elle entraîne un malus de -5 pour 1D10 heures.
+      Ce Désavantage peut survenir plusieurs fois.
+   */
+  var ret = <EntityEffect>[];
+
+  if(args.cost == 1) {
+    ret.add(
+      EntityEffectGlobalDiceThrowModifier(
+        name: 'Maladie - ${args.details} (Désavantage)',
+        trigger: EntityEffectTrigger.request,
+        duration: TickerEvent(
+          type: TickerEventType.end,
+          unit: TickerEventUnit.hour,
+          count: 4,
+        ),
+        modifier: -1,
+      )
+    );
+  }
+  else if(args.cost == 3) {
+    ret.add(
+      EntityEffectGlobalDiceThrowModifier(
+        name: 'Maladie - ${args.details} (Désavantage)',
+        trigger: EntityEffectTrigger.request,
+        duration: TickerEvent(
+          type: TickerEventType.end,
+          unit: TickerEventUnit.hour,
+          count: Random().nextInt(10) + 1,
+        ),
+        modifier: -3,
+      )
+    );
+  }
+  else if(args.cost == 5) {
+    ret.add(
+      EntityEffectGlobalDiceThrowModifier(
+        name: 'Maladie - ${args.details} (Désavantage)',
+        trigger: EntityEffectTrigger.request,
+        duration: TickerEvent(
+          type: TickerEventType.end,
+          unit: TickerEventUnit.hour,
+          count: Random().nextInt(10) + 1,
+        ),
+        modifier: -5,
+      )
+    );
+  }
+
+  return ret;
+}
+
+List<EntityEffect> _phobieEntityEffectBuilder(EntityEffectBuilderArgs args) {
+  /*
+      Le personnage a peur de quelque chose. Selon le coût du Désavantage, cela
+      peut aller de la simple peur à la panique totale.
+      Pour 1 point, cela peut être une peur liée à un mauvais souvenir ou une
+      gêne passagère (vertige, claustrophobie, etc.). Le personnage subit un
+      malus de -1 à toutes ses actions tant qu’il reste en présence du
+      catalyseur.
+      Pour 3 points, cette peur peut être liée à un environnement particulier
+      (nuit, forêt, etc.) ou à des situations déjà subies par le passé
+      (obscurité, foules, insectes, etc.). Le personnage subit un malus de -3 à
+      toutes ses actions en présence du catalyseur et de -1 pendant une heure
+      après l’avoir quitté.
+      Pour 5 points, cette peur est liée à un traumatisme violent ou une vision
+      récurrente (dragons, magie, etc.). Le personnage subit un malus de -5 à
+      toutes ses actions en présence du catalyseur et de -3 durant une heure
+      après l'avoir quitté du fait de sa panique.
+      Ce Désavantage ne se surmonte que progressivement. Le personnage retombe
+      au stade inférieur à chaque dépense et ne s’en débarrassera qu’en
+      surmontant le stade à 1.
+      Ce Désavantage peut survenir plusieurs fois.
+   */
+  var ret = <EntityEffect>[];
+
+  if(args.cost == 1) {
+    ret.add(
+      EntityEffectGlobalDiceThrowModifier(
+        name: 'Phobie - ${args.details} (Désavantage)',
+        trigger: EntityEffectTrigger.request,
+        modifier: -1,
+      )
+    );
+  }
+  else if(args.cost == 3) {
+    ret.add(
+      EntityEffectGlobalDiceThrowModifier(
+        name: 'Phobie - ${args.details} (Désavantage)',
+        trigger: EntityEffectTrigger.request,
+        modifier: -3,
+        postEffects: [
+          EntityEffectGlobalDiceThrowModifier(
+            name: 'Phobie - ${args.details} - Conséquences (Désavantage)',
+            trigger: EntityEffectTrigger.request,
+            duration: TickerEvent(
+              type: TickerEventType.end,
+              unit: TickerEventUnit.hour,
+              count: 1,
+            ),
+            removeOnUnapply: true,
+            modifier: -1,
+          )
+        ]
+      )
+    );
+  }
+  else if(args.cost == 5) {
+    ret.add(
+      EntityEffectGlobalDiceThrowModifier(
+        name: 'Phobie - ${args.details} (Désavantage)',
+        trigger: EntityEffectTrigger.request,
+        modifier: -5,
+        postEffects: [
+          EntityEffectGlobalDiceThrowModifier(
+            name: 'Phobie - ${args.details} - Conséquences (Désavantage)',
+            trigger: EntityEffectTrigger.request,
+            duration: TickerEvent(
+              type: TickerEventType.end,
+              unit: TickerEventUnit.hour,
+              count: 1,
+            ),
+            modifier: -3,
+          )
+        ]
+      )
+    );
+  }
+
+  return ret;
 }

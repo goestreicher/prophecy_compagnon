@@ -22,6 +22,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/entity_effects/combat_status.dart';
@@ -95,7 +96,25 @@ class PlayCharactersPage extends StatelessWidget {
                 }
               },
               child: Text('click-o'),
-            )
+            ),
+            Column(
+              children: [
+                for(var effect in pc.effects.where((EntityEffect e) => e.trigger == EntityEffectTrigger.request))
+                  TextButton(
+                    onPressed: () {
+                      if(!effect.active) {
+                        effect.apply(pc);
+                      }
+                      else {
+                        effect.unapply(pc);
+                      }
+                    },
+                    child: Text(
+                      '${effect.name} ${effect.active ? "\u2717" : "\u2713"}'
+                    ),
+                  ),
+              ],
+            ),
           ],
         )
       );

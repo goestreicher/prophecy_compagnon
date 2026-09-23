@@ -100,12 +100,10 @@ class EntityEditInjuriesWidget extends StatelessWidget {
                       || change.ability == Ability.volonte
                     )
               ) {
-                entity.injuries.manager =
-                    InjuryManager.getInjuryManagerForAbilities(
-                      resistance: entity.abilities.resistance,
-                      volonte: entity.abilities.volonte,
-                      source: entity.injuries.manager,
-                    );
+                entity.injuries.manager = fullCharacterDefaultInjuries(
+                  entity,
+                  entity.injuries.manager,
+                );
               }
             }
 

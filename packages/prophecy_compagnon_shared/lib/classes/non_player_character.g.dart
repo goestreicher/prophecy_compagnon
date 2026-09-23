@@ -130,6 +130,7 @@ NonPlayerCharacter _$NonPlayerCharacterFromJson(Map<String, dynamic> json) =>
         fervor: json['fervor'] == null
             ? null
             : EntityFervor.fromJson(json['fervor'] as Map<String, dynamic>),
+        effects: EntityEffects.fromJson(json['effects'] as List?),
         image: json['image'] == null
             ? null
             : ExportableBinaryData.fromJson(
@@ -164,6 +165,7 @@ Map<String, dynamic> _$NonPlayerCharacterToJson(NonPlayerCharacter instance) =>
       'magic': instance.magic.toJson(),
       'favors': EntityDraconicFavors.toJson(instance.favors),
       'fervor': instance.fervor.toJson(),
+      'effects': EntityEffects.toJson(instance.effects),
       'image': instance.image?.toJson(),
       'icon': instance.icon?.toJson(),
       'caste': instance.caste.toJson(),

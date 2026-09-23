@@ -26,7 +26,6 @@ import 'package:prophecy_compagnon_shared/classes/character/character_disadvanta
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/magic.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_instance.dart';
@@ -53,10 +52,6 @@ String? validateFinalize(PlayerCharacterWizardModel model) {
 PlayerCharacter playerCharacterWizardFinalize(PlayerCharacterWizardModel model) {
   var abilities = EntityAbilities(abilities: model.computedAbilities());
   var attributes = EntityAttributes(attributes: model.computedAttributes());
-  var injuriesManager = InjuryManager.getInjuryManagerForAbilities(
-    resistance: abilities.resistance,
-    volonte: abilities.volonte,
-  );
 
   var skills = <SkillFamily, List<SkillInstance>>{};
   for(var f in SkillFamily.values) {
@@ -185,7 +180,7 @@ PlayerCharacter playerCharacterWizardFinalize(PlayerCharacterWizardModel model) 
     abilities: abilities,
     attributes: attributes,
     initiative: model.initiative,
-    injuries: EntityInjuries(manager: injuriesManager),
+    injuryProvider: fullCharacterDefaultInjuries,
     skills: entitySkills,
     equipment: EntityEquipment(model.equipment!),
     money: MoneyWallet(bronze: (model.money ?? 0)),

@@ -8,16 +8,22 @@ part of 'character_advantage.dart';
 
 CharacterAdvantage _$CharacterAdvantageFromJson(Map<String, dynamic> json) =>
     CharacterAdvantage(
+      uuid: json['uuid'] as String?,
       advantage: $enumDecode(_$AdvantageEnumMap, json['advantage']),
       cost: (json['cost'] as num).toInt(),
       details: json['details'] as String,
+      effectIds: (json['effect_ids'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$CharacterAdvantageToJson(CharacterAdvantage instance) =>
     <String, dynamic>{
+      'uuid': instance.uuid,
       'advantage': _$AdvantageEnumMap[instance.advantage]!,
       'cost': instance.cost,
       'details': instance.details,
+      'effect_ids': instance.effectIds,
     };
 
 const _$AdvantageEnumMap = {

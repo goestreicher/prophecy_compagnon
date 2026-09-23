@@ -27,6 +27,7 @@ import 'package:prophecy_compagnon_shared/classes/encounter_entity_factory.dart'
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/fervor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
@@ -471,6 +472,7 @@ class NonPlayerCharacter extends HumanCharacter with EncounterEntityModel {
     String? description,
     EntityDraconicFavors? favors,
     EntityFervor? fervor,
+    EntityEffects? effects,
     ExportableBinaryData? image,
     ExportableBinaryData? icon,
   }) {
@@ -515,6 +517,7 @@ class NonPlayerCharacter extends HumanCharacter with EncounterEntityModel {
             description: description,
             favors: favors,
             fervor: fervor,
+            effects: effects,
             image: image,
             icon: icon,
           );
@@ -563,6 +566,7 @@ class NonPlayerCharacter extends HumanCharacter with EncounterEntityModel {
     super.description,
     super.favors,
     super.fervor,
+    super.effects,
     super.image,
     super.icon,
   })

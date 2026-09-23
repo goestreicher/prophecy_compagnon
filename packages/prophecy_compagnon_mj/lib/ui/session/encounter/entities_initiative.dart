@@ -16,6 +16,8 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
@@ -92,47 +94,60 @@ class _SessionEncounterEntitiesInitiativeWidgetState extends State<SessionEncoun
 
   @override
   Widget build(BuildContext context) {
+    var initiativeWidgets = <Widget>[];
+
+    for(var e in pending) {
+      var effectExtraDice = 0;
+
+      for(var effect in e.effects) {
+        if(!effect.active) continue;
+        if(effect.target != EntityEffectTarget.initiativeExtraDice) continue;
+        effectExtraDice += (effect as EntityEffectInitiativeExtraDice).count;
+      }
+
+      initiativeWidgets.add(
+        TurnInitiativeInputWidget(
+          // key is necessary so that widget won't be reused when an entity
+          // is removed from pending
+          key: ValueKey(e.id),
+          entity: e,
+          dice: e.initiative + (unusedActions[e.id] ?? 0) + effectExtraDice,
+          engagementRange: widget.encounter.engagements.smallestFor(e),
+          onDone: (TurnInitiative i) {
+            for(var a in i.dominantHand) {
+              actions.add(
+                SessionEncounterEntityAction(
+                  entity: e,
+                  initialRank: a.raw + (a.weaponModifier ?? 0) - e.damageMalus(),
+                )
+              );
+            }
+
+            if(i.weakHand != null) {
+              actions.add(
+                SessionEncounterEntityAction(
+                  entity: e,
+                  initialRank: i.weakHand!.raw + (i.weakHand!.weaponModifier ?? 0) - e.damageMalus(),
+                  weakHand: true,
+                )
+              );
+            }
+
+            setState(() {
+              pending.remove(e);
+            });
+
+            if(pending.isEmpty) {
+              widget.onDone(actions);
+            }
+          },
+        )
+      );
+    }
+
     return Column(
       spacing: 12.0,
-      children: [
-        for(var e in pending)
-          TurnInitiativeInputWidget(
-            // key is necessary so that widget won't be reused when an entity
-            // is removed from pending
-            key: ValueKey(e.id),
-            entity: e,
-            dice: e.initiative + (unusedActions[e.id] ?? 0),
-            engagementRange: widget.encounter.engagements.smallestFor(e),
-            onDone: (TurnInitiative i) {
-              for(var a in i.dominantHand) {
-                actions.add(
-                  SessionEncounterEntityAction(
-                    entity: e,
-                    initialRank: a.raw + (a.weaponModifier ?? 0) - e.damageMalus(),
-                  )
-                );
-              }
-
-              if(i.weakHand != null) {
-                actions.add(
-                  SessionEncounterEntityAction(
-                    entity: e,
-                    initialRank: i.weakHand!.raw + (i.weakHand!.weaponModifier ?? 0) - e.damageMalus(),
-                    weakHand: true,
-                  )
-                );
-              }
-
-              setState(() {
-                pending.remove(e);
-              });
-
-              if(pending.isEmpty) {
-                widget.onDone(actions);
-              }
-            },
-          ),
-      ],
+      children: initiativeWidgets,
     );
   }
 }

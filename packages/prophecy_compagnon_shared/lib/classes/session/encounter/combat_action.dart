@@ -26,14 +26,14 @@ abstract class CombatAction {
     required this.type,
     required this.rank,
     this.interpolate = false,
-    this.effects = const <EntityEffect>[],
+    this.effects = const <SessionEntityEffect>[],
   });
 
   final String entityId;
   final CombatActionType type;
   final int rank;
   final bool interpolate;
-  final List<EntityEffect> effects;
+  final List<SessionEntityEffect> effects;
 
   Map<String, dynamic> combatActionToJson();
 

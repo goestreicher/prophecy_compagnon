@@ -23,10 +23,13 @@ import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_instance.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item_map.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/turn.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/item.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/set_state/ticker.dart';
+import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
 class EncounterManagementWidget extends StatefulWidget {
   const EncounterManagementWidget({
@@ -101,7 +104,32 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
       );
     encounter.turns.add(turn);
 
+    SessionMessageBusClient.instance?.publish(
+      SessionTickerEventMessage(
+        event: TickerEvent(
+          type: TickerEventType.start,
+          unit: TickerEventUnit.turn,
+        )
+      )
+    );
+
     return true;
+  }
+
+  void endEncounter() {
+    setState(() {
+      encounter.status = SessionEncounterStatus.finished;
+      updateEncounterStatus();
+    });
+
+    SessionMessageBusClient.instance?.publish(
+      SessionTickerEventMessage(
+        event: TickerEvent(
+          type: TickerEventType.end,
+          unit: TickerEventUnit.combat,
+        )
+      )
+    );
   }
 
   @override
@@ -176,6 +204,15 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
             children: [
               IconButton.filled(
                 onPressed: () async {
+                  SessionMessageBusClient.instance?.publish(
+                    SessionTickerEventMessage(
+                      event: TickerEvent(
+                        type: TickerEventType.start,
+                        unit: TickerEventUnit.combat,
+                      )
+                    )
+                  );
+
                   var started = await startNewTurn();
                   if(started) {
                     widget.map.freeMovementEnabled = false;
@@ -201,14 +238,20 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
           TurnManagementWidget(
             turn: encounter.currentTurn!,
             onTurnFinished: () async {
+              SessionMessageBusClient.instance?.publish(
+                SessionTickerEventMessage(
+                  event: TickerEvent(
+                    type: TickerEventType.end,
+                    unit: TickerEventUnit.turn,
+                  )
+                )
+              );
+
               var allNpcsDead = encounter.npcs.every(
                   (EntityInstance npc) => npc.healthStatus.has(EntityHealthStatusFlag.dead)
               );
               if(allNpcsDead) {
-                setState(() {
-                  encounter.status = SessionEncounterStatus.finished;
-                  updateEncounterStatus();
-                });
+                endEncounter();
                 return;
               }
 
@@ -245,10 +288,7 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
 
                 continueEncounter ??= true;
                 if(!continueEncounter) {
-                  setState(() {
-                    encounter.status = SessionEncounterStatus.finished;
-                    updateEncounterStatus();
-                  });
+                  endEncounter();
                   return;
                 }
 
@@ -266,10 +306,7 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
             children: [
               IconButton.filled(
                 onPressed: () async {
-                  setState(() {
-                    widget.map.freeMovementEnabled = true;
-                    widget.session.encounter.value = null;
-                  });
+                  endEncounter();
                 },
                 icon: Icon(Icons.stop),
                 padding: const EdgeInsets.all(4.0),

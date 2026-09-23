@@ -23,7 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
 part 'health_status.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class EffectSetHealthStatus extends EntityEffect {
+class EffectSetHealthStatus extends SessionEntityEffect {
   EffectSetHealthStatus({
     required this.status,
   })
@@ -46,7 +46,7 @@ class EffectSetHealthStatus extends EntityEffect {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class EffectClearHealthStatus extends EntityEffect {
+class EffectClearHealthStatus extends SessionEntityEffect {
   EffectClearHealthStatus({
     required this.status,
   })

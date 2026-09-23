@@ -18,33 +18,18 @@
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_set_state.dart';
+import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
-class SessionSetStateNextHour extends SessionSetStateMessage {
-  SessionSetStateNextHour({
-      super.source,
+class SessionTickerEventMessage extends SessionSetStateMessage {
+  SessionTickerEventMessage({
+    required this.event,
   })
-    : super(
-        category: SessionSetStateCategory.datetime,
-        destination: SessionMessage.broadcast,
-      );
+    : super(destination: SessionMessage.broadcast);
+
+  final TickerEvent event;
 
   @override
   void apply(GameSession session) {
-    session.nextHour();
-  }
-}
-
-class SessionSetStateNextDay extends SessionSetStateMessage {
-  SessionSetStateNextDay({
-    super.source,
-  })
-    : super(
-        category: SessionSetStateCategory.datetime,
-        destination: SessionMessage.broadcast,
-      );
-
-  @override
-  void apply(GameSession session) {
-    session.day += 1;
+    session.tick(event);
   }
 }

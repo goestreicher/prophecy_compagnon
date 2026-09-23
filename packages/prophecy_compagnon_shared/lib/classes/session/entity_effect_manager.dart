@@ -23,13 +23,13 @@ part 'entity_effect_manager.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class EntityEffectManager {
   EntityEffectManager({
-    Map<String, List<EntityEffect>>? entityEffects,
+    Map<String, List<SessionEntityEffect>>? entityEffects,
   })
-    : entityEffects = entityEffects ?? <String, List<EntityEffect>>{};
+    : entityEffects = entityEffects ?? <String, List<SessionEntityEffect>>{};
 
-  final Map<String, List<EntityEffect>> entityEffects;
+  final Map<String, List<SessionEntityEffect>> entityEffects;
 
-  void addEffect(String entityId, EntityEffect effect) {
+  void addEffect(String entityId, SessionEntityEffect effect) {
     if(!entityEffects.containsKey(entityId)) {
       entityEffects[entityId] = [];
     }

@@ -18,10 +18,10 @@
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
-typedef EntityEffectJsonFactory = EntityEffect Function(Map<String, dynamic>);
+typedef SessionEntityEffectJsonFactory = SessionEntityEffect Function(Map<String, dynamic>);
 
-abstract class EntityEffect {
-  EntityEffect({
+abstract class SessionEntityEffect {
+  SessionEntityEffect({
     this.once,
     this.permanent,
     this.duration,
@@ -40,7 +40,7 @@ abstract class EntityEffect {
   void unapply(EntityBase entity);
   Map<String, dynamic> effectToJson();
 
-  factory EntityEffect.fromJson(Map<String, dynamic> json) {
+  factory SessionEntityEffect.fromJson(Map<String, dynamic> json) {
     if(!json.containsKey('_type')) {
       throw(ArgumentError('Missing "_type" key in JSON'));
     }
@@ -53,9 +53,9 @@ abstract class EntityEffect {
     return ret;
   }
 
-  static void registerEntityEffectJsonFactory(String name, EntityEffectJsonFactory factory) =>
+  static void registerSessionEntityEffectJsonFactory(String name, SessionEntityEffectJsonFactory factory) =>
       _effectFactories[name] = factory;
 
-  static final Map<String, EntityEffectJsonFactory> _effectFactories =
-      <String, EntityEffectJsonFactory>{};
+  static final Map<String, SessionEntityEffectJsonFactory> _effectFactories =
+      <String, SessionEntityEffectJsonFactory>{};
 }

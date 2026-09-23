@@ -19,6 +19,55 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'ticker.g.dart';
 
+enum TickerEventType {
+  start,
+  end,
+  ;
+}
+
+enum TickerEventUnit {
+  action,
+  turn,
+  combat, // same as an encounter
+  minute,
+  hour,
+  sleep,
+  day,
+  ;
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class TickerEvent {
+  const TickerEvent({
+    required this.type,
+    required this.unit,
+    this.count = 1,
+    this.entityId,
+  });
+
+  final TickerEventType type;
+  final TickerEventUnit unit;
+  final int count;
+  final String? entityId;
+
+  @override
+  bool operator ==(Object other) =>
+      other is TickerEvent
+      && other.type == type
+      && other.unit == unit
+      && other.count == 1
+      && other.entityId == entityId;
+
+  @override
+  int get hashCode => Object.hash(type, unit, count);
+
+  factory TickerEvent.fromJson(Map<String, dynamic> json) =>
+      _$TickerEventFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$TickerEventToJson(this);
+}
+
 enum TickerDurationUnit {
   action,
   turn,

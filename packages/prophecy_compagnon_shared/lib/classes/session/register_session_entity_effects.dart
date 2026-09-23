@@ -4,23 +4,23 @@ import "package:prophecy_compagnon_shared/classes/session/entity_effect.dart";
 import "package:prophecy_compagnon_shared/classes/session/entity_effects/combat_status.dart";
 import "package:prophecy_compagnon_shared/classes/session/entity_effects/health_status.dart";
 
-void registerEntityEffects() {
-  EntityEffect.registerEntityEffectJsonFactory(
+void registerSessionEntityEffects() {
+  SessionEntityEffect.registerSessionEntityEffectJsonFactory(
     "EffectSetCombatStatus",
     (Map<String, dynamic> json) => EffectSetCombatStatus.fromJson(json),
   );
 
-  EntityEffect.registerEntityEffectJsonFactory(
+  SessionEntityEffect.registerSessionEntityEffectJsonFactory(
     "EffectClearCombatStatus",
     (Map<String, dynamic> json) => EffectClearCombatStatus.fromJson(json),
   );
 
-  EntityEffect.registerEntityEffectJsonFactory(
+  SessionEntityEffect.registerSessionEntityEffectJsonFactory(
     "EffectSetHealthStatus",
     (Map<String, dynamic> json) => EffectSetHealthStatus.fromJson(json),
   );
 
-  EntityEffect.registerEntityEffectJsonFactory(
+  SessionEntityEffect.registerSessionEntityEffectJsonFactory(
     "EffectClearHealthStatus",
     (Map<String, dynamic> json) => EffectClearHealthStatus.fromJson(json),
   );

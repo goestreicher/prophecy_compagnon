@@ -26,7 +26,8 @@ import 'package:prophecy_compagnon_shared/classes/session/clients/session_messag
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_local_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/event.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
-import 'package:prophecy_compagnon_shared/classes/session/messages/set_state/datetime.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/set_state/ticker.dart';
+import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 import 'package:prophecy_compagnon_shared/ui/full_page_loading.dart';
 import 'package:provider/provider.dart';
@@ -237,7 +238,12 @@ class _PlayPageTitle extends StatelessWidget {
               }
             }
             sessionCommandBusClient.publish(
-              SessionSetStateNextHour()
+              SessionTickerEventMessage(
+                event: TickerEvent(
+                  type: TickerEventType.end,
+                  unit: TickerEventUnit.hour,
+                )
+              )
             );
           },
           icon: Icon(Icons.keyboard_arrow_right),
@@ -252,7 +258,12 @@ class _PlayPageTitle extends StatelessWidget {
               return;
             }
             sessionCommandBusClient.publish(
-              SessionSetStateNextDay()
+              SessionTickerEventMessage(
+                event: TickerEvent(
+                  type: TickerEventType.end,
+                  unit: TickerEventUnit.day,
+                )
+              )
             );
           },
           icon: Icon(Icons.keyboard_double_arrow_right),

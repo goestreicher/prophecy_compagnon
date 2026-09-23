@@ -26,5 +26,5 @@ class SessionEntitySetEffectMessage extends SessionEntityStatusMessage {
     required this.effect,
   });
 
-  EntityEffect effect;
+  SessionEntityEffect effect;
 }

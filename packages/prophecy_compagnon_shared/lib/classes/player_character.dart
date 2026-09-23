@@ -26,6 +26,7 @@ import 'package:prophecy_compagnon_shared/classes/draconic_link.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/fervor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
@@ -241,6 +242,7 @@ class PlayerCharacter extends HumanCharacter {
     super.description,
     super.favors,
     super.fervor,
+    super.effects,
     super.image,
     super.icon,
   });

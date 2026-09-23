@@ -22,6 +22,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:uuid/uuid.dart';
 
 part 'character_advantage.g.dart';
@@ -33,13 +34,16 @@ class CharacterAdvantage {
     required this.advantage,
     required this.cost,
     required this.details,
+    List<String>? effectIds,
   })
-    : uuid = uuid ?? Uuid().v4().toString();
+    : uuid = uuid ?? Uuid().v4().toString(),
+      effectIds = effectIds ?? <String>[];
 
   final String uuid;
   final Advantage advantage;
   final int cost;
   final String details;
+  final List<String> effectIds;
 
   List<DiceThrowModifier> buildThrowModifiers() {
     var ret = <DiceThrowModifier>[];
@@ -59,14 +63,32 @@ class CharacterAdvantage {
     else {
       for(var cfg in advantage.throwModifierConfigurations) {
         ret.add(
-          DisadvantageDiceThrowModifier(
+          AdvantageDiceThrowModifier(
             type: cfg.type,
-            label: '${advantage.title}${details.isEmpty ? "" : " - $details"} (Désavantage)',
+            label: '${advantage.title}${details.isEmpty ? "" : " - $details"} (Avantage)',
             value: cfg.value!,
-            disadvantageSuffix: advantageSuffix,
+            advantageSuffix: advantageSuffix,
           )
         );
       }
+    }
+
+    return ret;
+  }
+
+  List<EntityEffect> buildEffects() {
+    var ret = <EntityEffect>[];
+
+    for(var cfg in advantage.effectConfigurations) {
+      var effect = cfg.create();
+      effectIds.add(effect.id);
+      ret.add(effect);
+    }
+
+    var builderArgs = EntityEffectBuilderArgs(cost: cost, details: details);
+    for(var effect in (advantage.effectBuilder?.call(builderArgs) ?? <EntityEffect>[])) {
+      effectIds.add(effect.id);
+      ret.add(effect);
     }
 
     return ret;
@@ -81,9 +103,16 @@ class CharacterAdvantage {
 
 class CharacterAdvantages with IterableMixin<CharacterAdvantage>, ChangeNotifier {
   CharacterAdvantages(
-    List<CharacterAdvantage>? a
+    List<CharacterAdvantage>? a,
+    {
+      this.onAdvantageAdded,
+      this.onAdvantageRemoved,
+    }
   )
     : _all = a ?? <CharacterAdvantage>[];
+
+  void Function(CharacterAdvantage)? onAdvantageAdded;
+  void Function(CharacterAdvantage)? onAdvantageRemoved;
 
   @override
   Iterator<CharacterAdvantage> get iterator => _all.iterator;
@@ -93,11 +122,16 @@ class CharacterAdvantages with IterableMixin<CharacterAdvantage>, ChangeNotifier
 
   void add(CharacterAdvantage a) {
     _all.add(a);
+    onAdvantageAdded?.call(a);
     notifyListeners();
   }
 
   void remove(CharacterAdvantage a) {
-    if(_all.remove(a)) notifyListeners();
+    if(_all.contains(a)) {
+      _all.remove(a);
+      onAdvantageRemoved?.call(a);
+      notifyListeners();
+    }
   }
 
   static CharacterAdvantages fromJson(List<dynamic>? json) =>

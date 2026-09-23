@@ -1,0 +1,203 @@
+/*
+ * Copyright (C) 2026 Grégory Oestreicher
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import 'package:flutter/foundation.dart';
+import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/ticker.dart';
+import 'package:uuid/uuid.dart';
+
+enum EntityEffectTrigger {
+  permanent,
+  request,
+  tickerEvent,
+  ;
+}
+
+enum EntityEffectTarget {
+  diceThrowModifier,
+  initiativeExtraDice,
+  injuryCapacity,
+  ;
+}
+
+class EntityEffectBuilderArgs {
+  EntityEffectBuilderArgs({
+    required this.cost,
+    required this.details,
+  });
+
+  final int cost;
+  final String details;
+}
+
+typedef EntityEffectBuilder =
+    List<EntityEffect> Function(EntityEffectBuilderArgs);
+
+typedef EntityEffectJsonFactory = EntityEffect Function(Map<String, dynamic>);
+
+abstract class EntityEffectConfiguration{
+  const EntityEffectConfiguration({
+    required this.name,
+    required this.target,
+    required this.trigger,
+    this.triggerTickerEvent,
+    this.duration,
+    this.removeOnUnapply = false,
+  });
+
+  final String name;
+  final EntityEffectTarget target;
+  final EntityEffectTrigger trigger;
+  final TickerEvent? triggerTickerEvent;
+  final TickerEvent? duration;
+  final bool removeOnUnapply;
+
+  EntityEffect create();
+}
+
+abstract class EntityEffect {
+  EntityEffect({
+    String? uuid,
+    required this.name,
+    required this.target,
+    required this.trigger,
+    this.triggerTickerEvent,
+    this.duration,
+    List<EntityEffect>? postEffects,
+    this.removeOnUnapply = false,
+    this.elapsedDurationUnits,
+    bool active = false,
+  })
+    : uuid = uuid ?? Uuid().v4().toString(),
+      postEffects = postEffects ?? <EntityEffect>[],
+      _active = active;
+
+  final String uuid;
+  final String name;
+  final EntityEffectTarget target;
+  final EntityEffectTrigger trigger;
+  final TickerEvent? triggerTickerEvent;
+  final TickerEvent? duration;
+  final List<EntityEffect> postEffects;
+  final bool removeOnUnapply;
+  int? elapsedDurationUnits;
+  bool _active;
+
+  Map<String, dynamic> effectToJson();
+
+  @mustCallSuper
+  void apply(EntityBase target) {
+    if(duration != null) {
+      elapsedDurationUnits = 0;
+    }
+
+    active = true;
+  }
+
+  @mustCallSuper
+  void unapply(EntityBase target) {
+    if(duration != null) {
+      elapsedDurationUnits = null;
+    }
+
+    for(var effect in postEffects) {
+      target.effects.add(effect);
+      effect.apply(target);
+    }
+
+    active = false;
+  }
+
+  String get id => uuid;
+
+  bool get active => trigger == EntityEffectTrigger.permanent || _active;
+  set active(bool v) => _active = v;
+
+  @mustCallSuper
+  void tick(TickerEvent event) {
+    if(duration == null) return;
+    if(duration!.type != TickerEventType.end) return;
+    if(!active) return;
+
+    // TODO: manage ticker events with a higher duration unit
+    elapsedDurationUnits = elapsedDurationUnits! + 1;
+  }
+
+  bool get expired =>
+      duration != null
+      && elapsedDurationUnits != null
+      && elapsedDurationUnits! >= duration!.count;
+
+  factory EntityEffect.fromJson(Map<String, dynamic> json) {
+    if(!json.containsKey('_type')) {
+      throw(ArgumentError('Missing "_type" key in JSON'));
+    }
+    return _effectFactories[json['_type']]!(json);
+  }
+
+  Map<String, dynamic> toJson() {
+    var ret = effectToJson();
+    ret['_type'] = runtimeType.toString();
+    return ret;
+  }
+
+  static void registerEntityEffectJsonFactory(String name, EntityEffectJsonFactory factory) =>
+      _effectFactories[name] = factory;
+
+  static final Map<String, EntityEffectJsonFactory> _effectFactories =
+      <String, EntityEffectJsonFactory>{};
+}
+
+class EntityEffects with Iterable<EntityEffect>, ChangeNotifier {
+  EntityEffects({
+    List<EntityEffect>? effects,
+  })
+    : _all = effects ?? <EntityEffect>[];
+
+  @override
+  Iterator<EntityEffect> get iterator => _all.iterator;
+
+  void add(EntityEffect effect) {
+    _all.add(effect);
+    notifyListeners();
+  }
+
+  void remove(EntityEffect effect) {
+    _all.remove(effect);
+    notifyListeners();
+  }
+
+  Iterable<EntityEffect> forTarget(EntityEffectTarget target) =>
+      _all
+        .where((EntityEffect e) => e.target == target);
+
+  static EntityEffects fromJson(List<dynamic>? json) =>
+      EntityEffects(
+        effects: (json ?? [])
+          .map<EntityEffect>(
+            (e) => EntityEffect.fromJson(e as Map<String, dynamic>),
+          )
+          .toList()
+      );
+
+  static List<Map<String, dynamic>> toJson(EntityEffects effects) =>
+      effects
+        .map((EntityEffect e) => e.toJson())
+        .toList();
+
+  final List<EntityEffect> _all;
+}

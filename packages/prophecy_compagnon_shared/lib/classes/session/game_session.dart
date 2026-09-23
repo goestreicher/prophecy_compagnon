@@ -18,6 +18,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/calendar.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/scenario/scenario.dart';
 import 'package:prophecy_compagnon_shared/classes/scenario/scenario_event.dart';
@@ -28,6 +29,7 @@ import 'package:prophecy_compagnon_shared/classes/session/event.dart';
 import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/storable.dart';
 import 'package:prophecy_compagnon_shared/classes/table.dart';
+import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 import 'package:uuid/uuid.dart';
 
 part 'game_session.g.dart';
@@ -60,6 +62,11 @@ class GameSessionStore extends JsonStoreAdapter<GameSession> {
     j['scenario'] = object.scenario.uuid;
 
     return j;
+  }
+
+  @override
+  Future<void> willSave(GameSession object) async {
+    await GameTableStore().save(object.table);
   }
 }
 
@@ -125,6 +132,12 @@ class GameSession extends ChangeNotifier {
 
   EntityEffectManager effectManager;
 
+  Iterable<EntityBase> entities() =>
+      [
+        ...table.players,
+        ...(encounter.value?.npcs ?? []),
+      ];
+
   EntityBase? entity(String id) {
     for(var e in table.players) {
       if(e.id == id) return e;
@@ -153,16 +166,54 @@ class GameSession extends ChangeNotifier {
     notifyListeners();
   }
 
-  void nextHour() {
-    if(time.hour == 23) {
-      scenarioDay += 1;
-      time.hour = 0;
-      time.minute = 0;
+  void tick(TickerEvent event) {
+    if(event.type == TickerEventType.end) {
+      if(event.unit == TickerEventUnit.hour) {
+        _addHours(event.count);
+      }
+      else if(event.unit == TickerEventUnit.day) {
+        day += event.count;
+      }
     }
-    else {
-      time.hour += 1;
-      time.minute = 0;
+
+    for(var entity in entities()) {
+      if(event.entityId != null && event.entityId != entity.id) {
+        continue;
+      }
+
+      var toRemove = <EntityEffect>[];
+
+      for(var effect in entity.effects) {
+        if(!effect.active) {
+          if(effect.triggerTickerEvent == event) {
+            effect.apply(entity);
+          }
+        }
+        else {
+          effect.tick(event);
+        }
+
+        if(effect.expired) {
+          effect.unapply(entity);
+          if(effect.removeOnUnapply) toRemove.add(effect);
+        }
+      }
+
+      for(var e in toRemove) {
+        entity.effects.remove(e);
+      }
     }
+
+    // TODO
+  }
+
+  void _addHours(int count) {
+    var addedDays = (time.hour + count) ~/ 24;
+    var targetHour = (time.hour + count) % 24;
+
+    scenarioDay += addedDays;
+    time.hour = targetHour;
+    time.minute = 0;
     notifyListeners();
   }
 

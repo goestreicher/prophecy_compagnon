@@ -23,7 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
 part 'combat_status.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class EffectSetCombatStatus extends EntityEffect {
+class EffectSetCombatStatus extends SessionEntityEffect {
   EffectSetCombatStatus({
     required this.status,
   })
@@ -47,7 +47,7 @@ class EffectSetCombatStatus extends EntityEffect {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class EffectClearCombatStatus extends EntityEffect {
+class EffectClearCombatStatus extends SessionEntityEffect {
   EffectClearCombatStatus({
     required this.status
   })

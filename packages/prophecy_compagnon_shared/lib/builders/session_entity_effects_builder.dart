@@ -17,25 +17,25 @@
 
 import 'package:build/build.dart';
 import 'package:glob/glob.dart';
-import 'package:prophecy_compagnon_shared/builders/entity_effects_generator.dart';
+import 'package:prophecy_compagnon_shared/builders/session_entity_effects_generator.dart';
 import 'package:source_gen/source_gen.dart';
 
-Builder registerEntityEffectsBuilder(BuilderOptions options) {
+Builder registerSessionEntityEffectsBuilder(BuilderOptions options) {
   var defaults = BuilderOptions({
-    'output': 'lib/classes/entity/register_entity_effects.dart'
+    'output': 'lib/classes/session/register_session_entity_effects.dart'
   });
 
   var opts = options.overrideWith(defaults);
 
-  return RegisterEntityEffectsBuilder(options: opts);
+  return RegisterSessionEntityEffectsBuilder(options: opts);
 }
 
-class RegisterEntityEffectsBuilder implements Builder {
-  RegisterEntityEffectsBuilder({ required this.options })
-    : generator = RegisterEntityEffectsGenerator();
+class RegisterSessionEntityEffectsBuilder implements Builder {
+  RegisterSessionEntityEffectsBuilder({ required this.options })
+    : generator = RegisterSessionEntityEffectsGenerator();
 
   final BuilderOptions options;
-  final RegisterEntityEffectsGenerator generator;
+  final RegisterSessionEntityEffectsGenerator generator;
 
   @override
   Map<String, List<String>> get buildExtensions => {
@@ -46,10 +46,10 @@ class RegisterEntityEffectsBuilder implements Builder {
   Future<void> build(BuildStep buildStep) async {
     var buffer = StringBuffer(
       '// GENERATED CODE - DO NOT EDIT\n\n'
-      'import "package:prophecy_compagnon_shared/classes/entity/effect.dart";\n'
+      'import "package:prophecy_compagnon_shared/classes/session/entity_effect.dart";\n'
     );
     var functionBuffer = StringBuffer(
-        'void registerEntityEffects() {\n'
+      'void registerSessionEntityEffects() {\n'
     );
 
     await for(var input in buildStep.findAssets(Glob('lib/**.dart'))) {

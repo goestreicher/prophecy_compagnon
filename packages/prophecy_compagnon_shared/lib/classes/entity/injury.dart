@@ -18,7 +18,7 @@
 import 'dart:collection';
 import 'dart:math';
 
-import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'injury.g.dart';
@@ -228,7 +228,11 @@ class InjuryManager {
     );
   }
 
-  static InjuryManager getInjuryManagerForAbilities({ required int resistance, required int volonte, InjuryManager? source }) {
+  static InjuryManager getInjuryManagerForAbilities({
+      required int resistance,
+      required int volonte,
+      InjuryManager? source,
+  }) {
     int scratchCount = 0;
     int lightCount = 0;
     int graveCount = 0;
@@ -275,8 +279,32 @@ class InjuryManager {
     );
   }
 
-  List<InjuryLevel> levels() => _injuryLevels.values.toList();
-  int count(InjuryLevel level) => _injuries.containsKey(level.type) ? _injuries[level.type]! : 0;
+  List<InjuryLevel> levels() =>
+      _injuryLevels.values.toList();
+
+  int capacity(Injury type) {
+    for(var level in _injuryLevels.values) {
+      if(level.type == type) {
+        return level.capacity;
+      }
+    }
+
+    throw(ArgumentError('Impossible de trouver le niveau de blessure ${type.title}'));
+  }
+
+  void setCapacity(Injury type, int capacity) {
+    for(var level in _injuryLevels.values) {
+      if(level.type == type) {
+        level.capacity = capacity;
+        return;
+      }
+    }
+
+    throw(ArgumentError('Impossible de trouver le niveau de blessure ${type.title}'));
+  }
+
+  int count(InjuryLevel level) =>
+      _injuries.containsKey(level.type) ? _injuries[level.type]! : 0;
 
   InjuryLevel dealDamage(int amount) {
     var range = _injuryLevels.lastKeyBefore(_InjuryRange(min: amount, max: 99999));

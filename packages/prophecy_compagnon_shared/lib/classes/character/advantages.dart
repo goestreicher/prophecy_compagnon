@@ -29,10 +29,13 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart'
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
 import 'package:prophecy_compagnon_shared/classes/resource_link/resource_link.dart';
+import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 import 'package:prophecy_compagnon_shared/ui/resource_link_name_autocomplete_widget.dart';
 
 enum AdvantageType {
@@ -315,12 +318,27 @@ enum Advantage {
       ),
     ]
   ),
-  // TODO: manage this capacity
   sensEnAlerte(
     title: 'Sens en alerte',
     description: "Cet Avantage permet au personnage d’être toujours en alerte et, lors des combats, de garder une vue d'ensemble des événements, de façon à pouvoir intervenir au meilleur moment.\nAu premier tour de chaque combat, le joueur lance un dé supplémentaire pour déterminer le rang d’Initiative des actions de son personnage - il choisit ensuite les meilleurs résultats, en conservant un nombre de dés égal à son nombre d'actions.",
     cost: [3],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    effectConfigurations: [
+      EntityEffectInitiativeExtraDiceConfiguration(
+        name: 'Sens en alerte (Avantage)',
+        trigger: EntityEffectTrigger.tickerEvent,
+        triggerTickerEvent: TickerEvent(
+          type: TickerEventType.start,
+          unit: TickerEventUnit.combat,
+        ),
+        duration: TickerEvent(
+          type: TickerEventType.end,
+          unit: TickerEventUnit.turn,
+          count: 1,
+        ),
+        count: 1,
+      ),
+    ],
   ),
   // TODO: manage this capacity
   statutSocial(
@@ -460,6 +478,8 @@ enum Advantage {
   final bool unique;
   final List<DiceThrowModifierConfiguration> throwModifierConfigurations;
   final DiceThrowModifierBuilder? throwModifierBuilder;
+  final List<EntityEffectConfiguration> effectConfigurations;
+  final EntityEffectBuilder? effectBuilder;
   final List<String> Function()? detailsGenerator;
   final Widget Function(BuildContext, void Function(String))? detailsOverlay;
 
@@ -473,6 +493,8 @@ enum Advantage {
     this.unique = true,
     this.throwModifierConfigurations = const <DiceThrowModifierConfiguration>[],
     this.throwModifierBuilder,
+    this.effectConfigurations = const <EntityEffectConfiguration>[],
+    this.effectBuilder,
     this.detailsGenerator,
     this.detailsOverlay,
   });
@@ -596,11 +618,11 @@ List<DiceThrowModifier> _habileteReconnueThrowModifierBuilder(DiceThrowModifierB
   }
 
   return [
-    DisadvantageDiceThrowModifier(
+    AdvantageDiceThrowModifier(
       type: DiceThrowModifierType.difficulty,
       label: 'Habileté reconnue - ${args.details} (Avantage)',
       value: 1,
-      disadvantageSuffix: args.suffix,
+      advantageSuffix: args.suffix,
       matcher: BooleanAndDiceThrowMatcher(
         children: [
           SkillFamilyDiceThrowMatcher(family: family),

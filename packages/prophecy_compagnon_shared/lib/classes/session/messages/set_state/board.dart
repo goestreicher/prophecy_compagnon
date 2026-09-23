@@ -25,10 +25,7 @@ class SessionSetStateBoardPush extends SessionSetStateMessage {
     required this.item,
     super.source,
   })
-    : super(
-      category: SessionSetStateCategory.board,
-      destination: SessionMessage.broadcast,
-    );
+    : super(destination: SessionMessage.broadcast);
 
   final SessionBoardItem item;
 
@@ -43,10 +40,7 @@ class SessionSetStateBoardSelect extends SessionSetStateMessage {
     required this.index,
     super.source,
   })
-    : super(
-        category: SessionSetStateCategory.board,
-        destination: SessionMessage.broadcast,
-      );
+    : super(destination: SessionMessage.broadcast);
 
   final int index;
 
@@ -61,10 +55,7 @@ class SessionSetStateBoardRemove extends SessionSetStateMessage {
     required this.index,
     super.source,
   })
-    : super(
-        category: SessionSetStateCategory.board,
-        destination: SessionMessage.broadcast,
-      );
+    : super(destination: SessionMessage.broadcast);
 
   final int index;
 

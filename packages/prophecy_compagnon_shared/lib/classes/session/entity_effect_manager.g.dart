@@ -12,7 +12,9 @@ EntityEffectManager _$EntityEffectManagerFromJson(Map<String, dynamic> json) =>
         (k, e) => MapEntry(
           k,
           (e as List<dynamic>)
-              .map((e) => EntityEffect.fromJson(e as Map<String, dynamic>))
+              .map(
+                (e) => SessionEntityEffect.fromJson(e as Map<String, dynamic>),
+              )
               .toList(),
         ),
       ),

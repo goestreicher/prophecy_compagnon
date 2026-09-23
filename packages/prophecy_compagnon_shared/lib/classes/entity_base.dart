@@ -27,6 +27,7 @@ import 'package:prophecy_compagnon_shared/classes/draconic_favor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/fervor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
@@ -83,6 +84,7 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     EntityMagic? magic,
     EntityDraconicFavors? favors,
     EntityFervor? fervor,
+    EntityEffects? effects,
     ExportableBinaryData? image,
     ExportableBinaryData? icon,
   })
@@ -99,10 +101,21 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
       magic = magic ?? EntityMagic(),
       favors = favors ?? EntityDraconicFavors(),
       fervor = fervor ?? EntityFervor(),
+      effects = effects ?? EntityEffects(),
       _image = image,
       _icon = icon
   {
     this.injuries = injuries ?? EntityInjuries(manager: injuryProvider(this, null));
+
+    for(var effect in this.effects.where((EntityEffect e) => e.active)) {
+      switch(effect.target) {
+        case EntityEffectTarget.diceThrowModifier:
+          effect.apply(this);
+        case EntityEffectTarget.initiativeExtraDice:
+        case EntityEffectTarget.injuryCapacity:
+          continue;
+      }
+    }
   }
 
   @JsonKey(includeIfNull: false)
@@ -130,6 +143,8 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     )
     final EntityDraconicFavors favors;
   final EntityFervor fervor;
+  @JsonKey(fromJson: EntityEffects.fromJson, toJson: EntityEffects.toJson)
+    final EntityEffects effects;
 
   ExportableBinaryData? get image => _image;
   set image(ExportableBinaryData? i) {
