@@ -256,7 +256,7 @@ class _EventWidget extends StatelessWidget {
     ) {
       extraActionButtons[ResourceLinkType.encounter] = <ExtraActionButtonBuilder>[
         (BuildContext context, ResourceLink link) {
-          var idx = session.scenario.encounters.indexWhere(
+          var idx = (session.scenario?.encounters ?? <ScenarioEncounter>[]).indexWhere(
               (ScenarioEncounter e) => e.uuid == link.id
           );
           if(idx == -1) {
@@ -269,7 +269,7 @@ class _EventWidget extends StatelessWidget {
 
               var started = await StartEncounterManager(
                 session: session,
-                scenarioEncounter: session.scenario.encounters[idx],
+                scenarioEncounter: session.scenario!.encounters[idx],
                 context: context,
               ).start();
               if(!context.mounted) return;

@@ -135,7 +135,7 @@ class _ScenariosListPageState extends State<ScenariosListPage> {
                               });
 
                               for(var session in await GameSessionStore().getAll()) {
-                                if(session.scenario.uuid == scenarioSummaries[index].uuid) {
+                                if(session.scenario?.uuid == scenarioSummaries[index].uuid) {
                                   await GameSessionStore().delete(session);
                                 }
                               }

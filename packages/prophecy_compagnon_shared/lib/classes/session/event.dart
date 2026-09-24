@@ -56,10 +56,10 @@ class SessionEvent {
 
   factory SessionEvent.fromJson(
       Map<String, dynamic> json,
-      ScenarioDays scenarioDays
+      ScenarioDays? scenarioDays
   ) {
     if(json.containsKey('type') && json['type'] == 'reference') {
-      var e = scenarioDays.event(json['uuid']);
+      var e = scenarioDays!.event(json['uuid']);
       return SessionEvent(
         parent: e,
         realized: json['realized'] != null
@@ -158,7 +158,7 @@ class SessionDayEvents {
 
   factory SessionDayEvents.fromJson(
       Map<String, dynamic> json,
-      ScenarioDays scenarioDays,
+      ScenarioDays? scenarioDays,
   ) {
     var ret = SessionDayEvents();
 
@@ -327,7 +327,7 @@ class SessionDays extends ChangeNotifier {
   factory SessionDays.fromJson({
       required Map<String, dynamic> sessionDays,
       required Map<String, dynamic> remapped,
-      required ScenarioDays scenarioDays,
+      ScenarioDays? scenarioDays,
   }) {
     var days = <DayRange, SessionDayEvents>{};
     var remappedDays = <String, DayRange>{};
@@ -351,7 +351,9 @@ class SessionDays extends ChangeNotifier {
       sessionDays: days,
       remapped: remappedDays,
     );
-    ret.updateWithScenarioDays(scenarioDays);
+    if(scenarioDays != null) {
+      ret.updateWithScenarioDays(scenarioDays);
+    }
 
     return ret;
   }

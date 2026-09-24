@@ -138,15 +138,16 @@ class _SessionCreationDialogState extends State<SessionCreationDialog> {
                       ElevatedButton(
                         onPressed: () async {
                           if(table == null) return;
-                          if(scenario == null) return;
                           if(startDate == null) return;
 
                           var t = await GameTableStore().get(table!.uuid);
-                          var s = await ScenarioStore().get(scenario!.uuid);
+                          var s = scenario == null
+                              ? null
+                              : await ScenarioStore().get(scenario!.uuid);
 
                           var session = GameSession(
                               table: t!,
-                              scenario: s!,
+                              scenario: s,
                               startDate: startDate!,
                           );
 

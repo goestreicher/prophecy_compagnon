@@ -225,7 +225,7 @@ class _PlayPageTitle extends StatelessWidget {
       spacing: 8.0,
       children: [
         Text(
-            '${session.scenario.name} / '
+            '${session.scenario?.name ?? "Pas de scénario"} / '
             'Jour ${session.day+1} '
             '(${session.currentDate.toString()}) / '
             '${session.hour}h',

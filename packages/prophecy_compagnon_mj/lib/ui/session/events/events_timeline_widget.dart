@@ -213,10 +213,15 @@ class _SessionEventsTimelineWidgetState extends State<SessionEventsTimelineWidge
 
     if(!indicatorPositions.containsKey(session.day)) {
       var currentDayRange = DayRange(start: session.day, end: session.day);
-      var r = positioned.firstKeyAfter(currentDayRange)!;
-      indicatorPositions[session.day] = positioned[r]!.y - dayIndicatorWidth - pillSpacing;
+      var r = positioned.firstKeyAfter(currentDayRange);
+      if(r != null) {
+        indicatorPositions[session.day] = positioned[r]!.y - dayIndicatorWidth - pillSpacing;
+      }
     }
-    currentDayY = indicatorPositions[session.day]!;
+
+    if(indicatorPositions[session.day] != null) {
+      currentDayY = indicatorPositions[session.day]!;
+    }
 
     var currentDayColor = selectedDay == session.day
       ? theme.colorScheme.primaryContainer

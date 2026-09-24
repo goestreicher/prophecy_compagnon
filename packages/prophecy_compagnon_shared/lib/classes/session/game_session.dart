@@ -48,7 +48,9 @@ class GameSessionStore extends JsonStoreAdapter<GameSession> {
     var jsonFull = j;
 
     // TODO: manage when scenario or table were removed or when get() fails
-    jsonFull['scenario'] = (await ScenarioStore().get(j['scenario']))!.toJson();
+    if(jsonFull['scenario'] != null) {
+      jsonFull['scenario'] = (await ScenarioStore().get(j['scenario']))!.toJson();
+    }
     jsonFull['table'] = (await GameTableStore().getWithPlayers(j['table']))!.toJson();
 
     return GameSession.fromJson(jsonFull);
@@ -59,7 +61,7 @@ class GameSessionStore extends JsonStoreAdapter<GameSession> {
     var j = object.toJson();
 
     j['table'] = object.table.uuid;
-    j['scenario'] = object.scenario.uuid;
+    j['scenario'] = object.scenario?.uuid;
 
     return j;
   }
@@ -76,7 +78,7 @@ class GameSession extends ChangeNotifier {
   GameSession({
     String? uuid,
     required this.table,
-    required this.scenario,
+    this.scenario,
     required this.startDate,
     int? scenarioDay,
     KorTime? time,
@@ -91,15 +93,22 @@ class GameSession extends ChangeNotifier {
       board = board ?? SessionGameBoard(),
       effectManager = effectManager ?? EntityEffectManager()
   {
-    if(sessionDays == null) {
-      this.sessionDays = SessionDays.fromJson(
-        sessionDays: <String, dynamic>{},
-        remapped: <String, dynamic>{},
-        scenarioDays: scenario.events,
-      );
+    if(scenario == null) {
+      this.sessionDays = SessionDays();
     }
-
-    this.sessionDays.updateWithScenarioDays(scenario.events);
+    else {
+      if (sessionDays == null) {
+        this.sessionDays = SessionDays.fromJson(
+          sessionDays: <String, dynamic>{},
+          remapped: <String, dynamic>{},
+          scenarioDays: scenario!.events,
+        );
+      }
+      else {
+        this.sessionDays = sessionDays;
+        this.sessionDays.updateWithScenarioDays(scenario!.events);
+      }
+    }
 
     // If scenarioDay is null, assume this is a new session, and mark all
     // events before the start as realized, for the world category
@@ -115,7 +124,7 @@ class GameSession extends ChangeNotifier {
 
   final String uuid;
   final GameTable table;
-  final Scenario scenario;
+  final Scenario? scenario;
 
   KorDate startDate;
   late int scenarioDay;
@@ -251,7 +260,7 @@ class GameSession extends ChangeNotifier {
       ret.sessionDays = SessionDays.fromJson(
         sessionDays: entry['days'] as Map<String, dynamic>,
         remapped: (entry['remapped'] ?? <String, dynamic>{}) as Map<String, dynamic>,
-        scenarioDays: ret.scenario.events,
+        scenarioDays: ret.scenario?.events,
       );
     }
 

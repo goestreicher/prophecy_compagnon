@@ -84,7 +84,7 @@ class _SessionsListPageState extends State<SessionsListPage> {
                     child: ListTile(
                         title: Text(
                           'Table: ${_sessions[index].table.name}\n'
-                          'Scénario: ${_sessions[index].scenario.name} (jour ${_sessions[index].day+1})'
+                          'Scénario: ${_sessions[index].scenario?.name ?? "Pas de scénario"} (jour ${_sessions[index].day+1})'
                         ),
                         subtitle: Text('Date: ${_sessions[index].currentDate.toFullString()}'),
                         trailing: IconButton(
