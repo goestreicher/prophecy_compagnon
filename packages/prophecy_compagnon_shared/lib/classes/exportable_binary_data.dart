@@ -133,7 +133,8 @@ class ExportableBinaryData {
   ExportableBinaryData clone() => ExportableBinaryData(data: data);
 
   String get hash {
-    _hash ??= sha256.convert(utf8.encode(binaryDataToBase64(data))).toString();
+    //_hash ??= sha256.convert(utf8.encode(binaryDataToBase64(data))).toString();
+    _hash ??= sha256.convert(data).toString();
     return _hash!;
   }
 
