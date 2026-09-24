@@ -66,7 +66,9 @@ class CharacterAdvantage {
           AdvantageDiceThrowModifier(
             type: cfg.type,
             label: '${advantage.title}${details.isEmpty ? "" : " - $details"} (Avantage)',
+            matcher: cfg.matcher,
             value: cfg.value!,
+            alwaysApply: cfg.alwaysApply,
             advantageSuffix: advantageSuffix,
           )
         );

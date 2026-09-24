@@ -66,7 +66,9 @@ class CharacterDisadvantage {
           DisadvantageDiceThrowModifier(
             type: cfg.type,
             label: '${disadvantage.title}${details.isEmpty ? "" : " - $details"} (Désavantage)',
+            matcher: cfg.matcher,
             value: cfg.value!,
+            alwaysApply: cfg.alwaysApply,
             disadvantageSuffix: disadvantageSuffix,
           )
         );
