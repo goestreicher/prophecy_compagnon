@@ -118,6 +118,8 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
 
   void endEncounter() {
     setState(() {
+      widget.map.freeMovementEnabled = true;
+      widget.session.encounter.value = null;
       encounter.status = SessionEncounterStatus.finished;
       updateEncounterStatus();
     });
@@ -305,7 +307,7 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
             spacing: 8.0,
             children: [
               IconButton.filled(
-                onPressed: () async {
+                onPressed: () {
                   endEncounter();
                 },
                 icon: Icon(Icons.stop),
