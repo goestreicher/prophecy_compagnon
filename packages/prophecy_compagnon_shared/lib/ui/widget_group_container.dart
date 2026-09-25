@@ -23,10 +23,12 @@ class WidgetGroupContainer extends StatelessWidget {
   const WidgetGroupContainer({
     super.key,
     this.title,
+    this.titleBackgroundColor,
     required this.child,
   });
 
   final Widget? title;
+  final Color? titleBackgroundColor;
   final Widget child;
 
   @override
@@ -63,7 +65,7 @@ class WidgetGroupContainer extends StatelessWidget {
               top: -(titleWidgetSize.height / 2),
               left: 12,
               child: Container(
-                color: theme.colorScheme.surfaceBright,
+                color: titleBackgroundColor ?? theme.colorScheme.surfaceBright,
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: title,
               )
