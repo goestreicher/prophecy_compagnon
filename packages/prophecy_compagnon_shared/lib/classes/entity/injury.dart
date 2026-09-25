@@ -376,6 +376,9 @@ class InjuryManager {
     if(!_injuries.containsKey(level.type)) return;
     if(_injuries[level.type]! == 0) return;
     _injuries[level.type] = _injuries[level.type]! - 1;
+    if(_injuries[level.type] == 0) {
+      _injuries.remove(level.type);
+    }
   }
 
   bool isDead() {
@@ -391,7 +394,7 @@ class InjuryManager {
     );
 
     if(currentInjuryRanks.isNotEmpty) {
-      var highestRank = currentInjuryRanks.last;
+      highestRank = currentInjuryRanks.last;
       InjuryLevel? highestLevel;
       for(var level in _injuryLevels.values) {
         if(level.type == highestRank) {
