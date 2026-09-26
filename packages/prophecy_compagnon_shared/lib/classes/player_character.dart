@@ -145,8 +145,13 @@ class PlayerCharacterStore extends JsonStoreAdapter<PlayerCharacter> {
     if(object.icon != null) await BinaryDataStore().delete(object.icon!);
     if(object.image != null) await BinaryDataStore().delete(object.image!);
 
+    PlayerCharacter._cache.del(object.id);
+
     var summary = await PlayerCharacterSummaryStore().get(object.id);
-    if(summary != null) await PlayerCharacterSummaryStore().delete(summary);
+    if(summary != null) {
+      PlayerCharacterSummary._cache.del(summary.id);
+      await PlayerCharacterSummaryStore().delete(summary);
+    }
   }
 }
 
