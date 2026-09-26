@@ -524,7 +524,7 @@ class NonPlayerCharacter extends HumanCharacter with EncounterEntityModel {
             icon: icon,
           );
     _cache.add(id, npc);
-    // Force insertion in CreatureSummary cache
+    // Force insertion in summary cache
     // ignore:unused_local_variable
     var s = npc.summary;
     return npc;

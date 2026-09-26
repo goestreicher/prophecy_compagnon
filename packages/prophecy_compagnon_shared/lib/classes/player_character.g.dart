@@ -11,21 +11,23 @@ PlayerCharacterSummary _$PlayerCharacterSummaryFromJson(
 ) => PlayerCharacterSummary(
   id: json['id'] as String,
   name: json['name'] as String,
+  location: json['location'] == null
+      ? ObjectLocation.memory
+      : ObjectLocation.fromJson(json['location'] as Map<String, dynamic>),
+  source: ObjectSource.fromJson(json['source'] as Map<String, dynamic>),
   player: json['player'] as String,
   caste: CharacterCaste.fromJson(json['caste'] as Map<String, dynamic>),
   icon: json['icon'] == null
       ? null
       : ExportableBinaryData.fromJson(json['icon'] as Map<String, dynamic>),
-  location: json['location'] == null
-      ? ObjectLocation.memory
-      : ObjectLocation.fromJson(json['location'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$PlayerCharacterSummaryToJson(
   PlayerCharacterSummary instance,
 ) => <String, dynamic>{
-  'id': instance.id,
+  'source': instance.source.toJson(),
   'name': instance.name,
+  'id': instance.id,
   'player': instance.player,
   'caste': instance.caste.toJson(),
   'icon': instance.icon?.toJson(),
@@ -34,20 +36,18 @@ Map<String, dynamic> _$PlayerCharacterSummaryToJson(
 PlayerCharacter _$PlayerCharacterFromJson(Map<String, dynamic> json) =>
     PlayerCharacter(
         uuid: json['uuid'] as String?,
+        location: json['location'] == null
+            ? ObjectLocation.memory
+            : ObjectLocation.fromJson(json['location'] as Map<String, dynamic>),
+        source: ObjectSource.fromJson(json['source'] as Map<String, dynamic>),
+        name: json['name'] as String,
         player: json['player'] as String,
         augure: $enumDecode(_$AugureEnumMap, json['augure']),
-        name: json['name'] as String,
         privilegedExperience: $enumDecode(
           _$PlayerCharacterPrivilegedExperienceEnumMap,
           json['privileged_experience'],
         ),
         experience: (json['experience'] as num?)?.toInt() ?? 0,
-        source: json['source'] == null
-            ? ObjectSource.local
-            : ObjectSource.fromJson(json['source'] as Map<String, dynamic>),
-        location: json['location'] == null
-            ? ObjectLocation.memory
-            : ObjectLocation.fromJson(json['location'] as Map<String, dynamic>),
         abilities: json['abilities'] == null
             ? null
             : EntityAbilities.fromJson(
@@ -58,10 +58,10 @@ PlayerCharacter _$PlayerCharacterFromJson(Map<String, dynamic> json) =>
             : EntityAttributes.fromJson(
                 json['attributes'] as Map<String, dynamic>,
               ),
-        initiative: (json['initiative'] as num?)?.toInt() ?? 1,
         injuries: json['injuries'] == null
             ? null
             : EntityInjuries.fromJson(json['injuries'] as Map<String, dynamic>),
+        initiative: (json['initiative'] as num?)?.toInt() ?? 1,
         skills: json['skills'] == null
             ? null
             : EntitySkills.fromJson(json['skills'] as Map<String, dynamic>),
@@ -82,14 +82,6 @@ PlayerCharacter _$PlayerCharacterFromJson(Map<String, dynamic> json) =>
         magic: json['magic'] == null
             ? null
             : EntityMagic.fromJson(json['magic'] as Map<String, dynamic>),
-        caste: json['caste'] == null
-            ? null
-            : CharacterCaste.fromJson(json['caste'] as Map<String, dynamic>),
-        honoraryCaste: json['honorary_caste'] == null
-            ? null
-            : CharacterCaste.fromJson(
-                json['honorary_caste'] as Map<String, dynamic>,
-              ),
         age: (json['age'] as num?)?.toInt() ?? 25,
         height: (json['height'] as num?)?.toDouble() ?? 1.7,
         size: (json['size'] as num?)?.toDouble(),
@@ -102,6 +94,14 @@ PlayerCharacter _$PlayerCharacterFromJson(Map<String, dynamic> json) =>
         origin: json['origin'] == null
             ? null
             : CharacterOrigin.fromJson(json['origin'] as Map<String, dynamic>),
+        caste: json['caste'] == null
+            ? null
+            : CharacterCaste.fromJson(json['caste'] as Map<String, dynamic>),
+        honoraryCaste: json['honorary_caste'] == null
+            ? null
+            : CharacterCaste.fromJson(
+                json['honorary_caste'] as Map<String, dynamic>,
+              ),
         disadvantages: CharacterDisadvantages.fromJson(
           json['disadvantages'] as List?,
         ),

@@ -39,6 +39,8 @@ import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/classes/money.dart';
 import 'package:prophecy_compagnon_shared/classes/object_location.dart';
 import 'package:prophecy_compagnon_shared/classes/object_source.dart';
+import 'package:prophecy_compagnon_shared/classes/resource_base_class.dart';
+import 'package:prophecy_compagnon_shared/classes/resource_memory_cache.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/storable.dart';
 import 'package:uuid/uuid.dart';
 
@@ -149,23 +151,51 @@ class PlayerCharacterStore extends JsonStoreAdapter<PlayerCharacter> {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class PlayerCharacterSummary {
-  PlayerCharacterSummary({
+class PlayerCharacterSummary extends ResourceBaseClass {
+  factory PlayerCharacterSummary({
+    required String id,
+    required String name,
+    ObjectLocation location = ObjectLocation.memory,
+    required ObjectSource source,
+    required String player,
+    required CharacterCaste caste,
+    ExportableBinaryData? icon,
+  })
+  {
+    var summ = _cache.entry(id)
+      ?? PlayerCharacterSummary._create(
+        id: id,
+        name: name,
+        location: location,
+        source: source,
+        player: player,
+        caste: caste,
+        icon: icon,
+      );
+    _cache.add(id, summ);
+    return summ;
+  }
+
+  PlayerCharacterSummary._create({
     required this.id,
-    required this.name,
+    required super.name,
+    required super.source,
+    super.location,
     required this.player,
     required this.caste,
     this.icon,
-    this.location = ObjectLocation.memory,
   });
 
+  @override
   final String id;
-  final String name;
   final String player;
   final CharacterCaste caste;
   final ExportableBinaryData? icon;
-  @JsonKey(includeFromJson: true, includeToJson: false)
-    ObjectLocation location;
+
+  static final _cache = ResourceMemoryCache<PlayerCharacterSummary, PlayerCharacterSummaryStore>(
+    jsonConverter: PlayerCharacterSummary.fromJson,
+    store: () => PlayerCharacterSummaryStore(),
+  );
 
   Map<String, dynamic> toJson() => _$PlayerCharacterSummaryToJson(this);
   factory PlayerCharacterSummary.fromJson(Map<String, dynamic> json) => _$PlayerCharacterSummaryFromJson(json);
@@ -204,7 +234,101 @@ enum PlayerCharacterPrivilegedExperience {
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class PlayerCharacter extends HumanCharacter {
-  PlayerCharacter({
+  factory PlayerCharacter({
+    String? uuid,
+    ObjectLocation location = ObjectLocation.memory,
+    required ObjectSource source,
+    required String name,
+    required String player,
+    required Augure augure,
+    required PlayerCharacterPrivilegedExperience privilegedExperience,
+    int experience = 0,
+    EntityAbilities? abilities,
+    EntityAttributes? attributes,
+    EntityInjuries? injuries,
+    InjuryProvider injuryProvider = humanCharacterDefaultInjuries,
+    int initiative = 1,
+    EntitySkills? skills,
+    EntityHealthStatus? healthStatus,
+    EntityCombatStatus? combatStatus,
+    EntityEquipment? equipment,
+    MoneyWallet? money,
+    EntityMagic? magic,
+    int age = 25,
+    double height = 1.7,
+    double? size,
+    double weight = 60.0,
+    int luck = 0,
+    int usedLuck = 0,
+    int proficiency = 0,
+    int usedProficiency = 0,
+    int renown = 0,
+    CharacterOrigin? origin,
+    CharacterCaste? caste,
+    CharacterCaste? honoraryCaste,
+    CharacterDisadvantages? disadvantages,
+    CharacterAdvantages? advantages,
+    CharacterTendencies? tendencies,
+    String? description,
+    EntityDraconicFavors? favors,
+    EntityFervor? fervor,
+    EntityEffects? effects,
+    ExportableBinaryData? image,
+    ExportableBinaryData? icon,
+  })
+  {
+    var id = uuid ?? Uuid().v4().toString();
+    var pc = _cache.entry(id)
+      ?? PlayerCharacter._create(
+          uuid: id,
+          location: location,
+          source: source,
+          name: name,
+          player: player,
+          augure: augure,
+          privilegedExperience: privilegedExperience,
+          experience: experience,
+          abilities: abilities,
+          attributes: attributes,
+          injuries: injuries,
+          injuryProvider: injuryProvider,
+          initiative: initiative,
+          skills: skills,
+          healthStatus: healthStatus,
+          combatStatus: combatStatus,
+          equipment: equipment,
+          money: money,
+          magic: magic,
+          caste: caste,
+          honoraryCaste: honoraryCaste,
+          age: age,
+          height: height,
+          size: size,
+          weight: weight,
+          luck: luck,
+          usedLuck: usedLuck,
+          proficiency: proficiency,
+          usedProficiency: usedProficiency,
+          renown: renown,
+          origin: origin,
+          disadvantages: disadvantages,
+          advantages: advantages,
+          tendencies: tendencies,
+          description: description,
+          favors: favors,
+          fervor: fervor,
+          effects: effects,
+          image: image,
+          icon: icon,
+        );
+    _cache.add(id, pc);
+    // Force insertion in summary cache
+    // ignore:unused_local_variable
+    var s = pc.summary;
+    return pc;
+  }
+
+  PlayerCharacter._create({
     super.uuid,
     required this.player,
     required this.augure,
@@ -268,11 +392,17 @@ class PlayerCharacter extends HumanCharacter {
     caste: caste,
     icon: icon?.clone(),
     location: location,
+    source: source,
   );
 
   static void preImportFilter(Map<String, dynamic> json) {
     EntityBase.preImportFilter(json);
   }
+
+  static final _cache = ResourceMemoryCache<PlayerCharacter, PlayerCharacterStore>(
+    jsonConverter: PlayerCharacter.fromJson,
+    store: () => PlayerCharacterStore(),
+  );
 
   @override
   Map<String, dynamic> toJson() {

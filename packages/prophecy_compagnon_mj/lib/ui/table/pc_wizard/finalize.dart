@@ -37,6 +37,7 @@ import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
 import 'package:prophecy_compagnon_shared/classes/magic_spell.dart';
 import 'package:prophecy_compagnon_shared/classes/money.dart';
+import 'package:prophecy_compagnon_shared/classes/object_source.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
 
 String? validateFinalize(PlayerCharacterWizardModel model) {
@@ -176,6 +177,7 @@ PlayerCharacter playerCharacterWizardFinalize(PlayerCharacterWizardModel model) 
     player: model.playerName!,
     augure: model.augure!,
     name: model.characterName!,
+    source: ObjectSource.local,
     privilegedExperience: model.privilegedExperience!,
     abilities: abilities,
     attributes: attributes,

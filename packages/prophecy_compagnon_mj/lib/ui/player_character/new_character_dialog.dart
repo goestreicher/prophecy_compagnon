@@ -17,6 +17,7 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/calendar.dart';
+import 'package:prophecy_compagnon_shared/classes/object_source.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
 
 class NewPlayerCharacterDialog extends StatefulWidget {
@@ -130,6 +131,7 @@ class _NewPlayerCharacterDialogState extends State<NewPlayerCharacterDialog> {
 
                     PlayerCharacter char = PlayerCharacter(
                       name: characterName,
+                      source: ObjectSource.local,
                       player: playerName,
                       augure: augure!,
                       privilegedExperience: privilegedExperience!,
