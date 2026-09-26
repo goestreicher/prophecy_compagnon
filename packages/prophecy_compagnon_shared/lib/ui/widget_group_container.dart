@@ -41,36 +41,39 @@ class WidgetGroupContainer extends StatelessWidget {
     }
 
     return Center(
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            padding: EdgeInsets.fromLTRB(8.0, 8.0 + (titleWidgetSize.height / 2), 8.0, 8.0),
-            decoration: BoxDecoration(
-              border: const GradientBoxBorder(
-                width: 1.5,
-                gradient: LinearGradient(
-                  colors: [Colors.black54, Colors.transparent],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.0, 0.8]
+      child: Padding(
+        padding: EdgeInsets.only(top: (titleWidgetSize.height / 2)),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              padding: EdgeInsets.fromLTRB(8.0, 8.0 + (titleWidgetSize.height / 2), 8.0, 8.0),
+              decoration: BoxDecoration(
+                border: const GradientBoxBorder(
+                  width: 1.5,
+                  gradient: LinearGradient(
+                    colors: [Colors.black54, Colors.transparent],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: [0.0, 0.8]
+                  )
+                ),
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              child: child,
+            ),
+            if(title != null)
+              Positioned(
+                top: -(titleWidgetSize.height / 2),
+                left: 12,
+                child: Container(
+                  color: titleBackgroundColor ?? theme.colorScheme.surfaceBright,
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: title,
                 )
               ),
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-            child: child,
-          ),
-          if(title != null)
-            Positioned(
-              top: -(titleWidgetSize.height / 2),
-              left: 12,
-              child: Container(
-                color: titleBackgroundColor ?? theme.colorScheme.surfaceBright,
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: title,
-              )
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

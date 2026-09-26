@@ -108,6 +108,12 @@ class DiceThrowEntityBaseSkill extends DiceThrowEntityAttribute {
       entity.attributes[attribute] + componentValue(entity);
 
   @override
+  String difficultyModifierLabel(EntityBase entity) =>
+      difficultyModifier(entity) != 0
+        ? 'Utilisation de la caractéristique'
+        : '';
+
+  @override
   int difficultyModifier(EntityBase entity) =>
       (_entitySpecialization(entity) ?? _entitySkill(entity)) == null && additionalDifficultyOnAbility
         ? 5

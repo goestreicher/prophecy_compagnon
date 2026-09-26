@@ -31,6 +31,7 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/session_messa
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_property_status.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
+import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
 class SessionConnectionWidget extends StatefulWidget {
   const SessionConnectionWidget({
@@ -143,7 +144,7 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
       return;
     }
 
-    var result = await showDialog<DiceThrowResult>(
+    var result = await showDialog<EntityThrowBundle>(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => EntityDiceThrowDialog(
@@ -164,8 +165,8 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
     messageBus.sendResponse(
       m,
       DiceThrowRequestResult(
-        request: m.request,
-        result: result,
+        request: result.request,
+        result: result.result,
       ),
     );
   }

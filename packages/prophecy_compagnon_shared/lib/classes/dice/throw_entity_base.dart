@@ -31,5 +31,6 @@ abstract class DiceThrowEntityBase {
   String componentLabel(EntityBase entity);
   int componentValue(EntityBase entity);
 
+  String difficultyModifierLabel(EntityBase entity) => '';
   int difficultyModifier(EntityBase entity) => 0;
 }

@@ -16,6 +16,7 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_mj/ui/session/character/info.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
@@ -45,84 +46,17 @@ class PlayCharactersPage extends StatelessWidget {
     var pcWidgets = <Widget>[];
     for(var pc in session.table.players) {
       pcWidgets.add(
-        Row(
-          spacing: 16.0,
-          children: [
-            EntityStatusWidget(
-              entity: pc,
-              iconWidth: 50.0,
-              iconHeight: 50.0,
-            ),
-            TextButton(
-              onPressed: () async {
-                var request = DiceThrowRequest(
-                  type: DiceThrowRequestType.simple,
-                  context: DiceThrowRequestContext.none,
-                  difficulty: 15,
-                  base: DiceThrowEntityBaseSkill(
-                    attribute: Attribute.physique,
-                    ability: Ability.force,
-                    skill: Skill.athletisme,
-                  )
-                );
-
-                var result = await showDialog<DiceThrowResult>(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (BuildContext context) => EntityDiceThrowDialog(
-                    entity: pc,
-                    request: request,
-                  ),
-                );
-                if(result == null) return;
-
-                var bundle = EntityThrowBundle(
-                  entity: pc,
-                  request: request,
-                  result: result,
-                );
-
-                var evaluation = evaluateDiceThrow(bundle);
-                if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
-                  SessionMessageBusClient.instance?.publish(
-                    SessionEntitySetEffectMessage(
-                      broadcastIncludesSelf: true,
-                      entityId: pc.id,
-                      effect: EffectSetCombatStatus(
-                        status: EntityCombatStatusFlag.onGround,
-                      )
-                    )
-                  );
-                }
-              },
-              child: Text('click-o'),
-            ),
-            Column(
-              children: [
-                for(var effect in pc.effects.where((EntityEffect e) => e.trigger == EntityEffectTrigger.request))
-                  TextButton(
-                    onPressed: () {
-                      if(!effect.active) {
-                        effect.apply(pc);
-                      }
-                      else {
-                        effect.unapply(pc);
-                      }
-                    },
-                    child: Text(
-                      '${effect.name} ${effect.active ? "\u2717" : "\u2713"}'
-                    ),
-                  ),
-              ],
-            ),
-          ],
+        SessionCharacterInfoWidget(
+          character: pc,
         )
       );
     }
 
-    return Column(
-      spacing: 12.0,
-      children: pcWidgets,
+    return SingleChildScrollView(
+      child: Column(
+        spacing: 12.0,
+        children: pcWidgets,
+      ),
     );
   }
 }

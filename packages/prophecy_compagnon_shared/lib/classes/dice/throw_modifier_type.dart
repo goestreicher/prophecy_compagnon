@@ -24,6 +24,7 @@ enum DiceThrowModifierType {
 
 enum DiceThrowModifierFamily {
   advantage,
+  context,
   criticalDiceThrow,
   damage,
   disadvantage,

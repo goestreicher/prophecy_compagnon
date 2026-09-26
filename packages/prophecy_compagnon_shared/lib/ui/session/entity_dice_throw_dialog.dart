@@ -26,8 +26,10 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
+import 'package:prophecy_compagnon_shared/ui/dismissible_dialog.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/pill_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/num_input_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/ui/widget_group_container.dart';
 
 class EntityDiceThrowDialog extends StatefulWidget {
@@ -35,16 +37,23 @@ class EntityDiceThrowDialog extends StatefulWidget {
     super.key,
     required this.entity,
     required this.request,
+    this.canChangeDifficulty = false,
+    this.difficultyHints = const <String, int>{},
+    this.contextModifierHints,
   });
 
   final EntityBase entity;
   final DiceThrowRequest request;
+  final bool canChangeDifficulty;
+  final Map<String, int> difficultyHints;
+  final List<String>? contextModifierHints;
 
   @override
   State<EntityDiceThrowDialog> createState() => _EntityDiceThrowDialogState();
 }
 
 class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
+  int? difficulty;
   int? proficiency;
   bool useTendencies = false;
   bool diceThrowDone = false;
@@ -58,13 +67,28 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
   int? criticalDie;
   bool isCriticalSuccess = false;
   Set<String> appliedModifiers = <String>{};
+  int contextModifier = 0;
   int difficultyModifiersTotal = 0;
+
+  static List<String> defaultContextModifierHints = [
+    "-4 : Ne jamais avoir tenté l'action auparavant",
+    "-3 : Oublier d'ôter ses bottes pour nager",
+    "-2 : Courir en sandales, peindre à la bougie",
+    "-1 : Utiliser du matériel mal entretenu",
+    "0 : Action effectuée sans préparation particulière",
+    "+1 : Prendre de l'élan pour sauter en selle",
+    "+2 : Se faire expliquer la manœuvre par un expert juste avant",
+    "+3 : Huiler un parquet pour marcher en silence",
+    "+4 : Gravir une falaise avec des crampons, des pitons et de la corde de réserve",
+  ];
 
   @override
   void initState() {
     super.initState();
 
-    // By default, consider all modifiers applied
+    difficulty = widget.request.difficulty;
+
+    // By default, consider all entity modifiers applied
     appliedModifiers.addAll(
       widget.entity.throwModifiers(widget.request)
         .map((DiceThrowModifier m) => m.id)
@@ -94,21 +118,39 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
     return true;
   }
 
-  DiceThrowResult createResult() => DiceThrowResult(
-    mainDie: mainDie,
-    usedTendencies: useTendencies,
-    announcedTendency: announcedTendency,
-    keptTendency: keptTendency,
-    dragonDie: dragonDie,
-    fatalityDie: fatalityDie,
-    humanDie: humanDie,
-    proficiency: proficiency,
-    luck: luck,
-    criticalDie: criticalDie,
-    modifiers: modifiers()
+  DiceThrowResult createResult() {
+    var modifiers = entityModifiers()
         .where((DiceThrowModifier m) => appliedModifiers.contains(m.id))
-        .toList(),
-  );
+        .toList();
+
+    if(contextModifier != 0) {
+      modifiers.add(
+        OneOffDiceThrowModifier(
+          type: contextModifier < 0
+            ? DiceThrowModifierType.malus
+            : DiceThrowModifierType.bonus,
+          family: DiceThrowModifierFamily.context,
+          label: 'Modificateur de contexte',
+          value: contextModifier,
+          name: 'context',
+        )
+      );
+    }
+
+    return DiceThrowResult(
+      mainDie: mainDie,
+      usedTendencies: useTendencies,
+      announcedTendency: announcedTendency,
+      keptTendency: keptTendency,
+      dragonDie: dragonDie,
+      fatalityDie: fatalityDie,
+      humanDie: humanDie,
+      proficiency: proficiency,
+      luck: luck,
+      criticalDie: criticalDie,
+      modifiers: modifiers,
+    );
+  }
 
   bool mustRollCritical() {
     if(!hasDieResult()) return false;
@@ -116,7 +158,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
     return die == 1 || die == 10;
   }
 
-  List<DiceThrowModifier> modifiers() {
+  List<DiceThrowModifier> entityModifiers() {
     var ret = widget.entity.throwModifiers(widget.request);
 
     if(isCriticalSuccess) {
@@ -137,7 +179,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
   void updateModifiersTotal() {
     var difficultyTotal = 0;
 
-    for(var m in modifiers()) {
+    for(var m in entityModifiers()) {
       if(appliedModifiers.contains(m.id)) {
         switch(m.type) {
           case DiceThrowModifierType.malus:
@@ -149,6 +191,8 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
       }
     }
 
+    difficultyTotal += widget.request.base.difficultyModifier(widget.entity);
+
     difficultyModifiersTotal = difficultyTotal;
   }
 
@@ -156,31 +200,104 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
 
-    var modifierRows = <Widget>[];
-    for(var m in modifiers()) {
-      modifierRows.add(
-        Row(
-          children: [
-            if(!m.alwaysApply)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if(appliedModifiers.contains(m.id)) {
-                      appliedModifiers.remove(m.id);
-                    }
-                    else {
-                      appliedModifiers.add(m.id);
-                    }
-                    updateModifiersTotal();
-                  });
-                },
-                child: Icon(
-                  appliedModifiers.contains(m.id)
-                    ? Icons.check_box
-                    : Icons.check_box_outline_blank,
+    Widget? difficultyWidget;
+    if(widget.canChangeDifficulty) {
+      difficultyWidget = Column(
+        spacing: 8.0,
+        children: [
+          Row(
+            spacing: 8.0,
+            children: [
+              Text(
+                'Difficulté',
+              ),
+              Spacer(),
+              SizedBox(
+                width: 70,
+                child: NumIntInputWidget(
+                  initialValue: difficulty ?? 0,
+                  minValue: 0,
+                  maxValue: 99,
+                  onChanged: (int v) {
+                    setState(() {
+                      difficulty = v;
+                    });
+                  },
                 ),
               ),
-            Text(m.label),
+            ],
+          ),
+          if(widget.difficultyHints.isNotEmpty)
+            Row(
+              spacing: 8.0,
+              children: [
+                Text(
+                  'Propositions de difficulté'
+                ),
+                Expanded(
+                  child: DropdownMenu(
+                    textStyle: theme.textTheme.bodySmall,
+                    inputDecorationTheme: const InputDecorationTheme(
+                      border: OutlineInputBorder(),
+                      isCollapsed: true,
+                      constraints: BoxConstraints(maxHeight: 36.0),
+                      contentPadding: EdgeInsets.all(12.0),
+                    ),
+                    onSelected: (int? v) {
+                      if(v == null) return;
+
+                      setState(() {
+                        difficulty = v;
+                      });
+                    },
+                    dropdownMenuEntries: widget.difficultyHints.entries
+                      .map(
+                        (MapEntry<String, int> e) => DropdownMenuEntry(
+                            value: e.value, label: '${e.value}: ${e.key}',
+                        )
+                      )
+                      .toList(),
+                  ),
+                )
+              ],
+            )
+        ],
+      );
+    }
+
+    var entityModifierRows = <Widget>[];
+    for(var m in entityModifiers()) {
+      Widget label = Text(m.label);
+      if(!m.alwaysApply) {
+        label = GestureDetector(
+          onTap: () {
+            setState(() {
+              if(appliedModifiers.contains(m.id)) {
+                appliedModifiers.remove(m.id);
+              }
+              else {
+                appliedModifiers.add(m.id);
+              }
+              updateModifiersTotal();
+            });
+          },
+          child: Row(
+            children: [
+              Icon(
+                appliedModifiers.contains(m.id)
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank,
+              ),
+              label,
+            ],
+          ),
+        );
+      }
+
+      entityModifierRows.add(
+        Row(
+          children: [
+            label,
             Spacer(),
             _ValuePill(value: m.value),
           ],
@@ -211,8 +328,8 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
             + createResult().total();
         totalText = total.toString();
 
-        if(widget.request.difficulty != null) {
-          if(total >= (widget.request.difficulty! + difficultyModifiersTotal)) {
+        if(difficulty != null) {
+          if(total >= (difficulty! + difficultyModifiersTotal)) {
             totalColor = Colors.green;
           }
           else {
@@ -237,9 +354,9 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
       ),
     );
 
-    Widget? difficultyWidget;
-    if(widget.request.difficulty != null) {
-      difficultyWidget = Container(
+    Widget? difficultyTotalWidget;
+    if(difficulty != null) {
+      difficultyTotalWidget = Container(
         decoration: BoxDecoration(
           color: Colors.deepOrange,
           borderRadius: BorderRadius.circular(8.0),
@@ -247,7 +364,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
           child: Text(
-            (widget.request.difficulty! + difficultyModifiersTotal).toString(),
+            (difficulty! + difficultyModifiersTotal).toString(),
             style: theme.textTheme.headlineSmall!
               .copyWith(color: Colors.white),
           ),
@@ -271,266 +388,331 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
           )
         ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxHeight: 400,
-            ),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Column(
-                spacing: 12.0,
-                children: [
-                  _DiceThrowRow(
-                    label: Column(
-                      children: [
-                        Text(
-                          'Score de base',
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                '${widget.request.base.baseLabel(widget.entity)} : ${widget.request.base.baseValue(widget.entity)}',
-                                style: theme.textTheme.bodySmall,
-                              ),
-                              Text(
-                                '${widget.request.base.componentLabel(widget.entity)} : ${widget.request.base.componentValue(widget.entity)}',
-                                style: theme.textTheme.bodySmall,
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    child: _ValuePill(
-                      value: widget.request.base.value(widget.entity),
-                    ),
-                  ),
-                  if(widget.entity is HumanCharacter)
+      content: SizedBox(
+        width: 350,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxHeight: 400,
+              ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Column(
+                  spacing: 12.0,
+                  children: [
+                    ?difficultyWidget,
                     _DiceThrowRow(
-                      label: Text('Maîtrise (max ${(widget.entity as HumanCharacter).availableProficiency})'),
-                      child: SizedBox(
-                        width: 70,
-                        child: NumIntInputWidget(
-                          enabled: !diceThrowDone,
-                          initialValue: 0,
-                          minValue: 0,
-                          maxValue: (widget.entity as HumanCharacter).availableProficiency,
-                          onChanged: (int v) {
-                            setState(() {
-                              proficiency = v;
-                            });
-                          },
+                      title: Text(
+                        'Score de base',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                      label: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '${widget.request.base.baseLabel(widget.entity)} : ${widget.request.base.baseValue(widget.entity)}',
+                            ),
+                            Text(
+                              '${widget.request.base.componentLabel(widget.entity)} : ${widget.request.base.componentValue(widget.entity)}',
+                            )
+                          ],
                         ),
                       ),
+                      child: _ValuePill(
+                        value: widget.request.base.value(widget.entity),
+                      ),
                     ),
-                  if(widget.entity is HumanCharacter)
-                    Row(
-                      children: [
-                        Switch(
-                          value: useTendencies,
-                          onChanged: diceThrowDone ? null : (bool v) async {
-                            if(v) {
-                              var hc = widget.entity as HumanCharacter;
-                              var highestValue = [
-                                    hc.tendencies.dragon.value,
-                                    hc.tendencies.fatality.value,
-                                    hc.tendencies.human.value
-                                  ]
-                                  .reduce(max);
-
-                              var announcedCandidates = <Tendency>[];
-                              for(var t in Tendency.values) {
-                                if(hc.tendencies[t].value == highestValue) {
-                                  announcedCandidates.add(t);
-                                }
-                              }
-
-                              Tendency announced;
-                              if(announcedCandidates.length == 1) {
-                                announced = announcedCandidates[0];
-                              }
-                              else {
-                                var r = await showDialog<Tendency>(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context) {
-                                    return SimpleDialog(
-                                      title: Text(
-                                        "Sélectionner la tendance annoncée"
-                                      ),
-                                      children: [
-                                        for(var t in announcedCandidates)
-                                          SimpleDialogOption(
-                                            onPressed: () {
-                                              Navigator.of(context, rootNavigator: true).pop(t);
-                                            },
-                                            child: Text(
-                                              t.title,
-                                            ),
+                    WidgetGroupContainer(
+                      title: Text(
+                        'Modificateurs',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                      titleBackgroundColor: theme.colorScheme.surfaceContainerHigh,
+                      child: Column(
+                        spacing: 8.0,
+                        children: [
+                          ...entityModifierRows,
+                          if(widget.request.base.difficultyModifier(widget.entity) != 0)
+                            Row(
+                              spacing: 8.0,
+                              children: [
+                                Text('${widget.request.base.difficultyModifierLabel(widget.entity)} (Diff.)'),
+                                Spacer(),
+                                _ValuePill(
+                                  value: widget.request.base.difficultyModifier(widget.entity),
+                                ),
+                              ],
+                            ),
+                          Row(
+                            spacing: 8.0,
+                            children: [
+                              Text('Modificateur de contexte'),
+                              IconButton(
+                                style: IconButton.styleFrom(
+                                  iconSize: 16.0,
+                                ),
+                                padding: const EdgeInsets.all(4.0),
+                                constraints: const BoxConstraints(),
+                                icon: const Icon(Icons.info_outlined),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    DismissibleDialog<void>(
+                                      title: 'Modificateurs',
+                                      content: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          minWidth: 400,
+                                          maxWidth: 400,
+                                          maxHeight: 400,
+                                        ),
+                                        child: SingleChildScrollView(
+                                          child: Text(
+                                            '\u2022 '
+                                            '${(widget.contextModifierHints ?? defaultContextModifierHints).join("\n\u2022 ")}',
                                           ),
-                                      ],
-                                    );
+                                        )
+                                      )
+                                    )
+                                  );
+                                },
+                              ),
+                              Spacer(),
+                              SizedBox(
+                                width: 70.0,
+                                child: NumIntInputWidget(
+                                  initialValue: 0,
+                                  minValue: -30,
+                                  maxValue: 30,
+                                  onChanged: (int v) {
+                                    setState(() {
+                                      contextModifier = v;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    if(widget.entity is HumanCharacter)
+                      _DiceThrowRow(
+                        label: Text('Maîtrise (max ${(widget.entity as HumanCharacter).availableProficiency})'),
+                        child: SizedBox(
+                          width: 70,
+                          child: NumIntInputWidget(
+                            enabled: !diceThrowDone,
+                            initialValue: 0,
+                            minValue: 0,
+                            maxValue: (widget.entity as HumanCharacter).availableProficiency,
+                            onChanged: (int v) {
+                              setState(() {
+                                proficiency = v;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    if(widget.entity is HumanCharacter)
+                      Row(
+                        children: [
+                          Switch(
+                            value: useTendencies,
+                            onChanged: diceThrowDone ? null : (bool v) async {
+                              if(v) {
+                                var hc = widget.entity as HumanCharacter;
+                                var highestValue = [
+                                      hc.tendencies.dragon.value,
+                                      hc.tendencies.fatality.value,
+                                      hc.tendencies.human.value
+                                    ]
+                                    .reduce(max);
+
+                                var announcedCandidates = <Tendency>[];
+                                for(var t in Tendency.values) {
+                                  if(hc.tendencies[t].value == highestValue) {
+                                    announcedCandidates.add(t);
                                   }
-                                );
-                                if(!context.mounted) return;
-                                if(r == null) return;
-                                announced = r;
+                                }
+
+                                Tendency announced;
+                                if(announcedCandidates.length == 1) {
+                                  announced = announcedCandidates[0];
+                                }
+                                else {
+                                  var r = await showDialog<Tendency>(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return SimpleDialog(
+                                        title: Text(
+                                          "Sélectionner la tendance annoncée"
+                                        ),
+                                        children: [
+                                          for(var t in announcedCandidates)
+                                            SimpleDialogOption(
+                                              onPressed: () {
+                                                Navigator.of(context, rootNavigator: true).pop(t);
+                                              },
+                                              child: Text(
+                                                t.title,
+                                              ),
+                                            ),
+                                        ],
+                                      );
+                                    }
+                                  );
+                                  if(!context.mounted) return;
+                                  if(r == null) return;
+                                  announced = r;
+                                }
+
+                                setState(() {
+                                  announcedTendency = announced;
+                                });
                               }
 
                               setState(() {
-                                announcedTendency = announced;
+                                useTendencies = v;
                               });
+                            },
+                          ),
+                          Text(
+                            'Utiliser les Tendances',
+                          ),
+                        ],
+                      ),
+                    if(!useTendencies)
+                      _DiceThrowRow(
+                        label: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: 'Dé '),
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: IconButton(
+                                  onPressed: diceThrowDone ? null : () {
+                                    setState(() {
+                                      mainDie = Random().nextInt(10) + 1;
+                                      diceThrowDone = true;
+                                    });
+                                  },
+                                  icon: Icon(CustomIcons.d10),
+                                  iconSize: 18.0,
+                                  tooltip: 'Lancer',
+                                  constraints: const BoxConstraints(),
+                                  padding: const EdgeInsets.all(8.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        child: _TextPill(
+                          text: mainDie?.toString(),
+                        ),
+                      ),
+                    if(useTendencies)
+                      _TendencyThrowWidget(
+                        diceThrowDone: diceThrowDone,
+                        onDieChanged: (Tendency t, int v) {
+                          setState(() {
+                            diceThrowDone = true;
+                            switch(t) {
+                              case Tendency.dragon:
+                                dragonDie = v;
+                              case Tendency.fatality:
+                                fatalityDie = v;
+                              case Tendency.human:
+                                humanDie = v;
                             }
-
-                            setState(() {
-                              useTendencies = v;
-                            });
-                          },
-                        ),
-                        Text(
-                          'Utiliser les Tendances',
-                        ),
-                      ],
-                    ),
-                  if(!useTendencies)
-                    _DiceThrowRow(
-                      label: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(text: 'Dé '),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: IconButton(
-                                onPressed: diceThrowDone ? null : () {
-                                  setState(() {
-                                    mainDie = Random().nextInt(10) + 1;
-                                    diceThrowDone = true;
-                                  });
-                                },
-                                icon: Icon(CustomIcons.d10),
-                                iconSize: 18.0,
-                                tooltip: 'Lancer',
-                                constraints: const BoxConstraints(),
-                                padding: const EdgeInsets.all(8.0),
+                          });
+                        },
+                        announcedTendency: announcedTendency!,
+                        keptTendency: keptTendency,
+                        onDieKept: (Tendency t) {
+                          setState(() {
+                            keptTendency = t;
+                          });
+                        },
+                        dragonDie: dragonDie,
+                        fatalityDie: fatalityDie,
+                        humanDie: humanDie,
+                      ),
+                    if(mustRollCritical())
+                      _DiceThrowRow(
+                        label: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: 'Dé de Critique '),
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: IconButton(
+                                  onPressed: criticalDie != null ? null : () {
+                                    setState(() {
+                                      criticalDie = Random().nextInt(10) + 1;
+                                      var r = createResult();
+                                      if(r.criticalType(widget.request.base.componentValue(widget.entity)) == DiceThrowResultType.criticalSuccess) {
+                                        isCriticalSuccess = true;
+                                      }
+                                    });
+                                  },
+                                  icon: Icon(CustomIcons.d10),
+                                  iconSize: 18.0,
+                                  tooltip: 'Lancer',
+                                  constraints: const BoxConstraints(),
+                                  padding: const EdgeInsets.all(8.0),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        ),
+                        child: _TextPill(
+                          text: criticalDie?.toString(),
                         ),
                       ),
-                      child: _TextPill(
-                        text: mainDie?.toString(),
-                      ),
-                    ),
-                  if(useTendencies)
-                    _TendencyThrowWidget(
-                      diceThrowDone: diceThrowDone,
-                      onDieChanged: (Tendency t, int v) {
-                        setState(() {
-                          diceThrowDone = true;
-                          switch(t) {
-                            case Tendency.dragon:
-                              dragonDie = v;
-                            case Tendency.fatality:
-                              fatalityDie = v;
-                            case Tendency.human:
-                              humanDie = v;
-                          }
-                        });
-                      },
-                      announcedTendency: announcedTendency!,
-                      keptTendency: keptTendency,
-                      onDieKept: (Tendency t) {
-                        setState(() {
-                          keptTendency = t;
-                        });
-                      },
-                      dragonDie: dragonDie,
-                      fatalityDie: fatalityDie,
-                      humanDie: humanDie,
-                    ),
-                  if(mustRollCritical())
-                    _DiceThrowRow(
-                      label: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(text: 'Dé de Critique '),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: IconButton(
-                                onPressed: criticalDie != null ? null : () {
-                                  setState(() {
-                                    criticalDie = Random().nextInt(10) + 1;
-                                    var r = createResult();
-                                    if(r.criticalType(widget.request.base.componentValue(widget.entity)) == DiceThrowResultType.criticalSuccess) {
-                                      isCriticalSuccess = true;
-                                    }
-                                  });
-                                },
-                                icon: Icon(CustomIcons.d10),
-                                iconSize: 18.0,
-                                tooltip: 'Lancer',
-                                constraints: const BoxConstraints(),
-                                padding: const EdgeInsets.all(8.0),
-                              ),
-                            ),
-                          ],
+                    if(widget.entity is HumanCharacter)
+                      _DiceThrowRow(
+                        label: Text('Chance (max ${(widget.entity as HumanCharacter).availableLuck})'),
+                        child: SizedBox(
+                          width: 70,
+                          child: NumIntInputWidget(
+                            enabled: diceThrowDone,
+                            initialValue: 0,
+                            minValue: 0,
+                            maxValue: (widget.entity as HumanCharacter).availableLuck,
+                            onChanged: (int v) {
+                              setState(() {
+                                luck = v;
+                              });
+                            },
+                          ),
                         ),
                       ),
-                      child: _TextPill(
-                        text: criticalDie?.toString(),
-                      ),
-                    ),
-                  if(widget.entity is HumanCharacter)
-                    _DiceThrowRow(
-                      label: Text('Chance (max ${(widget.entity as HumanCharacter).availableLuck})'),
-                      child: SizedBox(
-                        width: 70,
-                        child: NumIntInputWidget(
-                          enabled: diceThrowDone,
-                          initialValue: 0,
-                          minValue: 0,
-                          maxValue: (widget.entity as HumanCharacter).availableLuck,
-                          onChanged: (int v) {
-                            setState(() {
-                              luck = v;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                  if(modifierRows.isNotEmpty)
-                    WidgetGroupContainer(
-                      child: Column(
-                        children: modifierRows,
-                      ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          Row(
-            children: [
-              Text(
-                'Total',
-                style: theme.textTheme.headlineSmall,
-              ),
-              Spacer(),
-              totalWidget,
-              if(difficultyWidget != null)
+            Row(
+              children: [
                 Text(
-                  ' vs. ',
+                  'Total',
                   style: theme.textTheme.headlineSmall,
                 ),
-              ?difficultyWidget,
-            ],
-          )
-        ],
+                Spacer(),
+                totalWidget,
+                if(difficultyTotalWidget != null)
+                  Text(
+                    ' vs. ',
+                    style: theme.textTheme.headlineSmall,
+                  ),
+                ?difficultyTotalWidget,
+              ],
+            )
+          ],
+        ),
       ),
       actions: [
         TextButton(
@@ -541,7 +723,19 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
         ),
         ElevatedButton(
           onPressed: !hasDieResult() || (mustRollCritical() && criticalDie == null) ? null : () {
-            Navigator.of(context, rootNavigator: true).pop(createResult());
+            Navigator.of(context, rootNavigator: true).pop(
+              EntityThrowBundle(
+                entity: widget.entity,
+                request: DiceThrowRequest(
+                  type: widget.request.type,
+                  context: widget.request.context,
+                  difficulty: difficulty,
+                  base: widget.request.base,
+                  allowTendencies: widget.request.allowTendencies,
+                ),
+                result: createResult(),
+              )
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: theme.colorScheme.primary,
@@ -556,16 +750,22 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
 
 class _DiceThrowRow extends StatelessWidget {
   const _DiceThrowRow({
+    this.title,
     required this.label,
     required this.child,
   });
 
+  final Widget? title;
   final Widget label;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
     return WidgetGroupContainer(
+      title: title,
+      titleBackgroundColor: theme.colorScheme.surfaceContainerHigh,
       child: Row(
         spacing: 8.0,
         children: [

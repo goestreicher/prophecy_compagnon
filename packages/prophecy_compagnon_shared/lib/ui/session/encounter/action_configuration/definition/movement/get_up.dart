@@ -81,16 +81,12 @@ class ActionConfigurationMovementGetUp extends ActionConfiguration {
       return;
     }
 
-    if(diceThrowResponse.data is! DiceThrowResult) {
+    if(diceThrowResponse.data is! EntityThrowBundle) {
       // TODO: display a nice message ?
       return;
     }
 
-    var bundle = EntityThrowBundle(
-      entity: action.entity,
-      request: request,
-      result: diceThrowResponse.data,
-    );
+    var bundle = diceThrowResponse as EntityThrowBundle;
 
     var evaluation = evaluateDiceThrow(bundle);
     if(evaluation.resultType == DiceThrowResultType.success) {
