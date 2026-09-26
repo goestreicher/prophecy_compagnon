@@ -117,39 +117,42 @@ class _DiceThrowMenuWidgetState extends State<_DiceThrowMenuWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      spacing: 8.0,
-      children: [
-        DropdownMenu(
-          label: Text(
-            'Jets',
-          ),
-          onSelected: (_DiceThrowMenuItem? i) {
-            setState(() {
-              selected = i;
-            });
-          },
-          dropdownMenuEntries: widget.items.map(
-              (_DiceThrowMenuItem i) => DropdownMenuEntry(value: i, label: i.label)
-            )
-            .toList(),
-        ),
-        IconButton(
-          onPressed: selected == null ? null : () async {
-            var bundle = await showDialog<EntityThrowBundle>(
-              context: context,
-              builder: (BuildContext context) => EntityDiceThrowDialog(
-                entity: widget.entity,
-                request: selected!.request,
-                canChangeDifficulty: selected!.canChangeDifficulty,
-                difficultyHints: selected!.difficultyHints,
-                contextModifierHints: selected!.contextModifierHints,
+    return Padding(
+      padding: const EdgeInsets.only(top: 4.0),
+      child: Row(
+        spacing: 8.0,
+        children: [
+          DropdownMenu(
+            label: Text(
+              'Jets',
+            ),
+            onSelected: (_DiceThrowMenuItem? i) {
+              setState(() {
+                selected = i;
+              });
+            },
+            dropdownMenuEntries: widget.items.map(
+                (_DiceThrowMenuItem i) => DropdownMenuEntry(value: i, label: i.label)
               )
-            );
-          },
-          icon: Icon(CustomIcons.d10),
-        ),
-      ],
+              .toList(),
+          ),
+          IconButton(
+            onPressed: selected == null ? null : () async {
+              var bundle = await showDialog<EntityThrowBundle>(
+                context: context,
+                builder: (BuildContext context) => EntityDiceThrowDialog(
+                  entity: widget.entity,
+                  request: selected!.request,
+                  canChangeDifficulty: selected!.canChangeDifficulty,
+                  difficultyHints: selected!.difficultyHints,
+                  contextModifierHints: selected!.contextModifierHints,
+                )
+              );
+            },
+            icon: Icon(CustomIcons.d10),
+          ),
+        ],
+      ),
     );
   }
 }
