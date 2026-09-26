@@ -88,15 +88,15 @@ class _DiceThrowMenuItem {
     required this.label,
     required this.request,
     this.canChangeDifficulty = true,
-    this.difficultyHints = const <String, int>{},
-    this.contextModifierHints = const <String>[],
+    this.difficultyHints,
+    this.contextModifierHints,
   });
 
   final String label;
   final DiceThrowRequest request;
   final bool canChangeDifficulty;
-  final Map<String, int> difficultyHints;
-  final List<String> contextModifierHints;
+  final Map<String, int>? difficultyHints;
+  final List<String>? contextModifierHints;
 }
 
 class _DiceThrowMenuWidget extends StatefulWidget {

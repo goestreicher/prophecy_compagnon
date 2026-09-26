@@ -38,14 +38,14 @@ class EntityDiceThrowDialog extends StatefulWidget {
     required this.entity,
     required this.request,
     this.canChangeDifficulty = false,
-    this.difficultyHints = const <String, int>{},
+    this.difficultyHints,
     this.contextModifierHints,
   });
 
   final EntityBase entity;
   final DiceThrowRequest request;
   final bool canChangeDifficulty;
-  final Map<String, int> difficultyHints;
+  final Map<String, int>? difficultyHints;
   final List<String>? contextModifierHints;
 
   @override
@@ -227,7 +227,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
               ),
             ],
           ),
-          if(widget.difficultyHints.isNotEmpty)
+          if(widget.difficultyHints?.isNotEmpty ?? false)
             Row(
               spacing: 8.0,
               children: [
@@ -250,7 +250,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
                         difficulty = v;
                       });
                     },
-                    dropdownMenuEntries: widget.difficultyHints.entries
+                    dropdownMenuEntries: widget.difficultyHints!.entries
                       .map(
                         (MapEntry<String, int> e) => DropdownMenuEntry(
                             value: e.value, label: '${e.value}: ${e.key}',
