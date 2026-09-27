@@ -19,7 +19,6 @@ import 'package:prophecy_compagnon_shared/classes/session/clients/session_messag
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
-import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_position_status.dart';
 
 void executeRankAction(CombatAction action) {
@@ -32,13 +31,7 @@ void executeRankAction(CombatAction action) {
   }
 
   for(var effect in action.effects) {
-    SessionMessageBusClient.instance?.publish(
-      SessionEntitySetEffectMessage(
-        broadcastIncludesSelf: true,
-        entityId: action.entityId,
-        effect: effect,
-      )
-    );
+    SessionMessageBusClient.instance?.publish(effect);
   }
 }
 

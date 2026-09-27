@@ -16,6 +16,12 @@ builders:
     build_extensions: {"lib/$lib$": ["lib/classes/session/encounter/register_combat_actions.dart"]}
     auto_apply: root_package
     build_to: source
+  register_dice_throw_entity_bases:
+    import: "package:prophecy_compagnon_shared/builders/dice_throw_entity_bases_builder.dart"
+    builder_factories: ["registerDiceThrowEntityBasesBuilder"]
+    build_extensions: {"lib/$lib$": ["lib/classes/dice/register_dice_throw_entity_bases.dart"]}
+    auto_apply: root_package
+    build_to: source
   register_entity_effects:
     import: "package:prophecy_compagnon_shared/builders/entity_effects_builder.dart"
     builder_factories: ["registerEntityEffectsBuilder"]
@@ -28,16 +34,16 @@ builders:
     build_extensions: {"lib/$lib$": ["lib/classes/session/board/register_board_items.dart"]}
     auto_apply: root_package
     build_to: source
-  register_session_entity_effects:
-    import: "package:prophecy_compagnon_shared/builders/session_entity_effects_builder.dart"
-    builder_factories: ["registerSessionEntityEffectsBuilder"]
-    build_extensions: {"lib/$lib$": ["lib/classes/session/register_session_entity_effects.dart"]}
-    auto_apply: root_package
-    build_to: source
   register_session_map_items:
     import: "package:prophecy_compagnon_shared/builders/session_map_items_builder.dart"
     builder_factories: ["registerSessionMapItemsBuilder"]
     build_extensions: {"lib/$lib$": ["lib/classes/session/map/register_map_items.dart"]}
+    auto_apply: root_package
+    build_to: source
+  register_session_messages:
+    import: "package:prophecy_compagnon_shared/builders/session_messages_builder.dart"
+    builder_factories: ["registerSessionMessagesBuilder"]
+    build_extensions: {"lib/$lib$": ["lib/classes/session/messages/register_session_messages.dart"]}
     auto_apply: root_package
     build_to: source
   register_store_adapters:

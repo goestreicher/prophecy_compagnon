@@ -36,10 +36,7 @@ class RegisterSessionBoardItemsGenerator extends Generator {
       lines.add(
         '  SessionBoardItem.registerSessionBoardItemJsonFactory(\n'
         '    "${element.name}",\n'
-        '    (\n'
-        '        Map<String, dynamic> json,\n'
-        '        SessionContextRetriever context\n'
-        '    ) => ${element.name}.fromJson(json, context),\n'
+        '    (Map<String, dynamic> json) => ${element.name}.fromJson(json),\n'
         '  );\n'
       );
     }

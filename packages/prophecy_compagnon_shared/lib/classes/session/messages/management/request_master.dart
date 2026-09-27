@@ -15,8 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 
+part 'request_master.g.dart';
+
+@JsonSerializable()
 class SessionRequestMaster extends SessionMessage {
   SessionRequestMaster({
     required super.source,
@@ -26,4 +30,11 @@ class SessionRequestMaster extends SessionMessage {
     : super(destination: SessionMessage.busIdentifier);
 
   final String runUuid;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionRequestMasterToJson(this);
+
+  factory SessionRequestMaster.fromJson(Map<String, dynamic> json) =>
+      _$SessionRequestMasterFromJson(json);
 }

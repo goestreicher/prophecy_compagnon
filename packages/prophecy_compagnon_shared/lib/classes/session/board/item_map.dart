@@ -23,8 +23,8 @@ import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
 import 'package:prophecy_compagnon_shared/classes/place_map.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/item.dart';
-import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 import 'package:prophecy_compagnon_shared/classes/string_pair_map_key.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
 
@@ -61,27 +61,33 @@ class SessionBoardItemMap extends SessionBoardItem {
   @override get removable =>
     (encounter == null || encounter!.status == SessionEncounterStatus.finished);
 
-  factory SessionBoardItemMap.fromJson(
-      Map<String, dynamic> json,
-      SessionContextRetriever context
-  ) =>
-      SessionBoardItemMap(
-        title: json['title'] as String,
-        background: PlaceMap.fromJson(
-          json['background'] as Map<String, dynamic>,
-        ),
-        items: SessionBoardItemMapItems.fromJson(
-          ((json['items'] as Map<String, dynamic>?) ?? <String, dynamic>{}),
-          context,
-        ),
-        encounter: context.encounter,
-      )
-      ..transformation = _matrix4FromJson(
+  factory SessionBoardItemMap.fromJson(Map<String, dynamic> json) {
+    var session = GameSession.instance;
+    if(session == null) {
+      throw(StateError('Pas de session en cours'));
+    }
+
+    var ret = SessionBoardItemMap(
+      title: json['title'] as String,
+      background: PlaceMap.fromJson(
+        json['background'] as Map<String, dynamic>,
+      ),
+      items: SessionBoardItemMapItems.fromJson(
+        ((json['items'] as Map<String, dynamic>?) ?? <String, dynamic>{}),
+      ),
+      encounter: session.encounter.value,
+    );
+
+    ret.transformation = _matrix4FromJson(
         ((json['transformation'] as List<dynamic>?) ?? <dynamic>[])
-          .map((dynamic d) => d as double)
-          .toList(),
-      )
-      ..freeMovementEnabled = json['free_movement_enabled'] as bool;
+            .map((dynamic d) => d as double)
+            .toList(),
+      );
+
+    ret.freeMovementEnabled = json['free_movement_enabled'] as bool;
+
+    return ret;
+  }
 
   @override
   Map<String, dynamic> boardItemToJson() =>
@@ -185,10 +191,7 @@ class SessionBoardItemMapItems with IterableMixin<MapEntry<String, SessionMapIte
     notifyListeners();
   }
 
-  factory SessionBoardItemMapItems.fromJson(
-      Map<String, dynamic> json,
-      SessionContextRetriever context,
-  ) {
+  factory SessionBoardItemMapItems.fromJson(Map<String, dynamic> json) {
     return SessionBoardItemMapItems(
       items: Map.fromEntries(
         json.entries
@@ -196,7 +199,7 @@ class SessionBoardItemMapItems with IterableMixin<MapEntry<String, SessionMapIte
             (MapEntry<String, dynamic> e) =>
               MapEntry<String, SessionMapItem>(
                 e.key,
-                SessionMapItem.fromJson(e.value as Map<String, dynamic>, context)
+                SessionMapItem.fromJson(e.value as Map<String, dynamic>)
               )
           )
       )

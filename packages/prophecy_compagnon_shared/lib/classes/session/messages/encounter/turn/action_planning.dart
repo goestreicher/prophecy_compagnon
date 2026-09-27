@@ -15,16 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/session_encounter_turn.dart';
 
+part 'action_planning.g.dart';
+
+@JsonSerializable()
 class SessionEncounterTurnActionPlanningStart extends SessionEncounterTurnActionMessage {
   SessionEncounterTurnActionPlanningStart({
     super.source,
     required super.destination,
     required super.actionUuid,
   });
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEncounterTurnActionPlanningStartToJson(this);
+
+  factory SessionEncounterTurnActionPlanningStart.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterTurnActionPlanningStartFromJson(json);
 }
 
+@JsonSerializable()
 class SessionEncounterTurnActionPlanningEnd extends SessionEncounterTurnActionMessage {
   SessionEncounterTurnActionPlanningEnd({
     super.source,
@@ -32,4 +44,11 @@ class SessionEncounterTurnActionPlanningEnd extends SessionEncounterTurnActionMe
     required super.actionUuid,
   })
     : super(hasResponse: false);
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEncounterTurnActionPlanningEndToJson(this);
+
+  factory SessionEncounterTurnActionPlanningEnd.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterTurnActionPlanningEndFromJson(json);
 }

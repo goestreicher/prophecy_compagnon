@@ -17,6 +17,8 @@
 
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 
+typedef DiceThrowEntityBaseJsonFactory = DiceThrowEntityBase Function(Map<String, dynamic>);
+
 abstract class DiceThrowEntityBase {
   DiceThrowEntityBase();
 
@@ -33,4 +35,25 @@ abstract class DiceThrowEntityBase {
 
   String difficultyModifierLabel(EntityBase entity) => '';
   int difficultyModifier(EntityBase entity) => 0;
+
+  Map<String, dynamic> diceThrowEntityBaseToJson();
+
+  factory DiceThrowEntityBase.fromJson(Map<String, dynamic> json) {
+    if(!json.containsKey('_type')) {
+      throw(ArgumentError('Missing "_type" key in JSON'));
+    }
+    return _baseFactories[json['_type']]!(json);
+  }
+
+  Map<String, dynamic> toJson() {
+    var ret = diceThrowEntityBaseToJson();
+    ret['_type'] = runtimeType.toString();
+    return ret;
+  }
+
+  static void registerDiceThrowEntityBaseJsonFactory(String name, DiceThrowEntityBaseJsonFactory factory) =>
+      _baseFactories[name] = factory;
+
+  static final Map<String, DiceThrowEntityBaseJsonFactory> _baseFactories =
+  <String, DiceThrowEntityBaseJsonFactory>{};
 }

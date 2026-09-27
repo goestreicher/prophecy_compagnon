@@ -15,8 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_map_status.dart';
 
+part 'entity_position_status.g.dart';
+
+@JsonSerializable()
 class SessionEntityPositionStatusMessage extends SessionEntityMapStatusMessage {
   SessionEntityPositionStatusMessage({
     super.source,
@@ -29,4 +33,11 @@ class SessionEntityPositionStatusMessage extends SessionEntityMapStatusMessage {
 
   final double x;
   final double y;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEntityPositionStatusMessageToJson(this);
+
+  factory SessionEntityPositionStatusMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionEntityPositionStatusMessageFromJson(json);
 }

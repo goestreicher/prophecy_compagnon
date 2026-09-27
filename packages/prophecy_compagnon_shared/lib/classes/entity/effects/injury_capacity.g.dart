@@ -47,6 +47,7 @@ Map<String, dynamic> _$EntityEffectInjuryCapacityToJson(
 };
 
 const _$EntityEffectTriggerEnumMap = {
+  EntityEffectTrigger.once: 'once',
   EntityEffectTrigger.permanent: 'permanent',
   EntityEffectTrigger.request: 'request',
   EntityEffectTrigger.tickerEvent: 'tickerEvent',

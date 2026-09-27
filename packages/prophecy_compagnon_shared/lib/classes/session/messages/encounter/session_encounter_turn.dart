@@ -17,7 +17,7 @@
 
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_action.dart';
 
-class SessionEncounterTurnMessage extends SessionActionMessage {
+abstract class SessionEncounterTurnMessage extends SessionActionMessage {
   SessionEncounterTurnMessage({
     super.source,
     required super.destination,
@@ -26,7 +26,7 @@ class SessionEncounterTurnMessage extends SessionActionMessage {
   });
 }
 
-class SessionEncounterTurnActionMessage extends SessionEncounterTurnMessage {
+abstract class SessionEncounterTurnActionMessage extends SessionEncounterTurnMessage {
   SessionEncounterTurnActionMessage({
     super.source,
     required super.destination,

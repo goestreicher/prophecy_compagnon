@@ -15,10 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
 
+part 'magic_skill.g.dart';
+
+@JsonSerializable()
 class DiceThrowEntityBaseMagicSkill extends DiceThrowEntityBase {
   DiceThrowEntityBaseMagicSkill({
     required this.skill,
@@ -47,4 +51,11 @@ class DiceThrowEntityBaseMagicSkill extends DiceThrowEntityBase {
 
   @override
   int componentValue(EntityBase entity) => entity.magic.spheres.get(sphere);
+
+  @override
+  Map<String, dynamic> diceThrowEntityBaseToJson() =>
+      _$DiceThrowEntityBaseMagicSkillToJson(this);
+
+  factory DiceThrowEntityBaseMagicSkill.fromJson(Map<String, dynamic> json) =>
+      _$DiceThrowEntityBaseMagicSkillFromJson(json);
 }

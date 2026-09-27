@@ -17,7 +17,7 @@
 
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_action.dart';
 
-class SessionActionMapMessage extends SessionActionMessage {
+abstract class SessionActionMapMessage extends SessionActionMessage {
   SessionActionMapMessage({
     super.source,
     required super.destination,

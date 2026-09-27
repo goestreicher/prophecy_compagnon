@@ -15,11 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/item.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_set_state.dart';
 
+part 'board.g.dart';
+
+@JsonSerializable()
 class SessionSetStateBoardPush extends SessionSetStateMessage {
   SessionSetStateBoardPush({
     required this.item,
@@ -33,8 +37,16 @@ class SessionSetStateBoardPush extends SessionSetStateMessage {
   void apply(GameSession session) {
     session.board.insert(0, item);
   }
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionSetStateBoardPushToJson(this);
+
+  factory SessionSetStateBoardPush.fromJson(Map<String, dynamic> json) =>
+      _$SessionSetStateBoardPushFromJson(json);
 }
 
+@JsonSerializable()
 class SessionSetStateBoardSelect extends SessionSetStateMessage {
   SessionSetStateBoardSelect({
     required this.index,
@@ -48,8 +60,16 @@ class SessionSetStateBoardSelect extends SessionSetStateMessage {
   void apply(GameSession session) {
     session.board.selected = index;
   }
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionSetStateBoardSelectToJson(this);
+
+  factory SessionSetStateBoardSelect.fromJson(Map<String, dynamic> json) =>
+      _$SessionSetStateBoardSelectFromJson(json);
 }
 
+@JsonSerializable()
 class SessionSetStateBoardRemove extends SessionSetStateMessage {
   SessionSetStateBoardRemove({
     required this.index,
@@ -63,4 +83,11 @@ class SessionSetStateBoardRemove extends SessionSetStateMessage {
   void apply(GameSession session) {
     session.board.removeAt(index);
   }
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionSetStateBoardRemoveToJson(this);
+
+  factory SessionSetStateBoardRemove.fromJson(Map<String, dynamic> json) =>
+      _$SessionSetStateBoardRemoveFromJson(json);
 }

@@ -19,8 +19,8 @@ import 'dart:ui';
 
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/item.dart';
-import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/icon_builder.dart';
 
 class SessionMapEntityItem extends SessionMapItem {
@@ -60,14 +60,16 @@ class SessionMapEntityItem extends SessionMapItem {
   @override
   double get movementDistance => entity.baseMovementDistance;
 
-  factory SessionMapEntityItem.fromJson(
-      Map<String, dynamic> json,
-      SessionContextRetriever context,
-  ) {
+  factory SessionMapEntityItem.fromJson(Map<String, dynamic> json) {
+    var session = GameSession.instance;
+    if(session == null) {
+      throw(StateError('Pas de session en cours'));
+    }
+
     return SessionMapEntityItem(
       x: json['x'] as double?,
       y: json['y'] as double?,
-      entity: context.entity((json['entity_id'] as String))!,
+      entity: session.entity((json['entity_id'] as String))!,
     );
   }
 

@@ -16,12 +16,8 @@
  */
 
 import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
-import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 
-typedef SessionBoardItemJsonFactory = SessionBoardItem Function(
-    Map<String, dynamic>,
-    SessionContextRetriever
-  );
+typedef SessionBoardItemJsonFactory = SessionBoardItem Function(Map<String, dynamic>);
 
 abstract class SessionBoardItem {
   SessionBoardItem({
@@ -36,14 +32,11 @@ abstract class SessionBoardItem {
   GenericImage image();
   Map<String, dynamic> boardItemToJson();
 
-  factory SessionBoardItem.fromJson(
-      Map<String, dynamic> json,
-      SessionContextRetriever context,
-  ) {
+  factory SessionBoardItem.fromJson(Map<String, dynamic> json) {
     if(!json.containsKey('_type')) {
       throw(ArgumentError('Missing "_type" key in JSON'));
     }
-    return _boardItemFactories[json['_type']]!(json, context);
+    return _boardItemFactories[json['_type']]!(json);
   }
 
   Map<String, dynamic> toJson() {

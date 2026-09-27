@@ -15,7 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
+
+part 'throw_request.g.dart';
 
 enum DiceThrowRequestType {
   simple,
@@ -32,6 +35,7 @@ enum DiceThrowRequestContext {
   ;
 }
 
+@JsonSerializable()
 class DiceThrowRequest {
   DiceThrowRequest({
     required this.type,
@@ -46,4 +50,10 @@ class DiceThrowRequest {
   final int? difficulty;
   final bool allowTendencies;
   final DiceThrowEntityBase base;
+
+  factory DiceThrowRequest.fromJson(Map<String, dynamic> json) =>
+    _$DiceThrowRequestFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$DiceThrowRequestToJson(this);
 }

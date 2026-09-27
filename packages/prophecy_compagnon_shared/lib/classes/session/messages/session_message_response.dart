@@ -15,7 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
+
+part 'session_message_response.g.dart';
 
 typedef SessionMessageResponseCallback = void Function(SessionMessageResponse);
 
@@ -27,6 +30,7 @@ enum SessionMessageResponseStatus {
   timeout,
 }
 
+@JsonSerializable()
 class SessionMessageResponse extends SessionMessage {
   SessionMessageResponse({
     required super.source,
@@ -46,4 +50,11 @@ class SessionMessageResponse extends SessionMessage {
   final SessionMessageResponseStatus status;
   final String? statusMessage;
   final dynamic data;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionMessageResponseToJson(this);
+
+  factory SessionMessageResponse.fromJson(Map<String, dynamic> json) =>
+      _$SessionMessageResponseFromJson(json);
 }

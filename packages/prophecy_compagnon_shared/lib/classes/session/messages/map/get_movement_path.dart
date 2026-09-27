@@ -15,8 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/map/session_action_map.dart';
 
+part 'get_movement_path.g.dart';
+
+@JsonSerializable()
 class SessionMapGetMovementPath extends SessionActionMapMessage {
   SessionMapGetMovementPath({
     super.source,
@@ -28,8 +32,16 @@ class SessionMapGetMovementPath extends SessionActionMapMessage {
 
   final String entityId;
   final double distanceMultiplier;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionMapGetMovementPathToJson(this);
+
+  factory SessionMapGetMovementPath.fromJson(Map<String, dynamic> json) =>
+      _$SessionMapGetMovementPathFromJson(json);
 }
 
+@JsonSerializable()
 class SessionMapCancelGetMovementPath extends SessionActionMapMessage {
   SessionMapCancelGetMovementPath({
     super.source,
@@ -41,4 +53,11 @@ class SessionMapCancelGetMovementPath extends SessionActionMapMessage {
 
   final String entityId;
   final String? cancelReason;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionMapCancelGetMovementPathToJson(this);
+
+  factory SessionMapCancelGetMovementPath.fromJson(Map<String, dynamic> json) =>
+      _$SessionMapCancelGetMovementPathFromJson(json);
 }

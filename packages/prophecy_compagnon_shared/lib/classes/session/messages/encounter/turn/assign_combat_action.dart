@@ -15,9 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/session_encounter_turn.dart';
 
+part 'assign_combat_action.g.dart';
+
+@JsonSerializable()
 class SessionEncounterTurnAssignCombatActionMessage extends SessionEncounterTurnActionMessage {
   SessionEncounterTurnAssignCombatActionMessage({
     super.source,
@@ -28,8 +32,16 @@ class SessionEncounterTurnAssignCombatActionMessage extends SessionEncounterTurn
     : super(waitResponseTimeout: 5);
 
   final CombatAction combatAction;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEncounterTurnAssignCombatActionMessageToJson(this);
+
+  factory SessionEncounterTurnAssignCombatActionMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterTurnAssignCombatActionMessageFromJson(json);
 }
 
+@JsonSerializable()
 class SessionEncounterTurnUnassignCombatActionMessage extends SessionEncounterTurnActionMessage {
   SessionEncounterTurnUnassignCombatActionMessage({
     super.source,
@@ -37,4 +49,11 @@ class SessionEncounterTurnUnassignCombatActionMessage extends SessionEncounterTu
     required super.actionUuid,
   })
     : super(hasResponse: false);
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEncounterTurnUnassignCombatActionMessageToJson(this);
+
+  factory SessionEncounterTurnUnassignCombatActionMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterTurnUnassignCombatActionMessageFromJson(json);
 }

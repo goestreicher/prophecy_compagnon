@@ -15,11 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_action.dart';
 
+part 'start_pc_review.g.dart';
+
+@JsonSerializable()
 class SessionStartPlayerCharacterReview extends SessionActionMessage {
   SessionStartPlayerCharacterReview({
     super.source,
     required super.destination,
   });
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionStartPlayerCharacterReviewToJson(this);
+
+  factory SessionStartPlayerCharacterReview.fromJson(Map<String, dynamic> json) =>
+      _$SessionStartPlayerCharacterReviewFromJson(json);
 }

@@ -15,9 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_action.dart';
 
+part 'dice_throw_request.g.dart';
+
+@JsonSerializable()
 class SessionActionDiceThrowRequestMessage extends SessionActionMessage {
   SessionActionDiceThrowRequestMessage({
     super.source,
@@ -29,4 +33,11 @@ class SessionActionDiceThrowRequestMessage extends SessionActionMessage {
 
   final String entityId;
   final DiceThrowRequest request;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionActionDiceThrowRequestMessageToJson(this);
+
+  factory SessionActionDiceThrowRequestMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionActionDiceThrowRequestMessageFromJson(json);
 }

@@ -111,6 +111,8 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
       switch(effect.target) {
         case EntityEffectTarget.diceThrowModifier:
           effect.apply(this);
+        case EntityEffectTarget.combatStatus:
+        case EntityEffectTarget.healthStatus:
         case EntityEffectTarget.initiativeExtraDice:
         case EntityEffectTarget.injuryCapacity:
           continue;

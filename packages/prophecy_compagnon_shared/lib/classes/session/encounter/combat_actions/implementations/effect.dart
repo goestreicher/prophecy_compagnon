@@ -18,7 +18,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
-import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 
 part 'effect.g.dart';
 

@@ -24,9 +24,7 @@ import 'package:prophecy_compagnon_shared/classes/scenario/scenario.dart';
 import 'package:prophecy_compagnon_shared/classes/scenario/scenario_event.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/board.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
-import 'package:prophecy_compagnon_shared/classes/session/entity_effect_manager.dart';
 import 'package:prophecy_compagnon_shared/classes/session/event.dart';
-import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/storable.dart';
 import 'package:prophecy_compagnon_shared/classes/table.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
@@ -75,7 +73,35 @@ class GameSessionStore extends JsonStoreAdapter<GameSession> {
 @ScenarioDaysJsonConverter()
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class GameSession extends ChangeNotifier {
-  GameSession({
+  static GameSession? instance;
+
+  factory GameSession({
+    String? uuid,
+    required GameTable table,
+    Scenario? scenario,
+    required KorDate startDate,
+    int? scenarioDay,
+    KorTime? time,
+    SessionDays? sessionDays,
+    SessionEncounter? encounter,
+    SessionGameBoard? board,
+  })
+  {
+    instance = GameSession._create(
+      uuid: uuid,
+      table: table,
+      scenario: scenario,
+      startDate: startDate,
+      scenarioDay: scenarioDay,
+      time: time,
+      sessionDays: sessionDays,
+      encounter: encounter,
+      board: board,
+    );
+    return instance!;
+  }
+
+  GameSession._create({
     String? uuid,
     required this.table,
     this.scenario,
@@ -85,13 +111,11 @@ class GameSession extends ChangeNotifier {
     SessionDays? sessionDays,
     SessionEncounter? encounter,
     SessionGameBoard? board,
-    EntityEffectManager? effectManager,
   })
     : uuid = uuid ?? const Uuid().v4().toString(),
       time = time ?? KorTime(hour: 0, minute: 0),
       encounter = ValueNotifier<SessionEncounter?>(encounter),
-      board = board ?? SessionGameBoard(),
-      effectManager = effectManager ?? EntityEffectManager()
+      board = board ?? SessionGameBoard()
   {
     if(scenario == null) {
       this.sessionDays = SessionDays();
@@ -138,8 +162,6 @@ class GameSession extends ChangeNotifier {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
     SessionGameBoard board;
-
-  EntityEffectManager effectManager;
 
   Iterable<EntityBase> entities() =>
       [
@@ -272,12 +294,7 @@ class GameSession extends ChangeNotifier {
         );
       }
 
-      var context = SessionContextRetriever(
-        entity: (String id) => ret.entity(id),
-        encounter: ret.encounter.value,
-      );
-
-      ret.board = SessionGameBoard.fromJson(json['board'], context);
+      ret.board = SessionGameBoard.fromJson(json['board']);
     });
 
     return ret;

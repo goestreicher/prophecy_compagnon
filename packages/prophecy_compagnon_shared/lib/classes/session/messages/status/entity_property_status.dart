@@ -15,7 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_status.dart';
+
+part 'entity_property_status.g.dart';
 
 enum EntityMessageProperty {
   useLuckPoints,
@@ -24,6 +27,7 @@ enum EntityMessageProperty {
   gainProficiencyPoints,
 }
 
+@JsonSerializable()
 class SessionEntitySetPropertyMessage extends SessionEntityStatusMessage {
   SessionEntitySetPropertyMessage({
     super.source,
@@ -35,4 +39,11 @@ class SessionEntitySetPropertyMessage extends SessionEntityStatusMessage {
 
   EntityMessageProperty property;
   dynamic value;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEntitySetPropertyMessageToJson(this);
+
+  factory SessionEntitySetPropertyMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionEntitySetPropertyMessageFromJson(json);
 }

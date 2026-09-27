@@ -18,7 +18,7 @@
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
-class RegisterSessionEntityEffectsGenerator extends Generator {
+class RegisterSessionMessageGenerator extends Generator {
   @override
   String generate(LibraryReader library, BuildStep buildStep) {
     var lines = <String>[];
@@ -27,14 +27,14 @@ class RegisterSessionEntityEffectsGenerator extends Generator {
       if(!element.isPublic) continue;
       if(element.isAbstract) continue;
 
-      var isEntityEffect = false;
+      var isSessionMessage = false;
       for(var interfaceType in element.allSupertypes) {
-        if(interfaceType.getDisplayString() == 'SessionEntityEffect') isEntityEffect = true;
+        if(interfaceType.getDisplayString() == 'SessionMessage') isSessionMessage = true;
       }
-      if(!isEntityEffect) continue;
+      if(!isSessionMessage) continue;
 
       lines.add(
-        '  SessionEntityEffect.registerSessionEntityEffectJsonFactory(\n'
+        '  SessionMessage.registerSessionMessageJsonFactory(\n'
         '    "${element.name}",\n'
         '    (Map<String, dynamic> json) => ${element.name}.fromJson(json),\n'
         '  );\n'

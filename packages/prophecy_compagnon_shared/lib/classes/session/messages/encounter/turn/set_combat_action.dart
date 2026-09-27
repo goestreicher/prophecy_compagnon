@@ -15,9 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/session_encounter_turn.dart';
 
+part 'set_combat_action.g.dart';
+
+@JsonSerializable()
 class SessionEncounterTurnSetCombatActionMessage extends SessionEncounterTurnActionMessage {
   SessionEncounterTurnSetCombatActionMessage({
     super.source,
@@ -28,4 +32,11 @@ class SessionEncounterTurnSetCombatActionMessage extends SessionEncounterTurnAct
     : super(waitResponseTimeout: 5);
 
   final CombatAction combatAction;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEncounterTurnSetCombatActionMessageToJson(this);
+
+  factory SessionEncounterTurnSetCombatActionMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterTurnSetCombatActionMessageFromJson(json);
 }

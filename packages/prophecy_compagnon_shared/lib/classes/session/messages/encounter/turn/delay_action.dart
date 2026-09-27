@@ -15,8 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/session_encounter_turn.dart';
 
+part 'delay_action.g.dart';
+
+@JsonSerializable()
 class SessionEncounterTurnDelayActionMessage extends SessionEncounterTurnActionMessage {
   SessionEncounterTurnDelayActionMessage({
     super.source,
@@ -24,4 +28,11 @@ class SessionEncounterTurnDelayActionMessage extends SessionEncounterTurnActionM
     required super.actionUuid,
   })
     : super(waitResponseTimeout: 5);
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEncounterTurnDelayActionMessageToJson(this);
+
+  factory SessionEncounterTurnDelayActionMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterTurnDelayActionMessageFromJson(json);
 }

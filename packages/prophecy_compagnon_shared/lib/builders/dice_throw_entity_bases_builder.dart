@@ -17,25 +17,25 @@
 
 import 'package:build/build.dart';
 import 'package:glob/glob.dart';
-import 'package:prophecy_compagnon_shared/builders/session_entity_effects_generator.dart';
+import 'package:prophecy_compagnon_shared/builders/dice_throw_entity_bases_generator.dart';
 import 'package:source_gen/source_gen.dart';
 
-Builder registerSessionEntityEffectsBuilder(BuilderOptions options) {
+Builder registerDiceThrowEntityBasesBuilder(BuilderOptions options) {
   var defaults = BuilderOptions({
-    'output': 'lib/classes/session/register_session_entity_effects.dart'
+    'output': 'lib/classes/dice/register_dice_throw_entity_bases.dart'
   });
 
   var opts = options.overrideWith(defaults);
 
-  return RegisterSessionEntityEffectsBuilder(options: opts);
+  return RegisterDiceThrowEntityBasesBuilder(options: opts);
 }
 
-class RegisterSessionEntityEffectsBuilder implements Builder {
-  RegisterSessionEntityEffectsBuilder({ required this.options })
-    : generator = RegisterSessionEntityEffectsGenerator();
+class RegisterDiceThrowEntityBasesBuilder implements Builder {
+  RegisterDiceThrowEntityBasesBuilder({ required this.options })
+      : generator = RegisterDiceThrowEntityBaseGenerator();
 
   final BuilderOptions options;
-  final RegisterSessionEntityEffectsGenerator generator;
+  final RegisterDiceThrowEntityBaseGenerator generator;
 
   @override
   Map<String, List<String>> get buildExtensions => {
@@ -46,10 +46,10 @@ class RegisterSessionEntityEffectsBuilder implements Builder {
   Future<void> build(BuildStep buildStep) async {
     var buffer = StringBuffer(
       '// GENERATED CODE - DO NOT EDIT\n\n'
-      'import "package:prophecy_compagnon_shared/classes/session/entity_effect.dart";\n'
+      'import "package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart";\n'
     );
     var functionBuffer = StringBuffer(
-      'void registerSessionEntityEffects() {\n'
+      'void registerDiceThrowEntityBases() {\n'
     );
 
     await for(var input in buildStep.findAssets(Glob('lib/**.dart'))) {

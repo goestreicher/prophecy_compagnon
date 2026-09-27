@@ -47,7 +47,6 @@ class RegisterSessionMapItemsBuilder implements Builder {
     var buffer = StringBuffer(
       '// GENERATED CODE - DO NOT EDIT\n\n'
       'import "package:prophecy_compagnon_shared/classes/session/map/item.dart";\n'
-      'import "package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart";\n'
     );
     var functionBuffer = StringBuffer(
         'void registerSessionMapItems() {\n'

@@ -22,15 +22,17 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
-import 'package:prophecy_compagnon_shared/classes/session/entity_effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/action/dice_throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/set_combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
 import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
@@ -90,6 +92,18 @@ class ActionConfigurationMovementGetUp extends ActionConfiguration {
 
     var evaluation = evaluateDiceThrow(bundle);
     if(evaluation.resultType == DiceThrowResultType.success) {
+      var candidates = action.entity.effects
+          .where(
+              (EntityEffect e) =>
+                  e is EntityEffectCombatStatus
+                  && e.status == EntityCombatStatusFlag.onGround
+          );
+
+      if(candidates.isEmpty) {
+        // TODO: display a nice message ?
+        return;
+      }
+
       var setResponse = await messageBus.publishAndWaitForResponse(
         SessionEncounterTurnSetCombatActionMessage(
           destination: SessionMessage.masterIdentifier,
@@ -98,9 +112,10 @@ class ActionConfigurationMovementGetUp extends ActionConfiguration {
             entityId: action.entity.id,
             rank: action.rank,
             effects: [
-              EffectClearCombatStatus(
-                status: EntityCombatStatusFlag.onGround,
-              )
+              SessionEntityUnapplyEffectMessage(
+                entityId: action.entity.id,
+                effectId: candidates.first.id,
+              ),
             ]
           )
         )

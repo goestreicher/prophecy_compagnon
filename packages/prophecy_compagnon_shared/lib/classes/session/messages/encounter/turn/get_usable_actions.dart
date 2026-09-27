@@ -15,8 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/session_encounter_turn.dart';
 
+part 'get_usable_actions.g.dart';
+
+@JsonSerializable()
 class SessionEncounterTurnGetUsableActions extends SessionEncounterTurnMessage {
   SessionEncounterTurnGetUsableActions({
     super.source,
@@ -28,4 +32,11 @@ class SessionEncounterTurnGetUsableActions extends SessionEncounterTurnMessage {
 
   final String entityId;
   final List<String> excludedActionUuids;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEncounterTurnGetUsableActionsToJson(this);
+
+  factory SessionEncounterTurnGetUsableActions.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterTurnGetUsableActionsFromJson(json);
 }

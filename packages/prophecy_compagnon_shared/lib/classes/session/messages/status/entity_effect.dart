@@ -15,16 +15,54 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_status.dart';
 
-class SessionEntitySetEffectMessage extends SessionEntityStatusMessage {
-  SessionEntitySetEffectMessage({
+part 'entity_effect.g.dart';
+
+abstract class SessionEntityEffectMessage extends SessionEntityStatusMessage {
+  SessionEntityEffectMessage({
+    super.source,
+    super.broadcastIncludesSelf,
+    required super.entityId,
+  });
+}
+
+@JsonSerializable()
+class SessionEntityAddEffectMessage extends SessionEntityEffectMessage {
+  SessionEntityAddEffectMessage({
     super.source,
     super.broadcastIncludesSelf,
     required super.entityId,
     required this.effect,
   });
 
-  SessionEntityEffect effect;
+  final EntityEffect effect;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEntityAddEffectMessageToJson(this);
+
+  factory SessionEntityAddEffectMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionEntityAddEffectMessageFromJson(json);
+}
+
+@JsonSerializable()
+class SessionEntityUnapplyEffectMessage extends SessionEntityEffectMessage {
+  SessionEntityUnapplyEffectMessage({
+    super.source,
+    super.broadcastIncludesSelf,
+    required super.entityId,
+    required this.effectId,
+  });
+
+  final String effectId;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEntityUnapplyEffectMessageToJson(this);
+
+  factory SessionEntityUnapplyEffectMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionEntityUnapplyEffectMessageFromJson(json);
 }

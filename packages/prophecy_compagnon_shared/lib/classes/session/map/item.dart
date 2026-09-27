@@ -19,12 +19,8 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
-import 'package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart';
 
-typedef SessionMapItemJsonFactory = SessionMapItem Function(
-    Map<String, dynamic>,
-    SessionContextRetriever,
-  );
+typedef SessionMapItemJsonFactory = SessionMapItem Function(Map<String, dynamic>);
 
 abstract class SessionMapItem extends ChangeNotifier {
   SessionMapItem({
@@ -57,14 +53,11 @@ abstract class SessionMapItem extends ChangeNotifier {
 
   Map<String, dynamic> mapItemToJson();
 
-  factory SessionMapItem.fromJson(
-      Map<String, dynamic> json,
-      SessionContextRetriever context,
-  ) {
+  factory SessionMapItem.fromJson(Map<String, dynamic> json) {
     if(!json.containsKey('_type')) {
       throw(ArgumentError('Missing "_type" key in JSON'));
     }
-    return _mapItemsFactories[json['_type']]!(json, context);
+    return _mapItemsFactories[json['_type']]!(json);
   }
 
   Map<String, dynamic> toJson() {

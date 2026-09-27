@@ -15,11 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_set_state.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
+part 'ticker.g.dart';
+
+@JsonSerializable()
 class SessionTickerEventMessage extends SessionSetStateMessage {
   SessionTickerEventMessage({
     required this.event,
@@ -32,4 +36,11 @@ class SessionTickerEventMessage extends SessionSetStateMessage {
   void apply(GameSession session) {
     session.tick(event);
   }
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionTickerEventMessageToJson(this);
+
+  factory SessionTickerEventMessage.fromJson(Map<String, dynamic> json) =>
+      _$SessionTickerEventMessageFromJson(json);
 }

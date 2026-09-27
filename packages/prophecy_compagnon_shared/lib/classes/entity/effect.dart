@@ -21,6 +21,7 @@ import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 import 'package:uuid/uuid.dart';
 
 enum EntityEffectTrigger {
+  once,
   permanent,
   request,
   tickerEvent,
@@ -28,7 +29,9 @@ enum EntityEffectTrigger {
 }
 
 enum EntityEffectTarget {
+  combatStatus,
   diceThrowModifier,
+  healthStatus,
   initiativeExtraDice,
   injuryCapacity,
   ;
@@ -98,6 +101,8 @@ abstract class EntityEffect {
   bool _active;
 
   Map<String, dynamic> effectToJson();
+
+  bool canApply(EntityBase target) => true;
 
   @mustCallSuper
   void apply(EntityBase target) {

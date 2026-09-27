@@ -11,7 +11,7 @@ CombatActionEffect _$CombatActionEffectFromJson(Map<String, dynamic> json) =>
       entityId: json['entity_id'] as String,
       rank: (json['rank'] as num).toInt(),
       effects: (json['effects'] as List<dynamic>)
-          .map((e) => SessionEntityEffect.fromJson(e as Map<String, dynamic>))
+          .map((e) => SessionMessage.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

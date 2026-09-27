@@ -16,7 +16,7 @@
  */
 
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
-import 'package:prophecy_compagnon_shared/classes/session/entity_effect.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 
 typedef CombatActionJsonFactory = CombatAction Function(Map<String, dynamic>);
 
@@ -26,14 +26,14 @@ abstract class CombatAction {
     required this.type,
     required this.rank,
     this.interpolate = false,
-    this.effects = const <SessionEntityEffect>[],
+    this.effects = const <SessionMessage>[],
   });
 
   final String entityId;
   final CombatActionType type;
   final int rank;
   final bool interpolate;
-  final List<SessionEntityEffect> effects;
+  final List<SessionMessage> effects;
 
   Map<String, dynamic> combatActionToJson();
 

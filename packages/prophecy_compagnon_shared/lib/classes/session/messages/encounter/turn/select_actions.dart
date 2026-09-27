@@ -15,8 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/session_encounter_turn.dart';
 
+part 'select_actions.g.dart';
+
+@JsonSerializable()
 class SessionEncounterTurnSelectActions extends SessionEncounterTurnMessage {
   SessionEncounterTurnSelectActions({
     super.source,
@@ -40,4 +44,11 @@ class SessionEncounterTurnSelectActions extends SessionEncounterTurnMessage {
   final bool allowEmptySelection;
   final bool usableOnly;
   final bool showWeakHandAction;
+
+  @override
+  Map<String, dynamic> sessionMessageToJson() =>
+      _$SessionEncounterTurnSelectActionsToJson(this);
+
+  factory SessionEncounterTurnSelectActions.fromJson(Map<String, dynamic> json) =>
+      _$SessionEncounterTurnSelectActionsFromJson(json);
 }

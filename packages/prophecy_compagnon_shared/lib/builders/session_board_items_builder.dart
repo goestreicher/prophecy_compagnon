@@ -47,7 +47,6 @@ class RegisterSessionBoardItemsBuilder implements Builder {
     var buffer = StringBuffer(
       '// GENERATED CODE - DO NOT EDIT\n\n'
       'import "package:prophecy_compagnon_shared/classes/session/board/item.dart";\n'
-      'import "package:prophecy_compagnon_shared/classes/session/session_context_retriever.dart";\n'
     );
     var functionBuffer = StringBuffer(
       'void registerSessionBoardItems() {\n'

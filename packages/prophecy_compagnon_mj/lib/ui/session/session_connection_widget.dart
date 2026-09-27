@@ -20,6 +20,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/pc_review_dialog.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/action/dice_throw_request.dart';
@@ -76,8 +77,8 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
     else if(m is SessionEntitySetPropertyMessage) {
       _doEntitySetProperty(m);
     }
-    else if(m is SessionEntitySetEffectMessage) {
-      _doEntitySetEffect(m);
+    else if(m is SessionEntityEffectMessage) {
+      _doEntityEffect(m);
     }
   }
 
@@ -187,13 +188,22 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
     }
   }
 
-  void _doEntitySetEffect(SessionEntitySetEffectMessage m) {
+  void _doEntityEffect(SessionEntityEffectMessage m) {
     var entity = widget.client.session?.entity(m.entityId);
     if(entity == null) return;
 
-    m.effect.apply(entity);
-    if(!(m.effect.once ?? false)) {
-      widget.client.session?.effectManager.addEffect(m.entityId, m.effect);
+    if(m is SessionEntityAddEffectMessage && m.effect.canApply(entity)) {
+      entity.effects.add(m.effect);
+      m.effect.apply(entity);
+    }
+    else if(m is SessionEntityUnapplyEffectMessage) {
+      var candidates = entity.effects.where((EntityEffect e) => e.id == m.effectId);
+      if(candidates.isNotEmpty) {
+        candidates.first.unapply(entity);
+        if(candidates.first.removeOnUnapply) {
+          entity.effects.remove(candidates.first);
+        }
+      }
     }
   }
 }

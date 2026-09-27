@@ -22,6 +22,8 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
@@ -29,7 +31,6 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actio
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
-import 'package:prophecy_compagnon_shared/classes/session/entity_effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/action/dice_throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/assign_combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/get_usable_actions.dart';
@@ -38,6 +39,7 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/map/get_movem
 import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/movement_path_result.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
 import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
@@ -112,9 +114,15 @@ class ActionConfigurationMovementSprint extends ActionConfiguration {
               entityId: action.entity.id,
               rank: action.rank,
               effects: [
-                EffectSetCombatStatus(
-                  status: EntityCombatStatusFlag.onGround,
-                )
+                SessionEntityAddEffectMessage(
+                  broadcastIncludesSelf: true,
+                  entityId: action.entity.id,
+                  effect: EntityEffectCombatStatus(
+                    name: 'Au sol',
+                    trigger: EntityEffectTrigger.once,
+                    status: EntityCombatStatusFlag.onGround,
+                  ),
+                ),
               ]
             )
           )

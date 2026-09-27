@@ -15,10 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/attribute.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 
+part 'ability.g.dart';
+
+@JsonSerializable()
 class DiceThrowEntityBaseAbility extends DiceThrowEntityAttribute {
   DiceThrowEntityBaseAbility({
     required super.attribute,
@@ -41,4 +46,11 @@ class DiceThrowEntityBaseAbility extends DiceThrowEntityAttribute {
     // TODO: manage bonuses
     return entity.attributes[attribute] + entity.abilities[ability];
   }
+
+  @override
+  Map<String, dynamic> diceThrowEntityBaseToJson() =>
+      _$DiceThrowEntityBaseAbilityToJson(this);
+
+  factory DiceThrowEntityBaseAbility.fromJson(Map<String, dynamic> json) =>
+      _$DiceThrowEntityBaseAbilityFromJson(json);
 }

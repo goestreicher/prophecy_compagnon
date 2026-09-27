@@ -17,6 +17,8 @@
 
 import 'package:uuid/uuid.dart';
 
+typedef SessionMessageJsonFactory = SessionMessage Function(Map<String, dynamic>);
+
 abstract class SessionMessage {
   static const String busIdentifier = 'BUS';
   static const String broadcast = 'ALL';
@@ -37,4 +39,25 @@ abstract class SessionMessage {
   bool hasResponse;
   int? waitResponseTimeout;
   bool broadcastIncludesSelf;
+
+  Map<String, dynamic> sessionMessageToJson();
+
+  factory SessionMessage.fromJson(Map<String, dynamic> json) {
+    if(!json.containsKey('_type')) {
+      throw(ArgumentError('Missing "_type" key in JSON'));
+    }
+    return _sessionMessageFactories[json['_type']]!(json);
+  }
+
+  Map<String, dynamic> toJson() {
+    var ret = sessionMessageToJson();
+    ret['_type'] = runtimeType.toString();
+    return ret;
+  }
+
+  static void registerSessionMessageJsonFactory(String name, SessionMessageJsonFactory factory) =>
+      _sessionMessageFactories[name] = factory;
+
+  static final Map<String, SessionMessageJsonFactory> _sessionMessageFactories =
+      <String, SessionMessageJsonFactory>{};
 }

@@ -36,10 +36,7 @@ class RegisterSessionMapItemsGenerator extends Generator {
       lines.add(
         '  SessionMapItem.registerSessionMapItemJsonFactory(\n'
         '    "${element.name}",\n'
-        '    (\n'
-        '        Map<String, dynamic> json,\n'
-        '        SessionContextRetriever context\n'
-        '    ) => ${element.name}.fromJson(json, context),\n'
+        '    (Map<String, dynamic> json) => ${element.name}.fromJson(json),\n'
         '  );\n'
       );
     }

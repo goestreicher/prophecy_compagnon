@@ -15,14 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/attribute.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_instance.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/specialized_skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/specialized_skill_instance.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 
+part 'skill.g.dart';
+
+@JsonSerializable()
 class DiceThrowEntityBaseSkill extends DiceThrowEntityAttribute {
   DiceThrowEntityBaseSkill({
     required super.attribute,
@@ -118,6 +123,13 @@ class DiceThrowEntityBaseSkill extends DiceThrowEntityAttribute {
       (_entitySpecialization(entity) ?? _entitySkill(entity)) == null && additionalDifficultyOnAbility
         ? 5
         : 0;
+
+  @override
+  Map<String, dynamic> diceThrowEntityBaseToJson() =>
+      _$DiceThrowEntityBaseSkillToJson(this);
+
+  factory DiceThrowEntityBaseSkill.fromJson(Map<String, dynamic> json) =>
+      _$DiceThrowEntityBaseSkillFromJson(json);
 
   SkillInstance? _entitySkill(EntityBase entity) => entity.skills
       .skill(
