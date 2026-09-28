@@ -20,6 +20,24 @@ EntityEffectHealthStatus _$EntityEffectHealthStatusFromJson(
   duration: json['duration'] == null
       ? null
       : TickerEvent.fromJson(json['duration'] as Map<String, dynamic>),
+  activationDiceThrowRequest: json['activation_dice_throw_request'] == null
+      ? null
+      : DiceThrowRequest.fromJson(
+          json['activation_dice_throw_request'] as Map<String, dynamic>,
+        ),
+  activationDiceThrowRequiredResult:
+      $enumDecodeNullable(
+        _$DiceThrowResultTypeEnumMap,
+        json['activation_dice_throw_required_result'],
+      ) ??
+      DiceThrowResultType.success,
+  activationDiceThrowValueTransformer:
+      json['activation_dice_throw_value_transformer'] == null
+      ? null
+      : EntityEffectActivationDiceThrowValueTransformer.fromJson(
+          json['activation_dice_throw_value_transformer']
+              as Map<String, dynamic>,
+        ),
   postEffects: (json['post_effects'] as List<dynamic>?)
       ?.map((e) => EntityEffect.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -36,6 +54,13 @@ Map<String, dynamic> _$EntityEffectHealthStatusToJson(
   'trigger': _$EntityEffectTriggerEnumMap[instance.trigger]!,
   'trigger_ticker_event': instance.triggerTickerEvent?.toJson(),
   'duration': instance.duration?.toJson(),
+  'activation_dice_throw_request': instance.activationDiceThrowRequest
+      ?.toJson(),
+  'activation_dice_throw_required_result':
+      _$DiceThrowResultTypeEnumMap[instance.activationDiceThrowRequiredResult],
+  'activation_dice_throw_value_transformer': instance
+      .activationDiceThrowValueTransformer
+      ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
@@ -47,6 +72,14 @@ const _$EntityEffectTriggerEnumMap = {
   EntityEffectTrigger.permanent: 'permanent',
   EntityEffectTrigger.request: 'request',
   EntityEffectTrigger.tickerEvent: 'tickerEvent',
+};
+
+const _$DiceThrowResultTypeEnumMap = {
+  DiceThrowResultType.none: 'none',
+  DiceThrowResultType.criticalFail: 'criticalFail',
+  DiceThrowResultType.fail: 'fail',
+  DiceThrowResultType.success: 'success',
+  DiceThrowResultType.criticalSuccess: 'criticalSuccess',
 };
 
 const _$EntityHealthStatusFlagEnumMap = {

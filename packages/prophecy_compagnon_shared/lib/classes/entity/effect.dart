@@ -16,9 +16,15 @@
  */
 
 import 'package:flutter/foundation.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
+import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 import 'package:uuid/uuid.dart';
+
+part 'effect.g.dart';
 
 enum EntityEffectTrigger {
   once,
@@ -30,6 +36,7 @@ enum EntityEffectTrigger {
 
 enum EntityEffectTarget {
   combatStatus,
+  damageMalusModifier,
   diceThrowModifier,
   healthStatus,
   initiativeExtraDice,
@@ -59,17 +66,47 @@ abstract class EntityEffectConfiguration{
     required this.trigger,
     this.triggerTickerEvent,
     this.duration,
+    this.activationDiceThrowRequest,
+    this.activationDiceThrowRequiredResult = DiceThrowResultType.success,
+    this.activationDiceThrowValueTransformer,
+    List<EntityEffect>? postEffects,
     this.removeOnUnapply = false,
-  });
+  })
+    : postEffects = postEffects ?? const <EntityEffect>[];
 
   final String name;
   final EntityEffectTarget target;
   final EntityEffectTrigger trigger;
   final TickerEvent? triggerTickerEvent;
   final TickerEvent? duration;
+  final DiceThrowRequest? activationDiceThrowRequest;
+  final DiceThrowResultType? activationDiceThrowRequiredResult;
+  final EntityEffectActivationDiceThrowValueTransformer? activationDiceThrowValueTransformer;
+  final List<EntityEffect> postEffects;
   final bool removeOnUnapply;
 
   EntityEffect create();
+}
+
+@JsonSerializable()
+class EntityEffectActivationDiceThrowValueTransformer {
+  const EntityEffectActivationDiceThrowValueTransformer({
+    this.base = 0,
+    this.nrMultiplier = 0,
+  });
+
+  final int base;
+  final int nrMultiplier;
+
+  int value(DiceThrowEvaluation evaluation) =>
+      base
+      + evaluation.nr * nrMultiplier;
+
+  factory EntityEffectActivationDiceThrowValueTransformer.fromJson(Map<String, dynamic> json) =>
+      _$EntityEffectActivationDiceThrowValueTransformerFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$EntityEffectActivationDiceThrowValueTransformerToJson(this);
 }
 
 abstract class EntityEffect {
@@ -80,6 +117,9 @@ abstract class EntityEffect {
     required this.trigger,
     this.triggerTickerEvent,
     this.duration,
+    this.activationDiceThrowRequest,
+    this.activationDiceThrowRequiredResult = DiceThrowResultType.success,
+    this.activationDiceThrowValueTransformer,
     List<EntityEffect>? postEffects,
     this.removeOnUnapply = false,
     this.elapsedDurationUnits,
@@ -95,6 +135,9 @@ abstract class EntityEffect {
   final EntityEffectTrigger trigger;
   final TickerEvent? triggerTickerEvent;
   final TickerEvent? duration;
+  final DiceThrowRequest? activationDiceThrowRequest;
+  final DiceThrowResultType? activationDiceThrowRequiredResult;
+  final EntityEffectActivationDiceThrowValueTransformer? activationDiceThrowValueTransformer;
   final List<EntityEffect> postEffects;
   final bool removeOnUnapply;
   int? elapsedDurationUnits;
@@ -102,26 +145,41 @@ abstract class EntityEffect {
 
   Map<String, dynamic> effectToJson();
 
-  bool canApply(EntityBase target) => true;
+  bool canApply({ required EntityBase target }) => true;
+
+  void setActivationDiceThrowValue(int v) {}
 
   @mustCallSuper
-  void apply(EntityBase target) {
+  void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
     if(duration != null) {
       elapsedDurationUnits = 0;
+    }
+
+    if(
+        activationDiceThrowRequest != null
+        && activationDiceThrowValueTransformer != null
+        && activationDiceThrowEvaluation != null
+        && activationDiceThrowRequiredResult! == activationDiceThrowEvaluation.resultType
+    ) {
+      setActivationDiceThrowValue(
+        activationDiceThrowValueTransformer!.value(
+          activationDiceThrowEvaluation
+        )
+      );
     }
 
     active = true;
   }
 
   @mustCallSuper
-  void unapply(EntityBase target) {
+  void unapply({ required EntityBase target }) {
     if(duration != null) {
       elapsedDurationUnits = null;
     }
 
     for(var effect in postEffects) {
       target.effects.add(effect);
-      effect.apply(target);
+      effect.apply(target: target);
     }
 
     active = false;
@@ -177,6 +235,10 @@ class EntityEffects with Iterable<EntityEffect>, ChangeNotifier {
   Iterator<EntityEffect> get iterator => _all.iterator;
 
   void add(EntityEffect effect) {
+    if(_all.any((EntityEffect e) => e.id == effect.id)) {
+      return;
+    }
+
     _all.add(effect);
     notifyListeners();
   }

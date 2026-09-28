@@ -20,7 +20,7 @@ import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 typedef DiceThrowEntityBaseJsonFactory = DiceThrowEntityBase Function(Map<String, dynamic>);
 
 abstract class DiceThrowEntityBase {
-  DiceThrowEntityBase();
+  const DiceThrowEntityBase();
 
   bool canThrow(EntityBase entity) => true;
 

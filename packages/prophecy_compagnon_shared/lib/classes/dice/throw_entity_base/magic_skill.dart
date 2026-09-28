@@ -24,7 +24,7 @@ part 'magic_skill.g.dart';
 
 @JsonSerializable()
 class DiceThrowEntityBaseMagicSkill extends DiceThrowEntityBase {
-  DiceThrowEntityBaseMagicSkill({
+  const DiceThrowEntityBaseMagicSkill({
     required this.skill,
     required this.sphere,
   });

@@ -2,6 +2,7 @@
 
 import "package:prophecy_compagnon_shared/classes/entity/effect.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/damage_malus_modifier.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/global_dice_throw_modifier.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/health_status.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart";
@@ -11,6 +12,11 @@ void registerEntityEffects() {
   EntityEffect.registerEntityEffectJsonFactory(
     "EntityEffectCombatStatus",
     (Map<String, dynamic> json) => EntityEffectCombatStatus.fromJson(json),
+  );
+
+  EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectDamageMalusModifier",
+    (Map<String, dynamic> json) => EntityEffectDamageMalusModifier.fromJson(json),
   );
 
   EntityEffect.registerEntityEffectJsonFactory(

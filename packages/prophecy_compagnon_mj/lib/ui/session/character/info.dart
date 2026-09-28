@@ -21,9 +21,12 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.d
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/base/injury_manager_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
@@ -72,7 +75,10 @@ class SessionCharacterInfoWidget extends StatelessWidget {
                   _DiceThrowMenuWidget(
                     entity: character,
                     items: _sharedDiceThrowMenuItems,
-                  )
+                  ),
+                  _EffectsMenuWidget(
+                    entity: character,
+                  ),
                 ],
               )
             ),
@@ -208,3 +214,99 @@ const _perceptionContextModifierHints = [
   "Mauvaise visibilité : -1 à -5",
   "Dans l'obscurité presque totale : -10",
 ];
+
+class _EffectsMenuWidget extends StatefulWidget {
+  const _EffectsMenuWidget({
+    required this.entity,
+  });
+
+  final EntityBase entity;
+
+  @override
+  State<_EffectsMenuWidget> createState() => _EffectsMenuWidgetState();
+}
+
+class _EffectsMenuWidgetState extends State<_EffectsMenuWidget> {
+  EntityEffect? selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4.0),
+      child: Row(
+        spacing: 8.0,
+        children: [
+          DropdownMenu(
+            label: Text(
+              'Effets',
+            ),
+            onSelected: (EntityEffect? e) {
+              setState(() {
+                selected = e;
+              });
+            },
+            dropdownMenuEntries: widget.entity.effects.map(
+                (EntityEffect e) => DropdownMenuEntry(value: e, label: e.name)
+              )
+              .toList(),
+          ),
+          IconButton(
+            onPressed: selected == null ? null : () async {
+              if(selected!.active) {
+                SessionMessageBusClient.instance?.publish(
+                  SessionEntityUnapplyEffectMessage(
+                    broadcastIncludesSelf: true,
+                    entityId: widget.entity.id,
+                    effectId: selected!.id,
+                  )
+                );
+              }
+              else {
+                DiceThrowEvaluation? activationDiceThrowEvaluation;
+
+                if (selected!.activationDiceThrowRequest != null) {
+                  var bundle = await showDialog<EntityThrowBundle>(
+                    context: context,
+                    builder: (BuildContext context) =>
+                      EntityDiceThrowDialog(
+                        entity: widget.entity,
+                        request: selected!.activationDiceThrowRequest!,
+                      )
+                  );
+                  if (bundle == null) return;
+                  if (!context.mounted) return;
+
+                  activationDiceThrowEvaluation = evaluateDiceThrow(bundle);
+                  if (activationDiceThrowEvaluation.resultType != selected!.activationDiceThrowRequiredResult) {
+                    // TODO: display a message?
+                    return;
+                  }
+                }
+
+                SessionMessageBusClient.instance?.publish(
+                  SessionEntityAddEffectMessage(
+                    broadcastIncludesSelf: true,
+                    entityId: widget.entity.id,
+                    effect: selected!,
+                    activationDiceThrowEvaluation: activationDiceThrowEvaluation,
+                  )
+                );
+              }
+
+              setState(() {
+                // no-op, required to have the button redraw if the effect
+                // activation has changed
+              });
+            },
+            tooltip: (selected?.active ?? false)
+              ? 'Désactiver'
+              : 'Activer',
+            icon: (selected?.active ?? false)
+              ? Icon(Icons.close)
+              : Icon(Icons.arrow_forward),
+          )
+        ],
+      )
+    );
+  }
+}

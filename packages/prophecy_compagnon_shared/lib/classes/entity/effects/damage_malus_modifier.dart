@@ -19,15 +19,13 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
-import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
-part 'health_status.g.dart';
+part 'damage_malus_modifier.g.dart';
 
-class EntityEffectHealthStatusConfiguration extends EntityEffectConfiguration {
-  const EntityEffectHealthStatusConfiguration({
+class EntityEffectDamageMalusModifierConfiguration extends EntityEffectConfiguration {
+  const EntityEffectDamageMalusModifierConfiguration({
     required super.name,
     required super.trigger,
     super.triggerTickerEvent,
@@ -36,29 +34,31 @@ class EntityEffectHealthStatusConfiguration extends EntityEffectConfiguration {
     super.activationDiceThrowRequiredResult,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
-    required this.status,
+    super.removeOnUnapply,
+    this.value = 0,
   })
-      : super(target: EntityEffectTarget.healthStatus);
+    : super(target: EntityEffectTarget.damageMalusModifier);
 
-  final EntityHealthStatusFlag status;
+  final int value;
 
   @override
-  EntityEffect create() => EntityEffectHealthStatus(
-      name: name,
-      trigger: trigger,
-      triggerTickerEvent: triggerTickerEvent,
-      duration: duration,
-      activationDiceThrowRequest: activationDiceThrowRequest,
-      activationDiceThrowRequiredResult: activationDiceThrowRequiredResult,
-      activationDiceThrowValueTransformer: activationDiceThrowValueTransformer,
-      postEffects: postEffects,
-      status: status
+  EntityEffect create() => EntityEffectDamageMalusModifier(
+    name: name,
+    trigger: trigger,
+    triggerTickerEvent: triggerTickerEvent,
+    duration: duration,
+    activationDiceThrowRequest: activationDiceThrowRequest,
+    activationDiceThrowRequiredResult: activationDiceThrowRequiredResult,
+    activationDiceThrowValueTransformer: activationDiceThrowValueTransformer,
+    postEffects: postEffects,
+    removeOnUnapply: removeOnUnapply,
+    value: value,
   );
 }
 
 @JsonSerializable()
-class EntityEffectHealthStatus extends EntityEffect {
-  EntityEffectHealthStatus({
+class EntityEffectDamageMalusModifier extends EntityEffect {
+  EntityEffectDamageMalusModifier({
     super.uuid,
     required super.name,
     required super.trigger,
@@ -68,42 +68,32 @@ class EntityEffectHealthStatus extends EntityEffect {
     super.activationDiceThrowRequiredResult,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
+    super.removeOnUnapply,
     super.elapsedDurationUnits,
     super.active,
-    required this.status,
+    int value = 0,
   })
-    : super(
-        target: EntityEffectTarget.healthStatus,
-        removeOnUnapply: true,
-      );
+    : _configuredValue = value,
+      super(target: EntityEffectTarget.damageMalusModifier);
 
-  final EntityHealthStatusFlag status;
+  int get value => _activationValue ?? _configuredValue;
 
-  @override
-  bool canApply({ required EntityBase target }) =>
-      super.canApply(target: target)
-      && !target.healthStatus.has(status);
+  int _configuredValue;
+  int? _activationValue;
 
   @override
-  void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
-    if(!canApply(target: target)) return;
-
-    super.apply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation);
-    target.healthStatus.add(status);
-  }
+  void setActivationDiceThrowValue(int v) => _activationValue = v;
 
   @override
-  void unapply({ required EntityBase target }) {
-    if(!canApply(target: target)) return;
-
-    target.healthStatus.clear(status);
+  void unapply({required EntityBase target}) {
+    _activationValue = null;
     super.unapply(target: target);
   }
 
   @override
   Map<String, dynamic> effectToJson() =>
-      _$EntityEffectHealthStatusToJson(this);
+      _$EntityEffectDamageMalusModifierToJson(this);
 
-  factory EntityEffectHealthStatus.fromJson(Map<String, dynamic> json) =>
-      _$EntityEffectHealthStatusFromJson(json);
+  factory EntityEffectDamageMalusModifier.fromJson(Map<String, dynamic> json) =>
+      _$EntityEffectDamageMalusModifierFromJson(json);
 }

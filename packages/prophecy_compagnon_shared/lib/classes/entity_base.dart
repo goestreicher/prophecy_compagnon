@@ -28,6 +28,7 @@ import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/damage_malus_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/fervor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
@@ -109,8 +110,9 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
 
     for(var effect in this.effects.where((EntityEffect e) => e.active)) {
       switch(effect.target) {
+        case EntityEffectTarget.damageMalusModifier:
         case EntityEffectTarget.diceThrowModifier:
-          effect.apply(this);
+          effect.apply(target: this);
         case EntityEffectTarget.combatStatus:
         case EntityEffectTarget.healthStatus:
         case EntityEffectTarget.initiativeExtraDice:
@@ -226,7 +228,13 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     return finalDamage > 0 ? finalDamage : 0;
   }
 
-  int damageMalus() => injuries.manager.getMalus();
+  int damageMalus() {
+    var ret = injuries.manager.getMalus();
+    for(var e in effects.forTarget(EntityEffectTarget.damageMalusModifier).where((EntityEffect e) => e.active)) {
+      ret += (e as EntityEffectDamageMalusModifier).value;
+    }
+    return ret;
+  }
 
   final Map<String, DiceThrowModifier> _throwModifiers =
       <String, DiceThrowModifier>{};
@@ -242,13 +250,13 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
   List<DiceThrowModifier> throwModifiers(DiceThrowRequest request) {
     var ret = <DiceThrowModifier>[];
 
-    if(damageMalus() > 0) {
+    if(damageMalus() < 0) {
       ret.add(
         OneOffDiceThrowModifier(
           type: DiceThrowModifierType.malus,
           family: DiceThrowModifierFamily.damage,
           label: 'Malus de dégâts',
-          value: -damageMalus(),
+          value: damageMalus(),
           name: injuries.manager.getHighestInjuryLevel()!.name,
         )
       );

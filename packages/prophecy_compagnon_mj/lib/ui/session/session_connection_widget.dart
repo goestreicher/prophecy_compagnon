@@ -192,14 +192,19 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
     var entity = widget.client.session?.entity(m.entityId);
     if(entity == null) return;
 
-    if(m is SessionEntityAddEffectMessage && m.effect.canApply(entity)) {
+    if(m is SessionEntityAddEffectMessage) {
       entity.effects.add(m.effect);
-      m.effect.apply(entity);
+      if(m.effect.canApply(target: entity)) {
+        m.effect.apply(
+          target: entity,
+          activationDiceThrowEvaluation: m.activationDiceThrowEvaluation
+        );
+      }
     }
     else if(m is SessionEntityUnapplyEffectMessage) {
       var candidates = entity.effects.where((EntityEffect e) => e.id == m.effectId);
       if(candidates.isNotEmpty) {
-        candidates.first.unapply(entity);
+        candidates.first.unapply(target: entity);
         if(candidates.first.removeOnUnapply) {
           entity.effects.remove(candidates.first);
         }

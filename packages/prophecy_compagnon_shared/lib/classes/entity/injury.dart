@@ -42,22 +42,22 @@ enum Injury {
   light(
     title: 'Légère',
     rank: 1,
-    malus: 1,
+    malus: -1,
   ),
   grave(
     title: 'Grave',
     rank: 2,
-    malus: 3,
+    malus: -3,
   ),
   fatal(
     title: 'Fatale',
     rank: 3,
-    malus: 5,
+    malus: -5,
   ),
   death(
     title: 'Mort',
     rank: 4,
-    malus: 10,
+    malus: -10,
     isFinal: true,
   ),
   ;

@@ -1,14 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'injury_capacity.dart';
+part of 'damage_malus_modifier.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-EntityEffectInjuryCapacity _$EntityEffectInjuryCapacityFromJson(
+EntityEffectDamageMalusModifier _$EntityEffectDamageMalusModifierFromJson(
   Map<String, dynamic> json,
-) => EntityEffectInjuryCapacity(
+) => EntityEffectDamageMalusModifier(
   uuid: json['uuid'] as String?,
   name: json['name'] as String,
   trigger: $enumDecode(_$EntityEffectTriggerEnumMap, json['trigger']),
@@ -31,19 +31,24 @@ EntityEffectInjuryCapacity _$EntityEffectInjuryCapacityFromJson(
         json['activation_dice_throw_required_result'],
       ) ??
       DiceThrowResultType.success,
+  activationDiceThrowValueTransformer:
+      json['activation_dice_throw_value_transformer'] == null
+      ? null
+      : EntityEffectActivationDiceThrowValueTransformer.fromJson(
+          json['activation_dice_throw_value_transformer']
+              as Map<String, dynamic>,
+        ),
   postEffects: (json['post_effects'] as List<dynamic>?)
       ?.map((e) => EntityEffect.fromJson(e as Map<String, dynamic>))
       .toList(),
   removeOnUnapply: json['remove_on_unapply'] as bool? ?? false,
   elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
   active: json['active'] as bool? ?? false,
-  damage: (json['damage'] as Map<String, dynamic>).map(
-    (k, e) => MapEntry($enumDecode(_$InjuryEnumMap, k), (e as num).toInt()),
-  ),
+  value: (json['value'] as num?)?.toInt() ?? 0,
 );
 
-Map<String, dynamic> _$EntityEffectInjuryCapacityToJson(
-  EntityEffectInjuryCapacity instance,
+Map<String, dynamic> _$EntityEffectDamageMalusModifierToJson(
+  EntityEffectDamageMalusModifier instance,
 ) => <String, dynamic>{
   'uuid': instance.uuid,
   'name': instance.name,
@@ -54,11 +59,14 @@ Map<String, dynamic> _$EntityEffectInjuryCapacityToJson(
       ?.toJson(),
   'activation_dice_throw_required_result':
       _$DiceThrowResultTypeEnumMap[instance.activationDiceThrowRequiredResult],
+  'activation_dice_throw_value_transformer': instance
+      .activationDiceThrowValueTransformer
+      ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
   'remove_on_unapply': instance.removeOnUnapply,
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
-  'damage': instance.damage.map((k, e) => MapEntry(_$InjuryEnumMap[k]!, e)),
+  'value': instance.value,
 };
 
 const _$EntityEffectTriggerEnumMap = {
@@ -74,14 +82,4 @@ const _$DiceThrowResultTypeEnumMap = {
   DiceThrowResultType.fail: 'fail',
   DiceThrowResultType.success: 'success',
   DiceThrowResultType.criticalSuccess: 'criticalSuccess',
-};
-
-const _$InjuryEnumMap = {
-  Injury.ignore: 'ignore',
-  Injury.scratch: 'scratch',
-  Injury.injured: 'injured',
-  Injury.light: 'light',
-  Injury.grave: 'grave',
-  Injury.fatal: 'fatal',
-  Injury.death: 'death',
 };

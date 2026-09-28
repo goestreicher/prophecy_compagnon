@@ -18,9 +18,12 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
+import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
 part 'global_dice_throw_modifier.g.dart';
 
@@ -30,6 +33,11 @@ class EntityEffectGlobalDiceThrowModifierConfiguration extends EntityEffectConfi
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.activationDiceThrowRequest,
+    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValueTransformer,
+    super.postEffects,
+    super.removeOnUnapply,
     required this.modifier,
   })
     : super(target: EntityEffectTarget.diceThrowModifier);
@@ -42,6 +50,11 @@ class EntityEffectGlobalDiceThrowModifierConfiguration extends EntityEffectConfi
       trigger: trigger,
       triggerTickerEvent: triggerTickerEvent,
       duration: duration,
+      activationDiceThrowRequest: activationDiceThrowRequest,
+      activationDiceThrowRequiredResult: activationDiceThrowRequiredResult,
+      activationDiceThrowValueTransformer: activationDiceThrowValueTransformer,
+      postEffects: postEffects,
+      removeOnUnapply: removeOnUnapply,
       modifier: modifier
     );
 }
@@ -54,6 +67,9 @@ class EntityEffectGlobalDiceThrowModifier extends EntityEffect {
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.activationDiceThrowRequest,
+    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.removeOnUnapply,
     super.elapsedDurationUnits,
@@ -67,8 +83,8 @@ class EntityEffectGlobalDiceThrowModifier extends EntityEffect {
   String? modifierId;
 
   @override
-  void apply(EntityBase target) {
-    super.apply(target);
+  void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
+    super.apply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation);
 
     var mod = OneOffDiceThrowModifier(
       type: DiceThrowModifierType.malus,
@@ -83,10 +99,10 @@ class EntityEffectGlobalDiceThrowModifier extends EntityEffect {
   }
 
   @override
-  void unapply(EntityBase target) {
+  void unapply({ required EntityBase target }) {
     target.removeThrowModifier(modifierId!);
 
-    super.unapply(target);
+    super.unapply(target: target);
   }
 
   @override

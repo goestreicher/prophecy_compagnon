@@ -18,6 +18,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_status.dart';
+import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
 part 'entity_effect.g.dart';
 
@@ -36,9 +37,11 @@ class SessionEntityAddEffectMessage extends SessionEntityEffectMessage {
     super.broadcastIncludesSelf,
     required super.entityId,
     required this.effect,
+    this.activationDiceThrowEvaluation,
   });
 
   final EntityEffect effect;
+  final DiceThrowEvaluation? activationDiceThrowEvaluation;
 
   @override
   Map<String, dynamic> sessionMessageToJson() =>

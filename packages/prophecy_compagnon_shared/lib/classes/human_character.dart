@@ -173,7 +173,7 @@ class HumanCharacter extends EntityBase with MagicUser {
         (CharacterDisadvantage d) {
           for(var effect in d.buildEffects()) {
             if(effect.active) {
-              effect.apply(this);
+              effect.apply(target: this);
             }
             effects.add(effect);
           }
@@ -185,7 +185,7 @@ class HumanCharacter extends EntityBase with MagicUser {
             var matching = effects.where((EntityEffect e) => e.id == id);
             if(matching.isNotEmpty) {
               if(matching.first.active) {
-                matching.first.unapply(this);
+                matching.first.unapply(target: this);
               }
               effects.remove(matching.first);
             }
@@ -202,7 +202,7 @@ class HumanCharacter extends EntityBase with MagicUser {
         (CharacterAdvantage a) {
           for(var effect in a.buildEffects()) {
             if(effect.active) {
-              effect.apply(this);
+              effect.apply(target: this);
             }
             effects.add(effect);
           }
@@ -214,7 +214,7 @@ class HumanCharacter extends EntityBase with MagicUser {
             var matching = effects.where((EntityEffect e) => e.id == id);
             if(matching.isNotEmpty) {
               if(matching.first.active) {
-                matching.first.unapply(this);
+                matching.first.unapply(target: this);
               }
               effects.remove(matching.first);
             }
@@ -343,7 +343,7 @@ InjuryManager fullCharacterDefaultInjuries(EntityBase? entity, InjuryManager? so
 
   for(var e in entity.effects.forTarget(EntityEffectTarget.injuryCapacity)) {
     if(e.trigger == EntityEffectTrigger.permanent) {
-      e.apply(entity);
+      e.apply(target: entity);
     }
   }
 

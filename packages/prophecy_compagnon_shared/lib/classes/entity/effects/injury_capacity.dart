@@ -16,10 +16,13 @@
  */
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
+import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
 part 'injury_capacity.g.dart';
 
@@ -29,6 +32,10 @@ class EntityEffectInjuryCapacityConfiguration extends EntityEffectConfiguration 
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.activationDiceThrowRequest,
+    super.activationDiceThrowRequiredResult,
+    super.postEffects,
+    super.removeOnUnapply,
     required this.damage,
   })
     : super(target: EntityEffectTarget.injuryCapacity);
@@ -41,6 +48,10 @@ class EntityEffectInjuryCapacityConfiguration extends EntityEffectConfiguration 
       trigger: trigger,
       triggerTickerEvent: triggerTickerEvent,
       duration: duration,
+      activationDiceThrowRequest: activationDiceThrowRequest,
+      activationDiceThrowRequiredResult: activationDiceThrowRequiredResult,
+      postEffects: postEffects,
+      removeOnUnapply: removeOnUnapply,
       damage: damage,
     );
 }
@@ -53,6 +64,8 @@ class EntityEffectInjuryCapacity extends EntityEffect {
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.activationDiceThrowRequest,
+    super.activationDiceThrowRequiredResult,
     super.postEffects,
     super.removeOnUnapply,
     super.elapsedDurationUnits,
@@ -64,8 +77,8 @@ class EntityEffectInjuryCapacity extends EntityEffect {
   final Map<Injury, int> damage;
 
   @override
-  void apply(EntityBase target) {
-    super.apply(target);
+  void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
+    super.apply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation);
 
     for(var i in damage.entries) {
       target.injuries.manager.setCapacity(
@@ -76,7 +89,7 @@ class EntityEffectInjuryCapacity extends EntityEffect {
   }
 
   @override
-  void unapply(EntityBase target) {
+  void unapply({ required EntityBase target }) {
     for(var i in damage.entries) {
       target.injuries.manager.setCapacity(
         i.key,
@@ -84,7 +97,7 @@ class EntityEffectInjuryCapacity extends EntityEffect {
       );
     }
 
-    super.unapply(target);
+    super.unapply(target: target);
   }
 
   @override

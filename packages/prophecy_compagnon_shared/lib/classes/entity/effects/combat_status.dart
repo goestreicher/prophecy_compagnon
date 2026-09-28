@@ -16,10 +16,13 @@
  */
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
+import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
 part 'combat_status.g.dart';
 
@@ -29,6 +32,10 @@ class EntityEffectCombatStatusConfiguration extends EntityEffectConfiguration {
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.activationDiceThrowRequest,
+    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValueTransformer,
+    super.postEffects,
     required this.status,
   })
     : super(target: EntityEffectTarget.combatStatus);
@@ -41,6 +48,10 @@ class EntityEffectCombatStatusConfiguration extends EntityEffectConfiguration {
       trigger: trigger,
       triggerTickerEvent: triggerTickerEvent,
       duration: duration,
+      activationDiceThrowRequest: activationDiceThrowRequest,
+      activationDiceThrowRequiredResult: activationDiceThrowRequiredResult,
+      activationDiceThrowValueTransformer: activationDiceThrowValueTransformer,
+      postEffects: postEffects,
       status: status
   );
 }
@@ -53,6 +64,9 @@ class EntityEffectCombatStatus extends EntityEffect {
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.activationDiceThrowRequest,
+    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.elapsedDurationUnits,
     required this.status,
@@ -66,20 +80,22 @@ class EntityEffectCombatStatus extends EntityEffect {
   final EntityCombatStatusFlag status;
 
   @override
-  bool canApply(EntityBase target) => !target.combatStatus.has(status);
+  bool canApply({ required EntityBase target }) =>
+      super.canApply(target: target)
+      && !target.combatStatus.has(status);
 
   @override
-  void apply(EntityBase target) {
-    if(!canApply(target)) return;
+  void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
+    if(!canApply(target: target)) return;
 
-    super.apply(target);
+    super.apply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation);
     target.combatStatus.add(status);
   }
 
   @override
-  void unapply(EntityBase target) {
+  void unapply({ required EntityBase target }) {
     target.combatStatus.clear(status);
-    super.unapply(target);
+    super.unapply(target: target);
   }
 
   @override

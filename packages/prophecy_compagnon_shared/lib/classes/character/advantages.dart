@@ -17,6 +17,7 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/attribute.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/boolean.dart';
@@ -30,6 +31,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/damage_malus_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
@@ -156,12 +158,35 @@ enum Advantage {
       ),
     ]
   ),
-  // TODO: manage this capacity
   corpsAguerri(
     title: 'Corps aguerri',
     description: "Cet Avantage permet au personnage de résister à la douleur et à la fatigue découlant de ses blessures. En réussissant un jet de Mental + Volonté contre une Difficulté de 15, il peut réduire de (1 + NR) points les malus liés à ses Seuils de blessure, et cela pour toute la durée du combat, après quoi ils s'appliquent de nouveau normalement. Ce jet ne s’effectue qu’une fois par combat.",
     cost: [3],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    effectConfigurations: [
+      EntityEffectDamageMalusModifierConfiguration(
+        name: 'Corps aguerri (Avantage)',
+        trigger: EntityEffectTrigger.request,
+        activationDiceThrowRequest: DiceThrowRequest(
+          type: DiceThrowRequestType.simple,
+          context: DiceThrowRequestContext.none,
+          difficulty: 15,
+          base: DiceThrowEntityBaseAbility(
+            attribute: Attribute.mental,
+            ability: Ability.volonte,
+          )
+        ),
+        activationDiceThrowValueTransformer: EntityEffectActivationDiceThrowValueTransformer(
+          base: 1,
+          nrMultiplier: 1,
+        ),
+        duration: TickerEvent(
+          type: TickerEventType.end,
+          unit: TickerEventUnit.combat,
+          count: 1,
+        ),
+      ),
+    ],
   ),
   // TODO: manage this capacity
   droiture(

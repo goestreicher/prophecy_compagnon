@@ -29,19 +29,14 @@ part 'skill.g.dart';
 
 @JsonSerializable()
 class DiceThrowEntityBaseSkill extends DiceThrowEntityAttribute {
-  DiceThrowEntityBaseSkill({
+  const DiceThrowEntityBaseSkill({
     required super.attribute,
     this.skill,
     this.specialization,
     this.implementation,
     this.ability,
     this.additionalDifficultyOnAbility = true,
-  })
-  {
-    if(skill == null && specialization == null) {
-      throw(ArgumentError('Une compétence ou une spécialisation doivent être fournies pour un lancer'));
-    }
-  }
+  });
 
   final Skill? skill;
   final SpecializedSkill? specialization;
@@ -51,6 +46,10 @@ class DiceThrowEntityBaseSkill extends DiceThrowEntityAttribute {
 
   @override
   bool canThrow(EntityBase entity) {
+    if(skill == null && specialization == null) {
+      throw(ArgumentError('Une compétence ou une spécialisation doivent être fournies pour un lancer'));
+    }
+
     if(_entitySpecialization(entity) != null) return true;
     if(_entitySkill(entity) != null) return true;
     if(ability != null) return true;

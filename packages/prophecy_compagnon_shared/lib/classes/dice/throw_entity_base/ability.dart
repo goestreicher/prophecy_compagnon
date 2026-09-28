@@ -25,7 +25,7 @@ part 'ability.g.dart';
 
 @JsonSerializable()
 class DiceThrowEntityBaseAbility extends DiceThrowEntityAttribute {
-  DiceThrowEntityBaseAbility({
+  const DiceThrowEntityBaseAbility({
     required super.attribute,
     required this.ability,
   });

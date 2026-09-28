@@ -37,7 +37,7 @@ enum DiceThrowRequestContext {
 
 @JsonSerializable()
 class DiceThrowRequest {
-  DiceThrowRequest({
+  const DiceThrowRequest({
     required this.type,
     required this.context,
     this.difficulty,

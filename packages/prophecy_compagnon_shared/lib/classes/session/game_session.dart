@@ -217,7 +217,7 @@ class GameSession extends ChangeNotifier {
       for(var effect in entity.effects) {
         if(!effect.active) {
           if(effect.triggerTickerEvent == event) {
-            effect.apply(entity);
+            effect.apply(target: entity);
           }
         }
         else {
@@ -225,7 +225,7 @@ class GameSession extends ChangeNotifier {
         }
 
         if(effect.expired) {
-          effect.unapply(entity);
+          effect.unapply(target: entity);
           if(effect.removeOnUnapply) toRemove.add(effect);
         }
       }

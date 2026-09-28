@@ -16,6 +16,8 @@
  */
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
@@ -27,6 +29,11 @@ class EntityEffectInitiativeExtraDiceConfiguration extends EntityEffectConfigura
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.activationDiceThrowRequest,
+    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValueTransformer,
+    super.postEffects,
+    super.removeOnUnapply,
     required this.count,
   })
     : super(target: EntityEffectTarget.initiativeExtraDice);
@@ -39,6 +46,11 @@ class EntityEffectInitiativeExtraDiceConfiguration extends EntityEffectConfigura
       trigger: trigger,
       triggerTickerEvent: triggerTickerEvent,
       duration: duration,
+      activationDiceThrowRequest: activationDiceThrowRequest,
+      activationDiceThrowRequiredResult: activationDiceThrowRequiredResult,
+      activationDiceThrowValueTransformer: activationDiceThrowValueTransformer,
+      postEffects: postEffects,
+      removeOnUnapply: removeOnUnapply,
       count: count,
   );
 }
@@ -51,6 +63,9 @@ class EntityEffectInitiativeExtraDice extends EntityEffect {
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.activationDiceThrowRequest,
+    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.removeOnUnapply,
     super.elapsedDurationUnits,

@@ -344,7 +344,7 @@ class _TurnInitiativeInputWidgetState extends State<TurnInitiativeInputWidget> {
                                           child: Text(
                                             dominantHandDieResults[i] == null
                                               ? '?'
-                                              : (dominantHandDieResults[i]! + (dominantHandModifierIndex == i ? dominantHandWeaponModifier : 0) - widget.entity.damageMalus()).toString(),
+                                              : (dominantHandDieResults[i]! + (dominantHandModifierIndex == i ? dominantHandWeaponModifier : 0) + widget.entity.damageMalus()).toString(),
                                             style: theme.textTheme.bodyLarge!
                                               .copyWith(color: theme.colorScheme.onTertiary),
                                           ),
@@ -412,7 +412,7 @@ class _TurnInitiativeInputWidgetState extends State<TurnInitiativeInputWidget> {
                                   child: Text(
                                     weakHandDieResult == null
                                         ? '?'
-                                        : (weakHandDieResult! + weakHandWeaponModifier - widget.entity.damageMalus()).toString(),
+                                        : (weakHandDieResult! + weakHandWeaponModifier + widget.entity.damageMalus()).toString(),
                                     style: theme.textTheme.bodyLarge!
                                         .copyWith(color: theme.colorScheme.onTertiaryFixed),
                                   ),

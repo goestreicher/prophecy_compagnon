@@ -118,7 +118,7 @@ class _SessionEncounterEntitiesInitiativeWidgetState extends State<SessionEncoun
               actions.add(
                 SessionEncounterEntityAction(
                   entity: e,
-                  initialRank: a.raw + (a.weaponModifier ?? 0) - e.damageMalus(),
+                  initialRank: a.raw + (a.weaponModifier ?? 0) + e.damageMalus(),
                 )
               );
             }
@@ -127,7 +127,7 @@ class _SessionEncounterEntitiesInitiativeWidgetState extends State<SessionEncoun
               actions.add(
                 SessionEncounterEntityAction(
                   entity: e,
-                  initialRank: i.weakHand!.raw + (i.weakHand!.weaponModifier ?? 0) - e.damageMalus(),
+                  initialRank: i.weakHand!.raw + (i.weakHand!.weaponModifier ?? 0) + e.damageMalus(),
                   weakHand: true,
                 )
               );

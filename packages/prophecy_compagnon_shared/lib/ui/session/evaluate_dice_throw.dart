@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
 import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
@@ -26,6 +27,9 @@ import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_property_status.dart';
 
+part 'evaluate_dice_throw.g.dart';
+
+@JsonSerializable()
 class DiceThrowEvaluation {
   DiceThrowEvaluation({
     required this.resultType,
@@ -40,6 +44,12 @@ class DiceThrowEvaluation {
   int margin;
   int nr;
   bool usedLuck;
+
+  factory DiceThrowEvaluation.fromJson(Map<String, dynamic> json) =>
+      _$DiceThrowEvaluationFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$DiceThrowEvaluationToJson(this);
 }
 
 class EntityThrowBundle {
@@ -55,10 +65,14 @@ class EntityThrowBundle {
 
   int? get _difficulty {
     if(request.difficulty == null) return null;
-    var modSum = result.modifiers
-        .where((DiceThrowModifier m) => m.type == DiceThrowModifierType.difficulty)
+    var mods = result.modifiers
+      .where((DiceThrowModifier m) => m.type == DiceThrowModifierType.difficulty);
+    var modSum = 0;
+    if(mods.isNotEmpty) {
+      modSum = mods
         .map((DiceThrowModifier m) => m.value)
         .reduce((int a, int b) => a + b);
+    }
     return request.difficulty! + modSum;
   }
 

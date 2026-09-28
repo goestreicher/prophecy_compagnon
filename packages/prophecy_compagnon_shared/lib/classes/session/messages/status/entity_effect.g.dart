@@ -15,6 +15,13 @@ SessionEntityAddEffectMessage _$SessionEntityAddEffectMessageFromJson(
             json['broadcast_includes_self'] as bool? ?? false,
         entityId: json['entity_id'] as String,
         effect: EntityEffect.fromJson(json['effect'] as Map<String, dynamic>),
+        activationDiceThrowEvaluation:
+            json['activation_dice_throw_evaluation'] == null
+            ? null
+            : DiceThrowEvaluation.fromJson(
+                json['activation_dice_throw_evaluation']
+                    as Map<String, dynamic>,
+              ),
       )
       ..destination = json['destination'] as String
       ..hasResponse = json['has_response'] as bool
@@ -30,6 +37,8 @@ Map<String, dynamic> _$SessionEntityAddEffectMessageToJson(
   'broadcast_includes_self': instance.broadcastIncludesSelf,
   'entity_id': instance.entityId,
   'effect': instance.effect.toJson(),
+  'activation_dice_throw_evaluation': instance.activationDiceThrowEvaluation
+      ?.toJson(),
 };
 
 SessionEntityUnapplyEffectMessage _$SessionEntityUnapplyEffectMessageFromJson(
