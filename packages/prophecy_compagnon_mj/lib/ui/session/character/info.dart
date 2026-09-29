@@ -16,6 +16,7 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
@@ -31,7 +32,6 @@ import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/base/injury_manager_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
-import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/ui/widget_group_container.dart';
 
 class SessionCharacterInfoWidget extends StatelessWidget {

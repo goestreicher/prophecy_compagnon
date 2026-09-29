@@ -16,6 +16,7 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
@@ -41,7 +42,6 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/session_messa
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
-import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
 class ActionConfigurationMovementSprint extends ActionConfiguration {
   ActionConfigurationMovementSprint();

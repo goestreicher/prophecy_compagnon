@@ -19,6 +19,7 @@ import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/pc_review_dialog.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
@@ -32,7 +33,6 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/session_messa
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_property_status.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
-import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
 class SessionConnectionWidget extends StatefulWidget {
   const SessionConnectionWidget({

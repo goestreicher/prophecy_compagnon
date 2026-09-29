@@ -16,9 +16,9 @@
  */
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_status.dart';
-import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 
 part 'entity_effect.g.dart';
 

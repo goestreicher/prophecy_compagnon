@@ -19,6 +19,7 @@ import 'dart:math';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
@@ -29,7 +30,6 @@ import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/dismissible_dialog.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/pill_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/num_input_widget.dart';
-import 'package:prophecy_compagnon_shared/ui/session/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/ui/widget_group_container.dart';
 
 class EntityDiceThrowDialog extends StatefulWidget {
