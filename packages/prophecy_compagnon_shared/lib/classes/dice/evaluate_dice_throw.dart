@@ -91,8 +91,10 @@ class EntityThrowBundle {
 
   int _nr(int threshold) =>
       (result.luck ?? 0) > 0
-      && entity is HumanCharacter
-      && (entity as HumanCharacter).advantages.has(Advantage.chanceInouie)
+      && !(
+        entity is HumanCharacter
+        && (entity as HumanCharacter).advantages.has(Advantage.chanceInouie)
+      )
           ? 0
           : _margin(threshold) ~/ 5;
 }
