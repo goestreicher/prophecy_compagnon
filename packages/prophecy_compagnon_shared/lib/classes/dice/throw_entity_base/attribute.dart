@@ -19,8 +19,8 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 
-abstract class DiceThrowEntityAttribute extends DiceThrowEntityBase {
-  const DiceThrowEntityAttribute({
+abstract class DiceThrowEntityBaseAttribute extends DiceThrowEntityBase {
+  const DiceThrowEntityBaseAttribute({
     required this.attribute,
   });
 

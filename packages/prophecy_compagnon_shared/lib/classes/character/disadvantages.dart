@@ -20,6 +20,7 @@ import 'dart:math';
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/interdicts.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/threshold.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/attribute.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/boolean.dart';
@@ -30,6 +31,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
@@ -566,18 +568,32 @@ enum Disadvantage {
       )
     ],
   ),
-  // TODO: manage this with effects
   maladeImaginaire(
     title: 'Malade imaginaire',
     description: "Le personnage est persuadé de souffrir de diverses afllictions irrégulières et parvient à s’en convaincre. Chaque matin, il jette 1D10 sous sa Volonté. Si son jet est supérieur ou égal à sa Caractéristique, il subit un malus de -1 à toutes ses actions pour la journée à cause de tous les désagréments et douleurs dus à sa “maladie”.",
     cost: [2],
     type: DisadvantageType.ancien,
     effectConfigurations: [
-      // EntityEffectConfiguration(
-      //   name: 'Malade imaginaire (Désavantage)',
-      //   trigger: EntityEffectTrigger.request,
-      //   target: EntityEffectTarget.diceThrowGlobalModifier,
-      // )
+      EntityEffectGlobalDiceThrowModifierConfiguration(
+        name: 'Malade imaginaire (Désavantage)',
+        trigger: EntityEffectTrigger.request,
+        modifier: -1,
+        activationDiceThrowRequest: DiceThrowRequest(
+          type: DiceThrowRequestType.threshold,
+          context: DiceThrowRequestContext.none,
+          base: DiceThrowEntityBaseThresholdAbility(
+            comparison: DiceThrowThresholdComparison.lowerThan,
+            ability: Ability.volonte,
+          ),
+          allowTendencies: false,
+        ),
+        activationDiceThrowRequiredResult: DiceThrowResultType.fail,
+        duration: TickerEvent(
+          type: TickerEventType.end,
+          unit: TickerEventUnit.day,
+          count: 1,
+        ),
+      ),
     ]
   ),
   nostalgieObsessionnelle(

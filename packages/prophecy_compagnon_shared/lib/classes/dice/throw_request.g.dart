@@ -25,8 +25,10 @@ Map<String, dynamic> _$DiceThrowRequestToJson(DiceThrowRequest instance) =>
     };
 
 const _$DiceThrowRequestTypeEnumMap = {
+  DiceThrowRequestType.threshold: 'threshold',
   DiceThrowRequestType.simple: 'simple',
-  DiceThrowRequestType.opposition: 'opposition',
+  DiceThrowRequestType.oppositionDirect: 'oppositionDirect',
+  DiceThrowRequestType.oppositionNR: 'oppositionNR',
 };
 
 const _$DiceThrowRequestContextEnumMap = {

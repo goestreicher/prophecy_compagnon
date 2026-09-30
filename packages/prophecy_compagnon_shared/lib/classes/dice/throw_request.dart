@@ -21,8 +21,10 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
 part 'throw_request.g.dart';
 
 enum DiceThrowRequestType {
+  threshold,
   simple,
-  opposition,
+  oppositionDirect,
+  oppositionNR,
   ;
 }
 

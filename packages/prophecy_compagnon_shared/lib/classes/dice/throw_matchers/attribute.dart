@@ -27,6 +27,6 @@ class AttributeDiceThrowMatcher extends DiceThrowMatcher {
 
   @override
   bool matches(DiceThrowRequest request) =>
-      request.base is DiceThrowEntityAttribute
-      && (request.base as DiceThrowEntityAttribute).attribute == attribute;
+      request.base is DiceThrowEntityBaseAttribute
+      && (request.base as DiceThrowEntityBaseAttribute).attribute == attribute;
 }

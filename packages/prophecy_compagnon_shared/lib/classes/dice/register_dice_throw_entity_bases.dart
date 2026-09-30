@@ -4,6 +4,7 @@ import "package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart";
 import "package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart";
 import "package:prophecy_compagnon_shared/classes/dice/throw_entity_base/magic_skill.dart";
 import "package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart";
+import "package:prophecy_compagnon_shared/classes/dice/throw_entity_base/threshold.dart";
 
 void registerDiceThrowEntityBases() {
   DiceThrowEntityBase.registerDiceThrowEntityBaseJsonFactory(
@@ -19,6 +20,11 @@ void registerDiceThrowEntityBases() {
   DiceThrowEntityBase.registerDiceThrowEntityBaseJsonFactory(
     "DiceThrowEntityBaseSkill",
     (Map<String, dynamic> json) => DiceThrowEntityBaseSkill.fromJson(json),
+  );
+
+  DiceThrowEntityBase.registerDiceThrowEntityBaseJsonFactory(
+    "DiceThrowEntityBaseThresholdAbility",
+    (Map<String, dynamic> json) => DiceThrowEntityBaseThresholdAbility.fromJson(json),
   );
 
 }

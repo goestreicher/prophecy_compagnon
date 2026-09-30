@@ -24,7 +24,7 @@ import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 part 'ability.g.dart';
 
 @JsonSerializable()
-class DiceThrowEntityBaseAbility extends DiceThrowEntityAttribute {
+class DiceThrowEntityBaseAbility extends DiceThrowEntityBaseAttribute {
   const DiceThrowEntityBaseAbility({
     required super.attribute,
     required this.ability,
@@ -40,12 +40,6 @@ class DiceThrowEntityBaseAbility extends DiceThrowEntityAttribute {
 
   @override
   int componentValue(EntityBase entity) => entity.abilities[ability];
-
-  @override
-  int value(EntityBase entity) {
-    // TODO: manage bonuses
-    return entity.attributes[attribute] + entity.abilities[ability];
-  }
 
   @override
   Map<String, dynamic> diceThrowEntityBaseToJson() =>

@@ -28,7 +28,7 @@ import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 part 'skill.g.dart';
 
 @JsonSerializable()
-class DiceThrowEntityBaseSkill extends DiceThrowEntityAttribute {
+class DiceThrowEntityBaseSkill extends DiceThrowEntityBaseAttribute {
   const DiceThrowEntityBaseSkill({
     required super.attribute,
     this.skill,
@@ -106,10 +106,6 @@ class DiceThrowEntityBaseSkill extends DiceThrowEntityAttribute {
 
     return ret;
   }
-
-  @override
-  int value(EntityBase entity) =>
-      entity.attributes[attribute] + componentValue(entity);
 
   @override
   String difficultyModifierLabel(EntityBase entity) =>

@@ -25,7 +25,7 @@ abstract class DiceThrowEntityBase {
   bool canThrow(EntityBase entity) => true;
 
   String get label;
-  int value(EntityBase entity);
+  int value(EntityBase entity) => baseValue(entity) + componentValue(entity);
 
   String baseLabel(EntityBase entity);
   int baseValue(EntityBase entity);

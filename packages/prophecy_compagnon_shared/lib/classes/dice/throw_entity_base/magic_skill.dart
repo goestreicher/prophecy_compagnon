@@ -38,9 +38,6 @@ class DiceThrowEntityBaseMagicSkill extends DiceThrowEntityBase {
   String get label => '${skill.title} + ${sphere.title}';
 
   @override
-  int value(EntityBase entity) => baseValue(entity) + componentValue(entity);
-
-  @override
   String baseLabel(EntityBase entity) => skill.title;
 
   @override

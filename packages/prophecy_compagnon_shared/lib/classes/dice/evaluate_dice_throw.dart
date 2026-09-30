@@ -18,6 +18,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
 import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/threshold.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
@@ -97,6 +98,43 @@ class EntityThrowBundle {
 }
 
 DiceThrowEvaluation evaluateDiceThrow(
+    EntityThrowBundle actor,
+    {
+      EntityThrowBundle? opposing,
+    }
+) {
+  switch(actor.request.type) {
+    case DiceThrowRequestType.threshold:
+      return _evaluateThresholdThrow(actor);
+    case DiceThrowRequestType.simple:
+    case DiceThrowRequestType.oppositionDirect:
+    case DiceThrowRequestType.oppositionNR:
+      return _evaluateStandardThrow(actor, opposing: opposing);
+  }
+}
+
+DiceThrowEvaluation _evaluateThresholdThrow(EntityThrowBundle actor) {
+  DiceThrowResultType type;
+  int total = actor.result.total();
+  int threshold = actor.request.base.value(actor.entity);
+
+  if((actor.request.base as DiceThrowEntityBaseThreshold).throwSucceeds(actor.entity, actor.result.total())) {
+    type = DiceThrowResultType.success;
+  }
+  else {
+    type = DiceThrowResultType.fail;
+  }
+
+  return DiceThrowEvaluation(
+    resultType: type,
+    criticalType: DiceThrowResultType.none,
+    margin: threshold - total,
+    nr: (threshold - total) ~/ 5,
+    usedLuck: false,
+  );
+}
+
+DiceThrowEvaluation _evaluateStandardThrow(
     EntityThrowBundle actor,
     {
       EntityThrowBundle? opposing,
