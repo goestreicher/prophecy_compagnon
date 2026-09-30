@@ -18,6 +18,8 @@
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 
 class DiceThrowModifierBuilderArgs {
   const DiceThrowModifierBuilderArgs({
@@ -40,10 +42,16 @@ class DiceThrowModifierConfiguration {
     this.value,
     this.matcher,
     this.alwaysApply = true,
+    this.valueOverrideDiceThrowRequest,
+    this.valueOverrideValidResults = const [DiceThrowResultType.success],
+    this.valueOverride,
   });
 
   final DiceThrowModifierType type;
   final int? value;
   final DiceThrowMatcher? matcher;
   final bool alwaysApply;
+  final DiceThrowRequest? valueOverrideDiceThrowRequest;
+  final List<DiceThrowResultType> valueOverrideValidResults;
+  final int? valueOverride;
 }

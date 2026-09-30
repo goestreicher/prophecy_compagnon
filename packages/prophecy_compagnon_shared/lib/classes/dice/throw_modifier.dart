@@ -15,8 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
 
 abstract class DiceThrowModifier {
@@ -27,6 +30,9 @@ abstract class DiceThrowModifier {
     required this.value,
     this.matcher,
     this.alwaysApply = true,
+    this.valueOverrideDiceThrowRequest,
+    this.valueOverrideValidResults = const [DiceThrowResultType.success],
+    this.valueOverride,
   });
 
   final DiceThrowModifierType type;
@@ -35,10 +41,32 @@ abstract class DiceThrowModifier {
   final int value;
   final DiceThrowMatcher? matcher;
   final bool alwaysApply;
+  final DiceThrowRequest? valueOverrideDiceThrowRequest;
+  final List<DiceThrowResultType> valueOverrideValidResults;
+  final int? valueOverride;
 
   String get suffix;
 
   String get id => '${type.name}.${family.name}.$suffix';
+
+  DiceThrowModifier? buildOverrideModifier({ required DiceThrowEvaluation evaluation }) {
+    DiceThrowModifier? ret;
+
+    if(valueOverride == null) return ret;
+
+    if(valueOverrideValidResults.contains(evaluation.resultType)) {
+      ret = OneOffDiceThrowModifier(
+        type: type,
+        family: family,
+        label: label,
+        value: valueOverride!,
+        name: suffix,
+        alwaysApply: alwaysApply,
+      );
+    }
+
+    return ret;
+  }
 }
 
 class OneOffDiceThrowModifier extends DiceThrowModifier {
@@ -48,6 +76,9 @@ class OneOffDiceThrowModifier extends DiceThrowModifier {
     required super.label,
     required super.value,
     super.alwaysApply,
+    super.valueOverrideDiceThrowRequest,
+    super.valueOverrideValidResults,
+    super.valueOverride,
     required this.name,
   });
 
@@ -65,6 +96,9 @@ class EquipmentDiceThrowModifier extends DiceThrowModifier {
     required super.value,
     super.matcher,
     super.alwaysApply,
+    super.valueOverrideDiceThrowRequest,
+    super.valueOverrideValidResults,
+    super.valueOverride,
     required this.equipment,
   });
 
@@ -81,6 +115,9 @@ class AdvantageDiceThrowModifier extends DiceThrowModifier {
     required super.value,
     super.matcher,
     super.alwaysApply,
+    super.valueOverrideDiceThrowRequest,
+    super.valueOverrideValidResults,
+    super.valueOverride,
     required this.advantageSuffix,
   })
     : super(family: DiceThrowModifierFamily.advantage);
@@ -98,6 +135,9 @@ class DisadvantageDiceThrowModifier extends DiceThrowModifier {
     required super.value,
     super.matcher,
     super.alwaysApply,
+    super.valueOverrideDiceThrowRequest,
+    super.valueOverrideValidResults,
+    super.valueOverride,
     required this.disadvantageSuffix,
   })
     : super(family: DiceThrowModifierFamily.disadvantage);

@@ -70,6 +70,9 @@ class CharacterAdvantage {
             value: cfg.value!,
             alwaysApply: cfg.alwaysApply,
             advantageSuffix: advantageSuffix,
+            valueOverrideDiceThrowRequest: cfg.valueOverrideDiceThrowRequest,
+            valueOverrideValidResults: cfg.valueOverrideValidResults,
+            valueOverride: cfg.valueOverride,
           )
         );
       }

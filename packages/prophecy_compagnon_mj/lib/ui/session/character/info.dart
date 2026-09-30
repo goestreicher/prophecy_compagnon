@@ -273,8 +273,8 @@ class _EffectsMenuWidgetState extends State<_EffectsMenuWidget> {
                         request: selected!.activationDiceThrowRequest!,
                       )
                   );
-                  if (bundle == null) return;
-                  if (!context.mounted) return;
+                  if(bundle == null) return;
+                  if(!context.mounted) return;
 
                   activationDiceThrowEvaluation = evaluateDiceThrow(bundle);
                   if(!selected!.canApply(target: widget.entity, activationDiceThrowEvaluation: activationDiceThrowEvaluation)) {

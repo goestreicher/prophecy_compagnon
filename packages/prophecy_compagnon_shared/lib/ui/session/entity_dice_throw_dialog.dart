@@ -286,6 +286,7 @@ class _EntitySimpleDiceThrowWidgetState extends State<_EntitySimpleDiceThrowWidg
   int? luck;
   int? criticalDie;
   bool isCriticalSuccess = false;
+  Map<String, DiceThrowModifier> overrideModifiers = <String, DiceThrowModifier>{};
   Set<String> appliedModifiers = <String>{};
   int contextModifier = 0;
   int difficultyModifiersTotal = 0;
@@ -379,7 +380,16 @@ class _EntitySimpleDiceThrowWidgetState extends State<_EntitySimpleDiceThrowWidg
   }
 
   List<DiceThrowModifier> entityModifiers() {
-    var ret = widget.entity.throwModifiers(widget.request);
+    var ret = <DiceThrowModifier>[];
+
+    for(var m in widget.entity.throwModifiers(widget.request)) {
+      if(overrideModifiers.containsKey(m.id)) {
+        ret.add(overrideModifiers[m.id]!);
+      }
+      else {
+        ret.add(m);
+      }
+    }
 
     if(isCriticalSuccess) {
       ret.add(
@@ -406,7 +416,7 @@ class _EntitySimpleDiceThrowWidgetState extends State<_EntitySimpleDiceThrowWidg
           case DiceThrowModifierType.bonus:
             break;
           case DiceThrowModifierType.difficulty:
-            difficultyTotal += m.value;
+            difficultyTotal += overrideModifiers[m.id]?.value ?? m.value;
         }
       }
     }
@@ -506,7 +516,48 @@ class _EntitySimpleDiceThrowWidgetState extends State<_EntitySimpleDiceThrowWidg
 
     var entityModifierRows = <Widget>[];
     for(var m in entityModifiers()) {
-      Widget label = Text(m.label);
+      Widget label = Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(text: m.label),
+            if(m.valueOverrideDiceThrowRequest != null)
+              TextSpan(text: ' '),
+            if(m.valueOverrideDiceThrowRequest != null)
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: IconButton(
+                  onPressed: !appliedModifiers.contains(m.id) || overrideModifiers.containsKey(m.id) ? null : () async {
+                    var bundle = await showDialog<EntityThrowBundle>(
+                      context: context,
+                      builder: (BuildContext context) =>
+                        EntityDiceThrowDialog(
+                          entity: widget.entity,
+                          request: m.valueOverrideDiceThrowRequest!,
+                        )
+                    );
+                    if(bundle == null) return;
+                    if(!context.mounted) return;
+
+                    var evaluation = evaluateDiceThrow(bundle);
+                    var overrideMod = m.buildOverrideModifier(evaluation: evaluation);
+
+                    if(overrideMod != null) {
+                      setState(() {
+                        overrideModifiers[m.id] = overrideMod;
+                        updateModifiersTotal();
+                      });
+                    }
+                  },
+                  icon: Icon(Icons.settings),
+                  iconSize: 18.0,
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(4.0),
+                )
+              ),
+          ]
+        )
+      );
+
       if(!m.alwaysApply) {
         label = GestureDetector(
           onTap: () {
@@ -539,7 +590,7 @@ class _EntitySimpleDiceThrowWidgetState extends State<_EntitySimpleDiceThrowWidg
           children: [
             label,
             Spacer(),
-            _ValuePill(value: m.value),
+            _ValuePill(value: overrideModifiers[m.id]?.value ?? m.value),
           ],
         )
       );

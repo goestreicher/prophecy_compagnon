@@ -20,6 +20,7 @@ import 'dart:math';
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/base.dart';
 import 'package:prophecy_compagnon_shared/classes/caste/interdicts.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/threshold.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/attribute.dart';
@@ -344,7 +345,6 @@ enum Disadvantage {
     type: DisadvantageType.rare,
     requireDetails: true,
   ),
-  // TODO: manage the dice throw to change the difficulty modifier
   echecRare(
     title: 'Échec',
     description: "Comme décrit précédemment (cf. Échec commun) si ce n’est que la Difficulté de tous les jets en rapport sera augmentée de 10. Il est possible d'accorder un jet (et un seul) de Mental + Volonté contre une Difficulté de 15 pour réduire cette augmentation à 5.",
@@ -356,6 +356,17 @@ enum Disadvantage {
         type: DiceThrowModifierType.difficulty,
         value: 10,
         alwaysApply: false,
+        valueOverrideDiceThrowRequest: DiceThrowRequest(
+          type: DiceThrowRequestType.simple,
+          context: DiceThrowRequestContext.none,
+          difficulty: 15,
+          base: DiceThrowEntityBaseAbility(
+            attribute: Attribute.mental,
+            ability: Ability.volonte,
+          ),
+          allowTendencies: false,
+        ),
+        valueOverride: 5,
       )
     ],
   ),
