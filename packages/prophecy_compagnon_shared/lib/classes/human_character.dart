@@ -171,6 +171,10 @@ class HumanCharacter extends EntityBase with MagicUser {
 
     disadvantages.onDisadvantageAdded =
         (CharacterDisadvantage d) {
+          for(var m in d.buildThrowModifiers()) {
+            addThrowModifier(m);
+          }
+
           for(var effect in d.buildEffects()) {
             if(effect.active) {
               effect.apply(target: this);
@@ -181,6 +185,10 @@ class HumanCharacter extends EntityBase with MagicUser {
 
     disadvantages.onDisadvantageRemoved =
         (CharacterDisadvantage d) {
+          for(var m in d.buildThrowModifiers()) {
+            removeThrowModifier(m.id);
+          }
+
           for(var id in d.effectIds) {
             var matching = effects.where((EntityEffect e) => e.id == id);
             if(matching.isNotEmpty) {
@@ -200,6 +208,10 @@ class HumanCharacter extends EntityBase with MagicUser {
 
     advantages.onAdvantageAdded =
         (CharacterAdvantage a) {
+          for(var m in a.buildThrowModifiers()) {
+            addThrowModifier(m);
+          }
+
           for(var effect in a.buildEffects()) {
             if(effect.active) {
               effect.apply(target: this);
@@ -210,6 +222,10 @@ class HumanCharacter extends EntityBase with MagicUser {
 
     advantages.onAdvantageRemoved =
         (CharacterAdvantage a) {
+          for(var m in a.buildThrowModifiers()) {
+            removeThrowModifier(m.id);
+          }
+
           for(var id in a.effectIds) {
             var matching = effects.where((EntityEffect e) => e.id == id);
             if(matching.isNotEmpty) {
