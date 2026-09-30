@@ -25,12 +25,11 @@ EntityEffectInitiativeExtraDice _$EntityEffectInitiativeExtraDiceFromJson(
       : DiceThrowRequest.fromJson(
           json['activation_dice_throw_request'] as Map<String, dynamic>,
         ),
-  activationDiceThrowRequiredResult:
-      $enumDecodeNullable(
-        _$DiceThrowResultTypeEnumMap,
-        json['activation_dice_throw_required_result'],
-      ) ??
-      DiceThrowResultType.success,
+  activationDiceThrowValidResults:
+      (json['activation_dice_throw_valid_results'] as List<dynamic>?)
+          ?.map((e) => $enumDecode(_$DiceThrowResultTypeEnumMap, e))
+          .toList() ??
+      const [DiceThrowResultType.success],
   activationDiceThrowValueTransformer:
       json['activation_dice_throw_value_transformer'] == null
       ? null
@@ -57,8 +56,10 @@ Map<String, dynamic> _$EntityEffectInitiativeExtraDiceToJson(
   'duration': instance.duration?.toJson(),
   'activation_dice_throw_request': instance.activationDiceThrowRequest
       ?.toJson(),
-  'activation_dice_throw_required_result':
-      _$DiceThrowResultTypeEnumMap[instance.activationDiceThrowRequiredResult],
+  'activation_dice_throw_valid_results': instance
+      .activationDiceThrowValidResults
+      .map((e) => _$DiceThrowResultTypeEnumMap[e]!)
+      .toList(),
   'activation_dice_throw_value_transformer': instance
       .activationDiceThrowValueTransformer
       ?.toJson(),

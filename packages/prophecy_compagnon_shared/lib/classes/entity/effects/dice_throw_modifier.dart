@@ -25,7 +25,7 @@ import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
-part 'global_dice_throw_modifier.g.dart';
+part 'dice_throw_modifier.g.dart';
 
 class EntityEffectGlobalDiceThrowModifierConfiguration extends EntityEffectConfiguration {
   const EntityEffectGlobalDiceThrowModifierConfiguration({
@@ -34,15 +34,21 @@ class EntityEffectGlobalDiceThrowModifierConfiguration extends EntityEffectConfi
     super.triggerTickerEvent,
     super.duration,
     super.activationDiceThrowRequest,
-    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValidResults,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.removeOnUnapply,
+    required this.type,
+    required this.family,
     required this.modifier,
+    this.alwaysApply = true,
   })
     : super(target: EntityEffectTarget.diceThrowModifier);
 
+  final DiceThrowModifierType type;
+  final DiceThrowModifierFamily family;
   final int modifier;
+  final bool alwaysApply;
 
   @override
   EntityEffect create() => EntityEffectGlobalDiceThrowModifier(
@@ -51,11 +57,14 @@ class EntityEffectGlobalDiceThrowModifierConfiguration extends EntityEffectConfi
       triggerTickerEvent: triggerTickerEvent,
       duration: duration,
       activationDiceThrowRequest: activationDiceThrowRequest,
-      activationDiceThrowRequiredResult: activationDiceThrowRequiredResult,
+      activationDiceThrowValidResults: activationDiceThrowValidResults,
       activationDiceThrowValueTransformer: activationDiceThrowValueTransformer,
       postEffects: postEffects,
       removeOnUnapply: removeOnUnapply,
-      modifier: modifier
+      type: type,
+      family: family,
+      modifier: modifier,
+      alwaysApply: alwaysApply,
     );
 }
 
@@ -68,30 +77,37 @@ class EntityEffectGlobalDiceThrowModifier extends EntityEffect {
     super.triggerTickerEvent,
     super.duration,
     super.activationDiceThrowRequest,
-    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValidResults,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.removeOnUnapply,
     super.elapsedDurationUnits,
     super.active,
+    required this.type,
+    required this.family,
     required this.modifier,
     this.modifierId,
+    this.alwaysApply = true,
   })
     : super(target: EntityEffectTarget.diceThrowModifier);
 
+  final DiceThrowModifierType type;
+  final DiceThrowModifierFamily family;
   final int modifier;
   String? modifierId;
+  final bool alwaysApply;
 
   @override
   void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
     super.apply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation);
 
     var mod = OneOffDiceThrowModifier(
-      type: DiceThrowModifierType.malus,
-      family: DiceThrowModifierFamily.disadvantage,
+      type: type,
+      family: family,
       label: name,
       value: modifier,
       name: uuid,
+      alwaysApply: alwaysApply,
     );
     modifierId = mod.id;
 

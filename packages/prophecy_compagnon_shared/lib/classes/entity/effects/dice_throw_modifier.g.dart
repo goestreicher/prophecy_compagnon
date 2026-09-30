@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'global_dice_throw_modifier.dart';
+part of 'dice_throw_modifier.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -25,12 +25,11 @@ _$EntityEffectGlobalDiceThrowModifierFromJson(Map<String, dynamic> json) =>
           : DiceThrowRequest.fromJson(
               json['activation_dice_throw_request'] as Map<String, dynamic>,
             ),
-      activationDiceThrowRequiredResult:
-          $enumDecodeNullable(
-            _$DiceThrowResultTypeEnumMap,
-            json['activation_dice_throw_required_result'],
-          ) ??
-          DiceThrowResultType.success,
+      activationDiceThrowValidResults:
+          (json['activation_dice_throw_valid_results'] as List<dynamic>?)
+              ?.map((e) => $enumDecode(_$DiceThrowResultTypeEnumMap, e))
+              .toList() ??
+          const [DiceThrowResultType.success],
       activationDiceThrowValueTransformer:
           json['activation_dice_throw_value_transformer'] == null
           ? null
@@ -44,8 +43,11 @@ _$EntityEffectGlobalDiceThrowModifierFromJson(Map<String, dynamic> json) =>
       removeOnUnapply: json['remove_on_unapply'] as bool? ?? false,
       elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
       active: json['active'] as bool? ?? false,
+      type: $enumDecode(_$DiceThrowModifierTypeEnumMap, json['type']),
+      family: $enumDecode(_$DiceThrowModifierFamilyEnumMap, json['family']),
       modifier: (json['modifier'] as num).toInt(),
       modifierId: json['modifier_id'] as String?,
+      alwaysApply: json['always_apply'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$EntityEffectGlobalDiceThrowModifierToJson(
@@ -58,8 +60,10 @@ Map<String, dynamic> _$EntityEffectGlobalDiceThrowModifierToJson(
   'duration': instance.duration?.toJson(),
   'activation_dice_throw_request': instance.activationDiceThrowRequest
       ?.toJson(),
-  'activation_dice_throw_required_result':
-      _$DiceThrowResultTypeEnumMap[instance.activationDiceThrowRequiredResult],
+  'activation_dice_throw_valid_results': instance
+      .activationDiceThrowValidResults
+      .map((e) => _$DiceThrowResultTypeEnumMap[e]!)
+      .toList(),
   'activation_dice_throw_value_transformer': instance
       .activationDiceThrowValueTransformer
       ?.toJson(),
@@ -67,8 +71,11 @@ Map<String, dynamic> _$EntityEffectGlobalDiceThrowModifierToJson(
   'remove_on_unapply': instance.removeOnUnapply,
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
+  'type': _$DiceThrowModifierTypeEnumMap[instance.type]!,
+  'family': _$DiceThrowModifierFamilyEnumMap[instance.family]!,
   'modifier': instance.modifier,
   'modifier_id': instance.modifierId,
+  'always_apply': instance.alwaysApply,
 };
 
 const _$EntityEffectTriggerEnumMap = {
@@ -84,4 +91,20 @@ const _$DiceThrowResultTypeEnumMap = {
   DiceThrowResultType.fail: 'fail',
   DiceThrowResultType.success: 'success',
   DiceThrowResultType.criticalSuccess: 'criticalSuccess',
+};
+
+const _$DiceThrowModifierTypeEnumMap = {
+  DiceThrowModifierType.bonus: 'bonus',
+  DiceThrowModifierType.malus: 'malus',
+  DiceThrowModifierType.difficulty: 'difficulty',
+};
+
+const _$DiceThrowModifierFamilyEnumMap = {
+  DiceThrowModifierFamily.advantage: 'advantage',
+  DiceThrowModifierFamily.context: 'context',
+  DiceThrowModifierFamily.criticalDiceThrow: 'criticalDiceThrow',
+  DiceThrowModifierFamily.damage: 'damage',
+  DiceThrowModifierFamily.disadvantage: 'disadvantage',
+  DiceThrowModifierFamily.healthStatus: 'healthStatus',
+  DiceThrowModifierFamily.movementPenalty: 'movementPenalty',
 };

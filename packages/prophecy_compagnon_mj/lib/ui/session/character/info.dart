@@ -277,7 +277,7 @@ class _EffectsMenuWidgetState extends State<_EffectsMenuWidget> {
                   if (!context.mounted) return;
 
                   activationDiceThrowEvaluation = evaluateDiceThrow(bundle);
-                  if (activationDiceThrowEvaluation.resultType != selected!.activationDiceThrowRequiredResult) {
+                  if(!selected!.canApply(target: widget.entity, activationDiceThrowEvaluation: activationDiceThrowEvaluation)) {
                     // TODO: display a message?
                     return;
                   }

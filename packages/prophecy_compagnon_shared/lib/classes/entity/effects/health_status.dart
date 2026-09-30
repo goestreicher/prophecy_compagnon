@@ -33,7 +33,7 @@ class EntityEffectHealthStatusConfiguration extends EntityEffectConfiguration {
     super.triggerTickerEvent,
     super.duration,
     super.activationDiceThrowRequest,
-    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValidResults,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
     required this.status,
@@ -49,7 +49,7 @@ class EntityEffectHealthStatusConfiguration extends EntityEffectConfiguration {
       triggerTickerEvent: triggerTickerEvent,
       duration: duration,
       activationDiceThrowRequest: activationDiceThrowRequest,
-      activationDiceThrowRequiredResult: activationDiceThrowRequiredResult,
+      activationDiceThrowValidResults: activationDiceThrowValidResults,
       activationDiceThrowValueTransformer: activationDiceThrowValueTransformer,
       postEffects: postEffects,
       status: status
@@ -65,7 +65,7 @@ class EntityEffectHealthStatus extends EntityEffect {
     super.triggerTickerEvent,
     super.duration,
     super.activationDiceThrowRequest,
-    super.activationDiceThrowRequiredResult,
+    super.activationDiceThrowValidResults,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.elapsedDurationUnits,
@@ -80,8 +80,8 @@ class EntityEffectHealthStatus extends EntityEffect {
   final EntityHealthStatusFlag status;
 
   @override
-  bool canApply({ required EntityBase target }) =>
-      super.canApply(target: target)
+  bool canApply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) =>
+      super.canApply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation)
       && !target.healthStatus.has(status);
 
   @override

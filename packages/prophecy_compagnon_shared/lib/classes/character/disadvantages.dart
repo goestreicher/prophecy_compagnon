@@ -35,7 +35,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/effects/global_dice_throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/dice_throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/injury_capacity.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
@@ -504,12 +504,19 @@ enum Disadvantage {
     cost: [1],
     type: DisadvantageType.enfant
   ),
-  // TODO: manage this, there's not just one dice throw that would match
   naivete(
     title: 'Naïveté',
     description: "À l'inverse de la méfiance, la naïveté pousse le personnage à croire aveuglément tout ce qu'on lui dit, quand bien même on lui présenterait un terrible dragon du feu comme une créature bienveillante et protectrice.\nTous ses jets pour détecter un éventuel mensonge (avec la Compétence Psychologie, par exemple) voient leur Difficulté augmenter de 5.",
     cost: [2],
-    type: DisadvantageType.enfant
+    type: DisadvantageType.enfant,
+    throwModifierConfigurations: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.difficulty,
+        value: 5,
+        alwaysApply: false,
+        matcher: AttributeDiceThrowMatcher(attribute: Attribute.social),
+      )
+    ],
   ),
   revolte(
     title: 'Révolte',
@@ -577,6 +584,8 @@ enum Disadvantage {
       EntityEffectGlobalDiceThrowModifierConfiguration(
         name: 'Malade imaginaire (Désavantage)',
         trigger: EntityEffectTrigger.request,
+        type: DiceThrowModifierType.malus,
+        family: DiceThrowModifierFamily.disadvantage,
         modifier: -1,
         activationDiceThrowRequest: DiceThrowRequest(
           type: DiceThrowRequestType.threshold,
@@ -587,7 +596,7 @@ enum Disadvantage {
           ),
           allowTendencies: false,
         ),
-        activationDiceThrowRequiredResult: DiceThrowResultType.fail,
+        activationDiceThrowValidResults: [DiceThrowResultType.fail],
         duration: TickerEvent(
           type: TickerEventType.end,
           unit: TickerEventUnit.day,
@@ -815,6 +824,8 @@ List<EntityEffect> _maladieEntityEffectBuilder(EntityEffectBuilderArgs args) {
       EntityEffectGlobalDiceThrowModifier(
         name: 'Maladie - ${args.details} (Désavantage)',
         trigger: EntityEffectTrigger.request,
+        type: DiceThrowModifierType.malus,
+        family: DiceThrowModifierFamily.disadvantage,
         duration: TickerEvent(
           type: TickerEventType.end,
           unit: TickerEventUnit.hour,
@@ -829,6 +840,8 @@ List<EntityEffect> _maladieEntityEffectBuilder(EntityEffectBuilderArgs args) {
       EntityEffectGlobalDiceThrowModifier(
         name: 'Maladie - ${args.details} (Désavantage)',
         trigger: EntityEffectTrigger.request,
+        type: DiceThrowModifierType.malus,
+        family: DiceThrowModifierFamily.disadvantage,
         duration: TickerEvent(
           type: TickerEventType.end,
           unit: TickerEventUnit.hour,
@@ -843,6 +856,8 @@ List<EntityEffect> _maladieEntityEffectBuilder(EntityEffectBuilderArgs args) {
       EntityEffectGlobalDiceThrowModifier(
         name: 'Maladie - ${args.details} (Désavantage)',
         trigger: EntityEffectTrigger.request,
+        type: DiceThrowModifierType.malus,
+        family: DiceThrowModifierFamily.disadvantage,
         duration: TickerEvent(
           type: TickerEventType.end,
           unit: TickerEventUnit.hour,
@@ -885,6 +900,8 @@ List<EntityEffect> _phobieEntityEffectBuilder(EntityEffectBuilderArgs args) {
       EntityEffectGlobalDiceThrowModifier(
         name: 'Phobie - ${args.details} (Désavantage)',
         trigger: EntityEffectTrigger.request,
+        type: DiceThrowModifierType.malus,
+        family: DiceThrowModifierFamily.disadvantage,
         modifier: -1,
       )
     );
@@ -895,10 +912,14 @@ List<EntityEffect> _phobieEntityEffectBuilder(EntityEffectBuilderArgs args) {
         name: 'Phobie - ${args.details} (Désavantage)',
         trigger: EntityEffectTrigger.request,
         modifier: -3,
+        type: DiceThrowModifierType.malus,
+        family: DiceThrowModifierFamily.disadvantage,
         postEffects: [
           EntityEffectGlobalDiceThrowModifier(
             name: 'Phobie - ${args.details} - Conséquences (Désavantage)',
             trigger: EntityEffectTrigger.request,
+            type: DiceThrowModifierType.malus,
+            family: DiceThrowModifierFamily.disadvantage,
             duration: TickerEvent(
               type: TickerEventType.end,
               unit: TickerEventUnit.hour,
@@ -916,11 +937,15 @@ List<EntityEffect> _phobieEntityEffectBuilder(EntityEffectBuilderArgs args) {
       EntityEffectGlobalDiceThrowModifier(
         name: 'Phobie - ${args.details} (Désavantage)',
         trigger: EntityEffectTrigger.request,
+        type: DiceThrowModifierType.malus,
+        family: DiceThrowModifierFamily.disadvantage,
         modifier: -5,
         postEffects: [
           EntityEffectGlobalDiceThrowModifier(
             name: 'Phobie - ${args.details} - Conséquences (Désavantage)',
             trigger: EntityEffectTrigger.request,
+            type: DiceThrowModifierType.malus,
+            family: DiceThrowModifierFamily.disadvantage,
             duration: TickerEvent(
               type: TickerEventType.end,
               unit: TickerEventUnit.hour,

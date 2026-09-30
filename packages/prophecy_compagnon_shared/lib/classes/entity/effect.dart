@@ -67,7 +67,7 @@ abstract class EntityEffectConfiguration{
     this.triggerTickerEvent,
     this.duration,
     this.activationDiceThrowRequest,
-    this.activationDiceThrowRequiredResult = DiceThrowResultType.success,
+    this.activationDiceThrowValidResults = const [DiceThrowResultType.success],
     this.activationDiceThrowValueTransformer,
     List<EntityEffect>? postEffects,
     this.removeOnUnapply = false,
@@ -80,7 +80,7 @@ abstract class EntityEffectConfiguration{
   final TickerEvent? triggerTickerEvent;
   final TickerEvent? duration;
   final DiceThrowRequest? activationDiceThrowRequest;
-  final DiceThrowResultType? activationDiceThrowRequiredResult;
+  final List<DiceThrowResultType> activationDiceThrowValidResults;
   final EntityEffectActivationDiceThrowValueTransformer? activationDiceThrowValueTransformer;
   final List<EntityEffect> postEffects;
   final bool removeOnUnapply;
@@ -118,7 +118,7 @@ abstract class EntityEffect {
     this.triggerTickerEvent,
     this.duration,
     this.activationDiceThrowRequest,
-    this.activationDiceThrowRequiredResult = DiceThrowResultType.success,
+    this.activationDiceThrowValidResults = const [DiceThrowResultType.success],
     this.activationDiceThrowValueTransformer,
     List<EntityEffect>? postEffects,
     this.removeOnUnapply = false,
@@ -136,7 +136,7 @@ abstract class EntityEffect {
   final TickerEvent? triggerTickerEvent;
   final TickerEvent? duration;
   final DiceThrowRequest? activationDiceThrowRequest;
-  final DiceThrowResultType? activationDiceThrowRequiredResult;
+  final List<DiceThrowResultType> activationDiceThrowValidResults;
   final EntityEffectActivationDiceThrowValueTransformer? activationDiceThrowValueTransformer;
   final List<EntityEffect> postEffects;
   final bool removeOnUnapply;
@@ -145,7 +145,12 @@ abstract class EntityEffect {
 
   Map<String, dynamic> effectToJson();
 
-  bool canApply({ required EntityBase target }) => true;
+  bool canApply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) =>
+    activationDiceThrowRequest == null
+    || (
+        activationDiceThrowEvaluation != null
+        && activationDiceThrowValidResults.contains(activationDiceThrowEvaluation.resultType)
+    );
 
   void setActivationDiceThrowValue(int v) {}
 
@@ -159,7 +164,7 @@ abstract class EntityEffect {
         activationDiceThrowRequest != null
         && activationDiceThrowValueTransformer != null
         && activationDiceThrowEvaluation != null
-        && activationDiceThrowRequiredResult! == activationDiceThrowEvaluation.resultType
+        && activationDiceThrowValidResults.contains(activationDiceThrowEvaluation.resultType)
     ) {
       setActivationDiceThrowValue(
         activationDiceThrowValueTransformer!.value(

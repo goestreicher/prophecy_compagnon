@@ -3,7 +3,7 @@
 import "package:prophecy_compagnon_shared/classes/entity/effect.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/damage_malus_modifier.dart";
-import "package:prophecy_compagnon_shared/classes/entity/effects/global_dice_throw_modifier.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/dice_throw_modifier.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/health_status.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/injury_capacity.dart";
