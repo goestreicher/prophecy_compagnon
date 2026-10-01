@@ -145,16 +145,16 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
       return;
     }
 
-    var result = await showDialog<EntityThrowBundle>(
+    var result = await showDialog<List<EntityThrowBundle>>(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => EntityDiceThrowDialog(
-        entity: entity,
+        entities: [entity],
         request: m.request,
       )
     );
 
-    if(result == null) {
+    if(result == null || result.isEmpty) {
       messageBus.sendResponse(
           m,
           null,
@@ -166,8 +166,8 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
     messageBus.sendResponse(
       m,
       DiceThrowRequestResult(
-        request: result.request,
-        result: result.result,
+        request: result.first.request,
+        result: result.first.result,
       ),
     );
   }

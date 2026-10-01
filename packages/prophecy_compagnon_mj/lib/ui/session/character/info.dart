@@ -144,17 +144,19 @@ class _DiceThrowMenuWidgetState extends State<_DiceThrowMenuWidget> {
           ),
           IconButton(
             onPressed: selected == null ? null : () async {
-              var bundle = await showDialog<EntityThrowBundle>(
+              var bundles = await showDialog<List<EntityThrowBundle>>(
                 context: context,
                 barrierDismissible: false,
                 builder: (BuildContext context) => EntityDiceThrowDialog(
-                  entity: widget.entity,
+                  entities: [widget.entity],
                   request: selected!.request,
                   canChangeDifficulty: selected!.canChangeDifficulty,
                   difficultyHints: selected!.difficultyHints,
                   contextModifierHints: selected!.contextModifierHints,
                 )
               );
+              if(bundles == null || bundles.isEmpty) return;
+              if(!context.mounted) return;
             },
             icon: Icon(CustomIcons.d10),
           ),
@@ -268,19 +270,19 @@ class _EffectsMenuWidgetState extends State<_EffectsMenuWidget> {
                 DiceThrowEvaluation? activationDiceThrowEvaluation;
 
                 if (selected!.activationDiceThrowRequest != null) {
-                  var bundle = await showDialog<EntityThrowBundle>(
+                  var bundles = await showDialog<List<EntityThrowBundle>>(
                     context: context,
                     barrierDismissible: false,
                     builder: (BuildContext context) =>
                       EntityDiceThrowDialog(
-                        entity: widget.entity,
+                        entities: [widget.entity],
                         request: selected!.activationDiceThrowRequest!,
                       )
                   );
-                  if(bundle == null) return;
+                  if(bundles == null || bundles.isEmpty) return;
                   if(!context.mounted) return;
 
-                  activationDiceThrowEvaluation = evaluateDiceThrow(bundle);
+                  activationDiceThrowEvaluation = evaluateDiceThrow(bundles.first);
                   if(!selected!.canApply(target: widget.entity, activationDiceThrowEvaluation: activationDiceThrowEvaluation)) {
                     // TODO: display a message?
                     return;
