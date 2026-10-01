@@ -71,6 +71,7 @@ Map<String, dynamic> _$EntityEffectDamageMalusModifierToJson(
 };
 
 const _$EntityEffectTriggerEnumMap = {
+  EntityEffectTrigger.diceThrow: 'diceThrow',
   EntityEffectTrigger.once: 'once',
   EntityEffectTrigger.permanent: 'permanent',
   EntityEffectTrigger.request: 'request',

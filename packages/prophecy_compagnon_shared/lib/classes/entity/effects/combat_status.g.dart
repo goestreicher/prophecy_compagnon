@@ -68,6 +68,7 @@ Map<String, dynamic> _$EntityEffectCombatStatusToJson(
 };
 
 const _$EntityEffectTriggerEnumMap = {
+  EntityEffectTrigger.diceThrow: 'diceThrow',
   EntityEffectTrigger.once: 'once',
   EntityEffectTrigger.permanent: 'permanent',
   EntityEffectTrigger.request: 'request',

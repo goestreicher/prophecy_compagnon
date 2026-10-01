@@ -110,6 +110,8 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
 
     for(var effect in this.effects.where((EntityEffect e) => e.active)) {
       switch(effect.target) {
+        case EntityEffectTarget.abilityModifier:
+        case EntityEffectTarget.attributeModifier:
         case EntityEffectTarget.damageMalusModifier:
         case EntityEffectTarget.diceThrowModifier:
           effect.apply(target: this);

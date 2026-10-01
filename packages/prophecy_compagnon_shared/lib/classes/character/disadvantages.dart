@@ -811,6 +811,7 @@ List<DiceThrowModifier> _infirmiteThrowModifierBuilder(DiceThrowModifierBuilderA
       label: 'Infirmité - ${args.details} (Désavantage)',
       value: finalDifficulty,
       disadvantageSuffix: args.suffix,
+      alwaysApply: false,
     )
   ];
 }

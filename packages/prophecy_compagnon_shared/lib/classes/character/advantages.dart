@@ -31,6 +31,8 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/ability_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/attribute_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/damage_malus_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
@@ -188,12 +190,19 @@ enum Advantage {
       ),
     ],
   ),
-  // TODO: manage this capacity
   droiture(
     title: 'Droiture',
     description: "L'honneur et le respect sont des valeurs fondamentales aux yeux du personnage. Ses certitudes sont telles que ses interlocuteurs peuvent sentir sa droiture. La Présence du personnage est augmentée de 2 lors de tous les jets basés sur l'honneur, le courage et le moral.",
     cost: [1],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    effectConfigurations: [
+      EntityEffectAbilityModifierConfiguration(
+        name: 'Droiture (Avantage)',
+        trigger: EntityEffectTrigger.diceThrow,
+        ability: Ability.presence,
+        modifier: 2,
+      )
+    ],
   ),
   figureDuMilieu(
       title: 'Figure du milieu',
@@ -265,12 +274,19 @@ enum Advantage {
     reservedCastes: [Caste.artisan],
     unique: false,
   ),
-  // TODO: manage this capacity
   prestance(
     title: 'Prestance',
     description: "Le prestige du personnage et l’expérience qu’il a acquis donnent à sa parole un poids évident lors des discussions. Chaque fois qu’il tentera une action sociale liée à son charisme, telle que faire aboutir une discussion, exposer un point de vue ou orienter une prise de décision, son Attribut Social sera augmenté de 2.",
     cost: [2],
-    type: AdvantageType.general
+    type: AdvantageType.general,
+    effectConfigurations: [
+      EntityEffectAttributeModifierConfiguration(
+        name: 'Prestance (Avantage)',
+        trigger: EntityEffectTrigger.diceThrow,
+        attribute: Attribute.social,
+        modifier: 2,
+      )
+    ],
   ),
   pressentiment(
     title: 'Pressentiment',

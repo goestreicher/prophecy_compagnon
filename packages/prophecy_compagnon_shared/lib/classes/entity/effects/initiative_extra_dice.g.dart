@@ -71,6 +71,7 @@ Map<String, dynamic> _$EntityEffectInitiativeExtraDiceToJson(
 };
 
 const _$EntityEffectTriggerEnumMap = {
+  EntityEffectTrigger.diceThrow: 'diceThrow',
   EntityEffectTrigger.once: 'once',
   EntityEffectTrigger.permanent: 'permanent',
   EntityEffectTrigger.request: 'request',

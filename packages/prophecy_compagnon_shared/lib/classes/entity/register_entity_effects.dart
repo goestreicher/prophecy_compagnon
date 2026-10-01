@@ -1,6 +1,8 @@
 // GENERATED CODE - DO NOT EDIT
 
 import "package:prophecy_compagnon_shared/classes/entity/effect.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/ability_modifier.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/attribute_modifier.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/damage_malus_modifier.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/dice_throw_modifier.dart";
@@ -9,6 +11,16 @@ import "package:prophecy_compagnon_shared/classes/entity/effects/initiative_extr
 import "package:prophecy_compagnon_shared/classes/entity/effects/injury_capacity.dart";
 
 void registerEntityEffects() {
+  EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectAbilityModifier",
+    (Map<String, dynamic> json) => EntityEffectAbilityModifier.fromJson(json),
+  );
+
+  EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectAttributeModifier",
+    (Map<String, dynamic> json) => EntityEffectAttributeModifier.fromJson(json),
+  );
+
   EntityEffect.registerEntityEffectJsonFactory(
     "EntityEffectCombatStatus",
     (Map<String, dynamic> json) => EntityEffectCombatStatus.fromJson(json),

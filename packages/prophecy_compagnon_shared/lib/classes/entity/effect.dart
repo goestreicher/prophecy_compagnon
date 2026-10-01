@@ -27,6 +27,7 @@ import 'package:uuid/uuid.dart';
 part 'effect.g.dart';
 
 enum EntityEffectTrigger {
+  diceThrow,
   once,
   permanent,
   request,
@@ -35,6 +36,8 @@ enum EntityEffectTrigger {
 }
 
 enum EntityEffectTarget {
+  abilityModifier,
+  attributeModifier,
   combatStatus,
   damageMalusModifier,
   diceThrowModifier,

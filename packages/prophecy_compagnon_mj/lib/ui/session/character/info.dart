@@ -146,6 +146,7 @@ class _DiceThrowMenuWidgetState extends State<_DiceThrowMenuWidget> {
             onPressed: selected == null ? null : () async {
               var bundle = await showDialog<EntityThrowBundle>(
                 context: context,
+                barrierDismissible: false,
                 builder: (BuildContext context) => EntityDiceThrowDialog(
                   entity: widget.entity,
                   request: selected!.request,
@@ -245,7 +246,9 @@ class _EffectsMenuWidgetState extends State<_EffectsMenuWidget> {
                 selected = e;
               });
             },
-            dropdownMenuEntries: widget.entity.effects.map(
+            dropdownMenuEntries: widget.entity.effects
+              .where((EntityEffect e) => e.trigger == EntityEffectTrigger.request)
+              .map(
                 (EntityEffect e) => DropdownMenuEntry(value: e, label: e.name)
               )
               .toList(),
@@ -267,6 +270,7 @@ class _EffectsMenuWidgetState extends State<_EffectsMenuWidget> {
                 if (selected!.activationDiceThrowRequest != null) {
                   var bundle = await showDialog<EntityThrowBundle>(
                     context: context,
+                    barrierDismissible: false,
                     builder: (BuildContext context) =>
                       EntityDiceThrowDialog(
                         entity: widget.entity,

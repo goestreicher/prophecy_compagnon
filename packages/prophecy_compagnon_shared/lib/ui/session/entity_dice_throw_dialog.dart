@@ -24,6 +24,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
@@ -54,6 +55,14 @@ class EntityDiceThrowDialog extends StatefulWidget {
 
 class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
   EntityThrowBundle? bundle;
+
+  void disableDiceThrowEffects() {
+    for(var e in widget.entity.effects.where((EntityEffect e) => e.trigger == EntityEffectTrigger.diceThrow)) {
+      if(e.active) {
+        e.unapply(target: widget.entity);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,12 +120,14 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
       actions: [
         TextButton(
           onPressed: () {
+            disableDiceThrowEffects();
             Navigator.of(context, rootNavigator: true).pop();
           },
           child: const Text('Annuler'),
         ),
         ElevatedButton(
           onPressed: bundle == null ? null : () {
+            disableDiceThrowEffects();
             Navigator.of(context, rootNavigator: true).pop(bundle);
           },
           style: ElevatedButton.styleFrom(
@@ -514,7 +525,63 @@ class _EntitySimpleDiceThrowWidgetState extends State<_EntitySimpleDiceThrowWidg
       );
     }
 
-    var entityModifierRows = <Widget>[];
+    var entityEffectRows = <Widget>[];
+    for(var e in widget.entity.effects.where((EntityEffect e) => e.trigger == EntityEffectTrigger.diceThrow)) {
+      entityEffectRows.add(
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () async {
+                DiceThrowEvaluation? activationDiceThrowEvaluation;
+
+                if (e.activationDiceThrowRequest != null) {
+                  var bundle = await showDialog<EntityThrowBundle>(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) =>
+                      EntityDiceThrowDialog(
+                        entity: widget.entity,
+                        request: e.activationDiceThrowRequest!,
+                      )
+                  );
+                  if(bundle == null) return;
+                  if(!context.mounted) return;
+
+                  activationDiceThrowEvaluation = evaluateDiceThrow(bundle);
+                  if(!e.canApply(target: widget.entity, activationDiceThrowEvaluation: activationDiceThrowEvaluation)) {
+                    // TODO: display a message?
+                    return;
+                  }
+                }
+
+                setState(() {
+                  if(e.active) {
+                    e.unapply(target: widget.entity);
+                  }
+                  else {
+                    e.apply(target: widget.entity);
+                  }
+                });
+                notifyBundle();
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    e.active
+                      ? Icons.check_box
+                      : Icons.check_box_outline_blank,
+                  ),
+                  Text(e.name),
+                ],
+              ),
+            ),
+          ],
+        )
+      );
+    }
+
+    var entityDifficultyModifierRows = <Widget>[];
+    var entityThrowModifierRows = <Widget>[];
     for(var m in entityModifiers()) {
       Widget label = Text.rich(
         TextSpan(
@@ -585,15 +652,21 @@ class _EntitySimpleDiceThrowWidgetState extends State<_EntitySimpleDiceThrowWidg
         );
       }
 
-      entityModifierRows.add(
-        Row(
-          children: [
-            label,
-            Spacer(),
-            _ValuePill(value: overrideModifiers[m.id]?.value ?? m.value),
-          ],
-        )
+      var row = Row(
+        children: [
+          label,
+          Spacer(),
+          _ValuePill(value: overrideModifiers[m.id]?.value ?? m.value),
+        ],
       );
+
+      switch(m.type) {
+        case DiceThrowModifierType.bonus:
+        case DiceThrowModifierType.malus:
+          entityThrowModifierRows.add(row);
+        case DiceThrowModifierType.difficulty:
+          entityDifficultyModifierRows.add(row);
+      }
     }
 
     String? totalText;
@@ -699,27 +772,55 @@ class _EntitySimpleDiceThrowWidgetState extends State<_EntitySimpleDiceThrowWidg
                     value: widget.request.base.value(widget.entity),
                   ),
                 ),
+                if(entityEffectRows.isNotEmpty)
+                  WidgetGroupContainer(
+                      title: Text(
+                        'Effets',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                      titleBackgroundColor: theme.colorScheme.surfaceContainerHigh,
+                      child: Column(
+                        spacing: 8.0,
+                        children: [
+                          ...entityEffectRows,
+                        ],
+                      )
+                  ),
+                if(entityDifficultyModifierRows.isNotEmpty)
+                  WidgetGroupContainer(
+                    title: Text(
+                      'Modificateurs de difficulté',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    titleBackgroundColor: theme.colorScheme.surfaceContainerHigh,
+                    child: Column(
+                      spacing: 8.0,
+                      children: [
+                        ...entityDifficultyModifierRows,
+                        if(widget.request.base.difficultyModifier(widget.entity) != 0)
+                          Row(
+                            spacing: 8.0,
+                            children: [
+                              Text(widget.request.base.difficultyModifierLabel(widget.entity)),
+                              Spacer(),
+                              _ValuePill(
+                                value: widget.request.base.difficultyModifier(widget.entity),
+                              ),
+                            ],
+                          ),
+                      ],
+                    )
+                  ),
                 WidgetGroupContainer(
                   title: Text(
-                    'Modificateurs',
+                    'Modificateurs de jet',
                     style: theme.textTheme.bodySmall,
                   ),
                   titleBackgroundColor: theme.colorScheme.surfaceContainerHigh,
                   child: Column(
                     spacing: 8.0,
                     children: [
-                      ...entityModifierRows,
-                      if(widget.request.base.difficultyModifier(widget.entity) != 0)
-                        Row(
-                          spacing: 8.0,
-                          children: [
-                            Text('${widget.request.base.difficultyModifierLabel(widget.entity)} (Diff.)'),
-                            Spacer(),
-                            _ValuePill(
-                              value: widget.request.base.difficultyModifier(widget.entity),
-                            ),
-                          ],
-                        ),
+                      ...entityThrowModifierRows,
                       Row(
                         spacing: 8.0,
                         children: [

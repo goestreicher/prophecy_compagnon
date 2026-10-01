@@ -1,14 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'health_status.dart';
+part of 'attribute_modifier.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-EntityEffectHealthStatus _$EntityEffectHealthStatusFromJson(
+EntityEffectAttributeModifier _$EntityEffectAttributeModifierFromJson(
   Map<String, dynamic> json,
-) => EntityEffectHealthStatus(
+) => EntityEffectAttributeModifier(
   uuid: json['uuid'] as String?,
   name: json['name'] as String,
   trigger: $enumDecode(_$EntityEffectTriggerEnumMap, json['trigger']),
@@ -40,13 +40,15 @@ EntityEffectHealthStatus _$EntityEffectHealthStatusFromJson(
   postEffects: (json['post_effects'] as List<dynamic>?)
       ?.map((e) => EntityEffect.fromJson(e as Map<String, dynamic>))
       .toList(),
+  removeOnUnapply: json['remove_on_unapply'] as bool? ?? false,
   elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
   active: json['active'] as bool? ?? false,
-  status: $enumDecode(_$EntityHealthStatusFlagEnumMap, json['status']),
+  attribute: $enumDecode(_$AttributeEnumMap, json['attribute']),
+  modifier: (json['modifier'] as num).toInt(),
 );
 
-Map<String, dynamic> _$EntityEffectHealthStatusToJson(
-  EntityEffectHealthStatus instance,
+Map<String, dynamic> _$EntityEffectAttributeModifierToJson(
+  EntityEffectAttributeModifier instance,
 ) => <String, dynamic>{
   'uuid': instance.uuid,
   'name': instance.name,
@@ -63,9 +65,11 @@ Map<String, dynamic> _$EntityEffectHealthStatusToJson(
       .activationDiceThrowValueTransformer
       ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
+  'remove_on_unapply': instance.removeOnUnapply,
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
-  'status': _$EntityHealthStatusFlagEnumMap[instance.status]!,
+  'attribute': _$AttributeEnumMap[instance.attribute]!,
+  'modifier': instance.modifier,
 };
 
 const _$EntityEffectTriggerEnumMap = {
@@ -84,10 +88,9 @@ const _$DiceThrowResultTypeEnumMap = {
   DiceThrowResultType.criticalSuccess: 'criticalSuccess',
 };
 
-const _$EntityHealthStatusFlagEnumMap = {
-  EntityHealthStatusFlag.none: 'none',
-  EntityHealthStatusFlag.injured: 'injured',
-  EntityHealthStatusFlag.dead: 'dead',
-  EntityHealthStatusFlag.stunned: 'stunned',
-  EntityHealthStatusFlag.unconscious: 'unconscious',
+const _$AttributeEnumMap = {
+  Attribute.physique: 'physique',
+  Attribute.mental: 'mental',
+  Attribute.manuel: 'manuel',
+  Attribute.social: 'social',
 };
