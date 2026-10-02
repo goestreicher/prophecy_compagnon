@@ -9,6 +9,8 @@ import "package:prophecy_compagnon_shared/classes/entity/effects/dice_throw_modi
 import "package:prophecy_compagnon_shared/classes/entity/effects/health_status.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/injury_capacity.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/luck_modifier.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/null.dart";
 
 void registerEntityEffects() {
   EntityEffect.registerEntityEffectJsonFactory(
@@ -49,6 +51,16 @@ void registerEntityEffects() {
   EntityEffect.registerEntityEffectJsonFactory(
     "EntityEffectInjuryCapacity",
     (Map<String, dynamic> json) => EntityEffectInjuryCapacity.fromJson(json),
+  );
+
+  EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectLuckModifier",
+    (Map<String, dynamic> json) => EntityEffectLuckModifier.fromJson(json),
+  );
+
+  EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectNull",
+    (Map<String, dynamic> json) => EntityEffectNull.fromJson(json),
   );
 
 }

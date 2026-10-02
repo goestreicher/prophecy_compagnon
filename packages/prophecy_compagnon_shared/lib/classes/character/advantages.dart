@@ -35,6 +35,7 @@ import 'package:prophecy_compagnon_shared/classes/entity/effects/ability_modifie
 import 'package:prophecy_compagnon_shared/classes/entity/effects/attribute_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/damage_malus_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/null.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
@@ -403,12 +404,40 @@ enum Advantage {
     cost: [3],
     type: AdvantageType.enfant
   ),
-  // TODO: manage this capacity
+  // TODO: manage the opposition throw variant
   empathieNaturelle(
     title: 'Empathie naturelle',
     description: "Cet Avantage permet au personnage de “sentir” son environnement comme s’il pouvait établir un contact empathique avec les éléments qui l’entourent. Cette faculté lui permet de ressentir des impressions, des émotions, des peurs. Cet Avantage s'utilise avec un jet de Mental + Empathie contre une Difficulté variable, en fonction de l’action entreprise. Pour ressentir des émotions sur des animaux et des créatures dénuées d'intelligence, la Difficulté est de 10. Sur des êtres intelligents, la Difficulté passe à 15. Le meneur de jeu se réserve le droit de faire effectuer à la cible un jet de Mental + Volonté contre une Difficulté de 15, s’il estime que cette dernière cherche à masquer ses émotions. Ce jet est alors un jet d'opposition.",
     cost: [4],
     type: AdvantageType.enfant,
+    effectConfigurations: [
+      EntityEffectNullConfiguration(
+        name: 'Empathie naturelle - Cible non intelligente',
+        trigger: EntityEffectTrigger.request,
+        activationDiceThrowRequest: DiceThrowRequest(
+          type: DiceThrowRequestType.simple,
+          context: DiceThrowRequestContext.none,
+          difficulty: 10,
+          base: DiceThrowEntityBaseAbility(
+            attribute: Attribute.mental,
+            ability: Ability.empathie,
+          ),
+        )
+      ),
+      EntityEffectNullConfiguration(
+        name: 'Empathie naturelle - Cible intelligente',
+        trigger: EntityEffectTrigger.request,
+        activationDiceThrowRequest: DiceThrowRequest(
+          type: DiceThrowRequestType.simple,
+          context: DiceThrowRequestContext.none,
+          difficulty: 15,
+          base: DiceThrowEntityBaseAbility(
+            attribute: Attribute.mental,
+            ability: Ability.empathie,
+          ),
+        )
+      ),
+    ],
   ),
   // TODO: manage this capacity
   faeGardienne(
@@ -491,13 +520,13 @@ enum Advantage {
     detailsGenerator: _skillFamilyGenerator,
     throwModifierBuilder: _habileteReconnueThrowModifierBuilder,
   ),
-  // TODO: manage this capacity
   objetDePredilection(
     title: 'Object de prédilection',
     description: "Le personnage possède un objet de prédilection (il ne peut pas s’agir d’une arme). Le personnage gagne un bonus de 2 à chaque fois qu’il utilise cet objet. Si l’objet est perdu, volé ou détruit, le personnage perd définitivement cet Avantage.\nCet Avantage ne peut être choisi qu’une seule fois.",
     cost: [3],
     type: AdvantageType.ancien,
     requireDetails: true,
+    throwModifierBuilder: _objetDePredilectionThrowModifierBuilder,
   ),
   // TODO: manage this capacity
   techniquePersonnelle(
@@ -622,12 +651,30 @@ List<DiceThrowModifier> _resistanceALaMagieThrowModifierBuilder(DiceThrowModifie
 
   return [
     AdvantageDiceThrowModifier(
-      type: DiceThrowModifierType.difficulty,
+      type: DiceThrowModifierType.bonus,
       label: 'Résistance à la Magie - ${args.details} (Avantage)',
       value: value,
       advantageSuffix: args.suffix,
       matcher: ThrowRequestContextDiceThrowMatcher(context: DiceThrowRequestContext.resistance),
     )
+  ];
+}
+
+List<DiceThrowModifier> _objetDePredilectionThrowModifierBuilder(DiceThrowModifierBuilderArgs args) {
+  /*
+      Le personnage possède un objet de prédilection (il ne peut pas s’agir
+      d’une arme). Le personnage gagne un bonus de 2 à chaque fois qu’il utilise
+      cet objet. Si l’objet est perdu, volé ou détruit, le personnage perd
+      définitivement cet Avantage.
+      Cet Avantage ne peut être choisi qu’une seule fois.
+   */
+  return [
+    AdvantageDiceThrowModifier(
+      type: DiceThrowModifierType.bonus,
+      label: 'Object de prédilection - ${args.details}',
+      value: 2,
+      advantageSuffix: args.suffix,
+    ),
   ];
 }
 
@@ -660,7 +707,7 @@ List<DiceThrowModifier> _habileteReconnueThrowModifierBuilder(DiceThrowModifierB
 
   return [
     AdvantageDiceThrowModifier(
-      type: DiceThrowModifierType.difficulty,
+      type: DiceThrowModifierType.bonus,
       label: 'Habileté reconnue - ${args.details} (Avantage)',
       value: 1,
       advantageSuffix: args.suffix,

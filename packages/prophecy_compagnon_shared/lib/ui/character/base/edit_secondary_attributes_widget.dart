@@ -49,7 +49,7 @@ class CharacterEditSecondaryAttributesWidget extends StatelessWidget {
             minValue: 0,
             maxValue: 10,
             onChanged: (int value) {
-              character.luck = value;
+              character.baseLuck = value;
             },
             label: 'CHAnce',
           ),

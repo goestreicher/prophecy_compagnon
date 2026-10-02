@@ -29,6 +29,7 @@ import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/base.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/luck_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/fervor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
@@ -105,7 +106,7 @@ class HumanCharacter extends EntityBase with MagicUser {
     super.icon,
     CharacterCaste? caste,
     this.honoraryCaste,
-    this.luck = 0,
+    int luck = 0,
     this.usedLuck = 0,
     this.proficiency = 0,
     this.usedProficiency = 0,
@@ -119,7 +120,8 @@ class HumanCharacter extends EntityBase with MagicUser {
     CharacterTendencies? tendencies,
     DraconicLink? draconicLink,
   })
-    : caste = caste ?? CharacterCaste.empty(),
+    : baseLuck = luck,
+      caste = caste ?? CharacterCaste.empty(),
       origin = origin ?? CharacterOrigin.unknown,
       disadvantages = disadvantages ?? CharacterDisadvantages(null),
       advantages = advantages ?? CharacterAdvantages(null),
@@ -135,12 +137,6 @@ class HumanCharacter extends EntityBase with MagicUser {
   double height;
   double weight;
   CharacterOrigin origin;
-  int luck;
-  int usedLuck;
-  int get availableLuck => luck - usedLuck;
-  int proficiency;
-  int usedProficiency;
-  int get availableProficiency => proficiency - usedProficiency;
   int renown;
   @JsonKey(fromJson: CharacterDisadvantages.fromJson, toJson: CharacterDisadvantages.toJson)
   CharacterDisadvantages disadvantages;
@@ -149,10 +145,27 @@ class HumanCharacter extends EntityBase with MagicUser {
   CharacterTendencies tendencies;
   DraconicLink draconicLink;
 
+  @JsonKey(name: 'luck')
+    int baseLuck;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+    int get luck {
+      var ret = baseLuck;
+      for(var effect in effects.where((EntityEffect e) => e.active && e.target == EntityEffectTarget.luckModifier)){
+        ret += (effect as EntityEffectLuckModifier).value;
+      }
+      return ret;
+    }
+  int usedLuck;
+  int get availableLuck => luck - usedLuck;
+
   void gainLuckPoints(int v) {
     usedLuck -= v;
     if(usedLuck < 0) usedLuck = 0;
   }
+
+  int proficiency;
+  int usedProficiency;
+  int get availableProficiency => proficiency - usedProficiency;
 
   void gainProficiencyPoints(int v) {
     usedProficiency -= v;

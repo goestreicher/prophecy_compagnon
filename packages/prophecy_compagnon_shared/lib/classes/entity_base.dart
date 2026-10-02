@@ -119,6 +119,8 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
         case EntityEffectTarget.healthStatus:
         case EntityEffectTarget.initiativeExtraDice:
         case EntityEffectTarget.injuryCapacity:
+        case EntityEffectTarget.luckModifier:
+        case EntityEffectTarget.none:
           continue;
       }
     }

@@ -98,7 +98,6 @@ NonPlayerCharacter _$NonPlayerCharacterFromJson(Map<String, dynamic> json) =>
         height: (json['height'] as num?)?.toDouble() ?? 1.7,
         size: (json['size'] as num?)?.toDouble(),
         weight: (json['weight'] as num?)?.toDouble() ?? 60.0,
-        luck: (json['luck'] as num?)?.toInt() ?? 0,
         usedLuck: (json['used_luck'] as num?)?.toInt() ?? 0,
         proficiency: (json['proficiency'] as num?)?.toInt() ?? 0,
         usedProficiency: (json['used_proficiency'] as num?)?.toInt() ?? 0,
@@ -144,7 +143,8 @@ NonPlayerCharacter _$NonPlayerCharacterFromJson(Map<String, dynamic> json) =>
       )
       ..draconicLink = DraconicLink.fromJson(
         json['draconic_link'] as Map<String, dynamic>,
-      );
+      )
+      ..baseLuck = (json['luck'] as num).toInt();
 
 Map<String, dynamic> _$NonPlayerCharacterToJson(NonPlayerCharacter instance) =>
     <String, dynamic>{
@@ -174,15 +174,15 @@ Map<String, dynamic> _$NonPlayerCharacterToJson(NonPlayerCharacter instance) =>
       'height': instance.height,
       'weight': instance.weight,
       'origin': instance.origin.toJson(),
-      'luck': instance.luck,
-      'used_luck': instance.usedLuck,
-      'proficiency': instance.proficiency,
-      'used_proficiency': instance.usedProficiency,
       'renown': instance.renown,
       'disadvantages': CharacterDisadvantages.toJson(instance.disadvantages),
       'advantages': CharacterAdvantages.toJson(instance.advantages),
       'tendencies': instance.tendencies.toJson(),
       'draconic_link': instance.draconicLink.toJson(),
+      'luck': instance.baseLuck,
+      'used_luck': instance.usedLuck,
+      'proficiency': instance.proficiency,
+      'used_proficiency': instance.usedProficiency,
       'category': const NPCCategoryJsonConverter().toJson(instance.category),
       'sub_category': const NPCSubcategoryJsonConverter().toJson(
         instance.subCategory,

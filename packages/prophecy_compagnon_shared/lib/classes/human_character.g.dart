@@ -77,7 +77,6 @@ HumanCharacter _$HumanCharacterFromJson(
   honoraryCaste: json['honorary_caste'] == null
       ? null
       : CharacterCaste.fromJson(json['honorary_caste'] as Map<String, dynamic>),
-  luck: (json['luck'] as num?)?.toInt() ?? 0,
   usedLuck: (json['used_luck'] as num?)?.toInt() ?? 0,
   proficiency: (json['proficiency'] as num?)?.toInt() ?? 0,
   usedProficiency: (json['used_proficiency'] as num?)?.toInt() ?? 0,
@@ -100,7 +99,7 @@ HumanCharacter _$HumanCharacterFromJson(
   draconicLink: json['draconic_link'] == null
       ? null
       : DraconicLink.fromJson(json['draconic_link'] as Map<String, dynamic>),
-);
+)..baseLuck = (json['luck'] as num).toInt();
 
 Map<String, dynamic> _$HumanCharacterToJson(HumanCharacter instance) =>
     <String, dynamic>{
@@ -130,13 +129,13 @@ Map<String, dynamic> _$HumanCharacterToJson(HumanCharacter instance) =>
       'height': instance.height,
       'weight': instance.weight,
       'origin': instance.origin.toJson(),
-      'luck': instance.luck,
-      'used_luck': instance.usedLuck,
-      'proficiency': instance.proficiency,
-      'used_proficiency': instance.usedProficiency,
       'renown': instance.renown,
       'disadvantages': CharacterDisadvantages.toJson(instance.disadvantages),
       'advantages': CharacterAdvantages.toJson(instance.advantages),
       'tendencies': instance.tendencies.toJson(),
       'draconic_link': instance.draconicLink.toJson(),
+      'luck': instance.baseLuck,
+      'used_luck': instance.usedLuck,
+      'proficiency': instance.proficiency,
+      'used_proficiency': instance.usedProficiency,
     };

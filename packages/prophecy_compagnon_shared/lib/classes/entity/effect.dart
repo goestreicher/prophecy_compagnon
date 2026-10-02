@@ -44,6 +44,8 @@ enum EntityEffectTarget {
   healthStatus,
   initiativeExtraDice,
   injuryCapacity,
+  luckModifier,
+  none,
   ;
 }
 
