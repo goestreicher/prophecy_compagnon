@@ -30,7 +30,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/request_co
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';

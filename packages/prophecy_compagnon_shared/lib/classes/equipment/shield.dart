@@ -21,7 +21,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/combat.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/base.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';

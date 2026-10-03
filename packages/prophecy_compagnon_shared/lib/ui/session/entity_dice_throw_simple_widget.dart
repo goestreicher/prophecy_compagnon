@@ -21,12 +21,13 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/dismissible_dialog.dart';
 import 'package:prophecy_compagnon_shared/ui/num_input_widget.dart';
@@ -69,10 +70,11 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
   int? luck;
   int? criticalDie;
   bool isCriticalSuccess = false;
-  Map<String, DiceThrowModifier> overrideModifiers = <String, DiceThrowModifier>{};
-  Set<String> appliedModifiers = <String>{};
+  Map<String, DiceThrowModifier> overrideEntityModifiers = <String, DiceThrowModifier>{};
+  Set<String> appliedEntityModifiers = <String>{};
   int contextModifier = 0;
-  int difficultyModifiersTotal = 0;
+  EntityBase? selectedPeer;
+  Set<String> appliedPeerModifiers = <String>{};
 
   static List<String> defaultContextModifierHints = [
     "-4 : Ne jamais avoir tenté l'action auparavant",
@@ -91,12 +93,10 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
     super.initState();
 
     // By default, consider all entity modifiers applied
-    appliedModifiers.addAll(
+    appliedEntityModifiers.addAll(
         widget.entity.throwModifiers(widget.request)
             .map((DiceThrowModifier m) => m.id)
     );
-
-    updateModifiersTotal();
   }
 
   bool hasDieResult() {
@@ -122,8 +122,15 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
 
   DiceThrowResult createResult() {
     var modifiers = entityModifiers()
-      .where((DiceThrowModifier m) => appliedModifiers.contains(m.id))
+      .where((DiceThrowModifier m) => appliedEntityModifiers.contains(m.id))
       .toList();
+
+    if(selectedPeer != null) {
+      modifiers.addAll(
+        selectedPeer!.peerThrowModifiers()
+          .where((DiceThrowModifier m) => appliedPeerModifiers.contains(m.id))
+      );
+    }
 
     if(contextModifier != 0) {
       modifiers.add(
@@ -188,8 +195,8 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
     var ret = <DiceThrowModifier>[];
 
     for(var m in widget.entity.throwModifiers(widget.request)) {
-      if(overrideModifiers.containsKey(m.id)) {
-        ret.add(overrideModifiers[m.id]!);
+      if(overrideEntityModifiers.containsKey(m.id)) {
+        ret.add(overrideEntityModifiers[m.id]!);
       }
       else {
         ret.add(m);
@@ -197,26 +204,6 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
     }
 
     return ret;
-  }
-
-  void updateModifiersTotal() {
-    var difficultyTotal = 0;
-
-    for(var m in entityModifiers()) {
-      if(appliedModifiers.contains(m.id)) {
-        switch(m.type) {
-          case DiceThrowModifierType.malus:
-          case DiceThrowModifierType.bonus:
-            break;
-          case DiceThrowModifierType.difficulty:
-            difficultyTotal += overrideModifiers[m.id]?.value ?? m.value;
-        }
-      }
-    }
-
-    difficultyTotal += widget.request.base.difficultyModifier(widget.entity);
-
-    difficultyModifiersTotal = difficultyTotal;
   }
 
   EntityThrowBundle createBundle() => EntityThrowBundle(
@@ -302,7 +289,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
               WidgetSpan(
                 alignment: PlaceholderAlignment.middle,
                 child: IconButton(
-                  onPressed: !appliedModifiers.contains(m.id) || overrideModifiers.containsKey(m.id) ? null : () async {
+                  onPressed: !appliedEntityModifiers.contains(m.id) || overrideEntityModifiers.containsKey(m.id) ? null : () async {
                     var resultBundles = await showDialog<List<EntityThrowBundle>>(
                       context: context,
                       builder: (BuildContext context) =>
@@ -319,8 +306,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
 
                     if(overrideMod != null) {
                       setState(() {
-                        overrideModifiers[m.id] = overrideMod;
-                        updateModifiersTotal();
+                        overrideEntityModifiers[m.id] = overrideMod;
                       });
                     }
                   },
@@ -338,20 +324,19 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
         label = GestureDetector(
           onTap: () {
             setState(() {
-              if(appliedModifiers.contains(m.id)) {
-                appliedModifiers.remove(m.id);
+              if(appliedEntityModifiers.contains(m.id)) {
+                appliedEntityModifiers.remove(m.id);
               }
               else {
-                appliedModifiers.add(m.id);
+                appliedEntityModifiers.add(m.id);
               }
-              updateModifiersTotal();
             });
             notifyBundle();
           },
           child: Row(
             children: [
               Icon(
-                appliedModifiers.contains(m.id)
+                appliedEntityModifiers.contains(m.id)
                     ? Icons.check_box
                     : Icons.check_box_outline_blank,
               ),
@@ -365,7 +350,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
         children: [
           label,
           Spacer(),
-          DiceThrowValuePill(value: overrideModifiers[m.id]?.value ?? m.value),
+          DiceThrowValuePill(value: overrideEntityModifiers[m.id]?.value ?? m.value),
         ],
       );
 
@@ -376,6 +361,45 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
         case DiceThrowModifierType.difficulty:
           entityDifficultyModifierRows.add(row);
       }
+    }
+
+    var peerThrowModifierRows = <Widget>[];
+    for(var m in (selectedPeer?.peerThrowModifiers() ?? <DiceThrowModifier>[])) {
+      Widget label = GestureDetector(
+        onTap: () {
+          setState(() {
+            if(appliedPeerModifiers.contains(m.id)) {
+              appliedPeerModifiers.remove(m.id);
+            }
+            else {
+              appliedPeerModifiers.add(m.id);
+            }
+          });
+          notifyBundle();
+        },
+        child: Row(
+          children: [
+            Icon(
+              appliedPeerModifiers.contains(m.id)
+                ? Icons.check_box
+                : Icons.check_box_outline_blank,
+            ),
+            Text(
+              m.label,
+            ),
+          ],
+        ),
+      );
+
+      var row = Row(
+        children: [
+          label,
+          Spacer(),
+          DiceThrowValuePill(value: overrideEntityModifiers[m.id]?.value ?? m.value),
+        ],
+      );
+
+      peerThrowModifierRows.add(row);
     }
 
     if(widget.request.base.difficultyModifier(widget.entity) != 0) {
@@ -526,6 +550,39 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
                       ),
                     ],
                   ),
+                ),
+                WidgetGroupContainer(
+                  title: Text(
+                    "Modificateurs d'un autre personnage",
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  titleBackgroundColor: theme.colorScheme.surfaceContainerHigh,
+                  child: Column(
+                    spacing: 8.0,
+                    children: [
+                      DropdownMenu(
+                        textStyle: theme.textTheme.bodySmall,
+                        expandedInsets: EdgeInsets.zero,
+                        inputDecorationTheme: const InputDecorationTheme(
+                          border: OutlineInputBorder(),
+                          isCollapsed: true,
+                          constraints: BoxConstraints(maxHeight: 36.0),
+                          contentPadding: EdgeInsets.all(12.0),
+                        ),
+                        dropdownMenuEntries: (GameSession.instance?.entities() ?? <EntityBase>[])
+                          .where((EntityBase e) => e.id != widget.entity.id)
+                          .map((EntityBase e) => DropdownMenuEntry(value: e, label: e.name))
+                          .toList(),
+                        onSelected: (EntityBase? e) {
+                          setState(() {
+                            appliedPeerModifiers.clear();
+                            selectedPeer = e;
+                          });
+                        },
+                      ),
+                      ...peerThrowModifierRows,
+                    ],
+                  )
                 ),
                 if(widget.entity is HumanCharacter)
                   DiceThrowRow(

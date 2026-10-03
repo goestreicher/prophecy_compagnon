@@ -17,7 +17,7 @@
 
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 
@@ -38,6 +38,7 @@ typedef DiceThrowModifierBuilder =
 
 class DiceThrowModifierConfiguration {
   const DiceThrowModifierConfiguration({
+    this.target = DiceThrowModifierTarget.self,
     required this.type,
     this.value,
     this.matcher,
@@ -47,6 +48,7 @@ class DiceThrowModifierConfiguration {
     this.valueOverride,
   });
 
+  final DiceThrowModifierTarget target;
   final DiceThrowModifierType type;
   final int? value;
   final DiceThrowMatcher? matcher;

@@ -17,7 +17,7 @@
 
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
 
 enum DiceThrowResultType {
   none(title: "Inconnu (pas de Difficulté)"),

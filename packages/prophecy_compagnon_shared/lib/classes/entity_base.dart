@@ -21,7 +21,7 @@ import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/combat.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/draconic_favor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
@@ -288,6 +288,11 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
 
     return ret;
   }
+
+  List<DiceThrowModifier> peerThrowModifiers() =>
+      _throwModifiers.values
+        .where((DiceThrowModifier m) => m.target == DiceThrowModifierTarget.other)
+        .toList();
 
   @override
   bool meetsEquipableRequirements(EquipableItem item) {

@@ -26,7 +26,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill.dart
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matchers/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_configuration.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
@@ -389,13 +389,25 @@ enum Advantage {
     cost: [2],
     type: AdvantageType.general
   ),
-  // TODO: manage this capacity
   surprise(
     title: 'Surprise',
     description: "Permet au personnage de gagner un bonus de +5 sur le jet de sa première action d’un tour, ou, au contraire, d’imposer un malus de +5 à la Difficulté du premier jet d’action de son adversaire. Ce Privilège n’est applicable que sur le jet correspondant à la première action du personnage ou de son adversaire - une seule fois par combat, donc. Il peut s’utiliser plusieurs fois sur une même personne, mais toujours seulement une fois par combat (à la première action).",
     cost: [6],
     type: AdvantageType.general,
-    reservedCastes: [Caste.commercant]
+    reservedCastes: [Caste.commercant],
+    throwModifierConfigurations: [
+      DiceThrowModifierConfiguration(
+        type: DiceThrowModifierType.bonus,
+        value: 5,
+        alwaysApply: false,
+      ),
+      DiceThrowModifierConfiguration(
+        target: DiceThrowModifierTarget.other,
+        type: DiceThrowModifierType.malus,
+        value: 5,
+        alwaysApply: false,
+      ),
+    ],
   ),
   // Managed in evaluate_dice_throw.dart:EntityThrowBundle._nr
   chanceInouie(
@@ -453,12 +465,19 @@ enum Advantage {
     cost: [1],
     type: AdvantageType.enfant
   ),
-  // TODO: manage this capacity
   instinctProtecteur(
     title: 'Instinct protecteur',
     description: "L'enfant provoque au sein du groupe un instinct de protection. Lorsqu’il est en danger (combat, chute imminente, noyade, etc.), l’un de ses compagnons se porte immanquablement à son secours. Pour ce faire, le sauveur bénéficie d’un bonus de 3 à UNE action destinée à le tirer d'affaire (parer une attaque fatale, rattraper la corde qui glisse, plonger à son secours, etc.) une fois par jour. Le joueur est en droit de réclamer l'assistance d’un des personnages si la situation l’exige. Le meneur de jeu pourra, en dernier recours, désigner un personnage si aucun ne réagit spontanément.",
     cost: [2],
-    type: AdvantageType.enfant
+    type: AdvantageType.enfant,
+    throwModifierConfigurations: [
+      DiceThrowModifierConfiguration(
+        target: DiceThrowModifierTarget.other,
+        type: DiceThrowModifierType.bonus,
+        value: 3,
+        alwaysApply: false,
+      ),
+    ],
   ),
   precoce(
     title: 'Précoce',

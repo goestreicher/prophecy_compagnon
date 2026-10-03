@@ -64,6 +64,7 @@ class CharacterAdvantage {
       for(var cfg in advantage.throwModifierConfigurations) {
         ret.add(
           AdvantageDiceThrowModifier(
+            target: cfg.target,
             type: cfg.type,
             label: '${advantage.title}${details.isEmpty ? "" : " - $details"} (Avantage)',
             matcher: cfg.matcher,

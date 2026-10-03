@@ -17,13 +17,14 @@
 
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
 
 abstract class DiceThrowModifier {
   const DiceThrowModifier({
+    this.target = DiceThrowModifierTarget.self,
     required this.type,
     required this.family,
     required this.label,
@@ -35,6 +36,7 @@ abstract class DiceThrowModifier {
     this.valueOverride,
   });
 
+  final DiceThrowModifierTarget target;
   final DiceThrowModifierType type;
   final DiceThrowModifierFamily family;
   final String label;
@@ -71,6 +73,7 @@ abstract class DiceThrowModifier {
 
 class OneOffDiceThrowModifier extends DiceThrowModifier {
   const OneOffDiceThrowModifier({
+    super.target,
     required super.type,
     required super.family,
     required super.label,
@@ -90,6 +93,7 @@ class OneOffDiceThrowModifier extends DiceThrowModifier {
 
 class EquipmentDiceThrowModifier extends DiceThrowModifier {
   const EquipmentDiceThrowModifier({
+    super.target,
     required super.type,
     required super.family,
     required super.label,
@@ -110,6 +114,7 @@ class EquipmentDiceThrowModifier extends DiceThrowModifier {
 
 class AdvantageDiceThrowModifier extends DiceThrowModifier {
   const AdvantageDiceThrowModifier({
+    super.target,
     required super.type,
     required super.label,
     required super.value,
@@ -130,6 +135,7 @@ class AdvantageDiceThrowModifier extends DiceThrowModifier {
 
 class DisadvantageDiceThrowModifier extends DiceThrowModifier {
   const DisadvantageDiceThrowModifier({
+    super.target,
     required super.type,
     required super.label,
     required super.value,
