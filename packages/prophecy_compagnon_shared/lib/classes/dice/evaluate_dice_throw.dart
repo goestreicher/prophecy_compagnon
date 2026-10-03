@@ -106,6 +106,7 @@ DiceThrowEvaluation evaluateDiceThrow(
     EntityThrowBundle actor,
     {
       EntityThrowBundle? opposing,
+      dispatchPropertyUpdates = true,
     }
 ) {
   switch(actor.request.type) {
@@ -114,7 +115,11 @@ DiceThrowEvaluation evaluateDiceThrow(
     case DiceThrowRequestType.simple:
     case DiceThrowRequestType.oppositionDirect:
     case DiceThrowRequestType.oppositionNR:
-      return _evaluateStandardThrow(actor, opposing: opposing);
+      return _evaluateStandardThrow(
+        actor,
+        opposing: opposing,
+        dispatchPropertyUpdates: dispatchPropertyUpdates,
+      );
   }
 }
 
@@ -143,6 +148,7 @@ DiceThrowEvaluation _evaluateStandardThrow(
     EntityThrowBundle actor,
     {
       EntityThrowBundle? opposing,
+      dispatchPropertyUpdates = true,
     }
 ) {
   if(actor.request.difficulty == null && opposing == null) {
@@ -153,7 +159,7 @@ DiceThrowEvaluation _evaluateStandardThrow(
   if(opposing == null && actorEvaluation.resultType == DiceThrowResultType.none) {
     actorEvaluation.resultType = DiceThrowResultType.success;
   }
-  if(!actor._evaluated) {
+  if(dispatchPropertyUpdates && !actor._evaluated) {
     _dispatchUsedLuckProficiencyMessages(actor);
     _dispatchGainedLuckProficiencyMessages(actorEvaluation, actor.entity);
     if(actor.entity is HumanCharacter) {
@@ -169,7 +175,7 @@ DiceThrowEvaluation _evaluateStandardThrow(
   DiceThrowEvaluation? opposingEvaluation;
   if(opposing != null) {
     opposingEvaluation = _doEvaluation(opposing, actor._total);
-    if(!opposing._evaluated) {
+    if(dispatchPropertyUpdates && !opposing._evaluated) {
       _dispatchUsedLuckProficiencyMessages(opposing);
       _dispatchGainedLuckProficiencyMessages(opposingEvaluation, opposing.entity);
       if(opposing.entity is HumanCharacter) {

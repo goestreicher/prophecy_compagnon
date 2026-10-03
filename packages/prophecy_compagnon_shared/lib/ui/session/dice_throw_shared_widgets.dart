@@ -118,7 +118,7 @@ class DiceThrowResultStatusWidget extends StatelessWidget {
     var totalColor = Colors.indigo;
     String? totalText;
     if(bundle != null) {
-      var eval = evaluateDiceThrow(bundle!);
+      var eval = evaluateDiceThrow(bundle!, dispatchPropertyUpdates: false);
 
       if(eval.resultType == DiceThrowResultType.fail) {
         totalColor = Colors.red;
@@ -171,7 +171,7 @@ class DiceThrowResultSimpleWidget extends StatelessWidget {
     String? totalText;
     var totalColor = Colors.indigo;
     if(bundle != null) {
-      var evaluation = evaluateDiceThrow(bundle!);
+      var evaluation = evaluateDiceThrow(bundle!, dispatchPropertyUpdates: false);
       if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
         totalText = 'Échec critique';
         totalColor = Colors.red;

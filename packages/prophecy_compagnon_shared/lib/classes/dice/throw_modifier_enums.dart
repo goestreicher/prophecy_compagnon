@@ -32,3 +32,9 @@ enum DiceThrowModifierFamily {
   movementPenalty,
   ;
 }
+
+enum DiceThrowModifierTarget {
+  self,
+  other,
+  ;
+}
