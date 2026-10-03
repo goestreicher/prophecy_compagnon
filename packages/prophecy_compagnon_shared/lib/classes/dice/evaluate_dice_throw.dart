@@ -54,15 +54,17 @@ class DiceThrowEvaluation {
 }
 
 class EntityThrowBundle {
-  const EntityThrowBundle({
+  EntityThrowBundle({
     required this.entity,
     required this.request,
     required this.result,
-  });
+  })
+    : _evaluated = false;
 
   final EntityBase entity;
   final DiceThrowRequest request;
   final DiceThrowResult result;
+  bool _evaluated;
 
   int? get _difficulty {
     if(request.difficulty == null) return null;
@@ -150,14 +152,20 @@ DiceThrowEvaluation _evaluateStandardThrow(
   if(opposing == null && actorEvaluation.resultType == DiceThrowResultType.none) {
     actorEvaluation.resultType = DiceThrowResultType.success;
   }
-  _dispatchUsedLuckProficiencyMessages(actor);
-  _dispatchGainedLuckProficiencyMessages(actorEvaluation, actor.entity);
+  if(!actor._evaluated) {
+    _dispatchUsedLuckProficiencyMessages(actor);
+    _dispatchGainedLuckProficiencyMessages(actorEvaluation, actor.entity);
+    actor._evaluated = true;
+  }
 
   DiceThrowEvaluation? opposingEvaluation;
   if(opposing != null) {
     opposingEvaluation = _doEvaluation(opposing, actor._total);
-    _dispatchUsedLuckProficiencyMessages(opposing);
-    _dispatchGainedLuckProficiencyMessages(opposingEvaluation, opposing.entity);
+    if(!opposing._evaluated) {
+      _dispatchUsedLuckProficiencyMessages(opposing);
+      _dispatchGainedLuckProficiencyMessages(opposingEvaluation, opposing.entity);
+      opposing._evaluated = true;
+    }
   }
 
   return actorEvaluation;
