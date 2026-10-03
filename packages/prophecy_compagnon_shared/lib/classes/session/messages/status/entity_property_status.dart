@@ -25,6 +25,7 @@ enum EntityMessageProperty {
   gainLuckPoints,
   useProficiencyPoints,
   gainProficiencyPoints,
+  updateTendency,
 }
 
 @JsonSerializable()

@@ -18,6 +18,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/character/advantages.dart';
 import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
+import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/threshold.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_type.dart';
@@ -155,6 +156,13 @@ DiceThrowEvaluation _evaluateStandardThrow(
   if(!actor._evaluated) {
     _dispatchUsedLuckProficiencyMessages(actor);
     _dispatchGainedLuckProficiencyMessages(actorEvaluation, actor.entity);
+    if(actor.entity is HumanCharacter) {
+      _dispatchTendenciesUpdateMessages(
+        actor.entity as HumanCharacter,
+        actor,
+        actorEvaluation,
+      );
+    }
     actor._evaluated = true;
   }
 
@@ -164,6 +172,13 @@ DiceThrowEvaluation _evaluateStandardThrow(
     if(!opposing._evaluated) {
       _dispatchUsedLuckProficiencyMessages(opposing);
       _dispatchGainedLuckProficiencyMessages(opposingEvaluation, opposing.entity);
+      if(opposing.entity is HumanCharacter) {
+        _dispatchTendenciesUpdateMessages(
+          opposing.entity as HumanCharacter,
+          opposing,
+          opposingEvaluation,
+        );
+      }
       opposing._evaluated = true;
     }
   }
@@ -277,6 +292,99 @@ void _dispatchGainedLuckProficiencyMessages(DiceThrowEvaluation evaluation, Enti
         entityId: entity.id,
         property: EntityMessageProperty.gainProficiencyPoints,
         value: proficiencyGain,
+      )
+    );
+  }
+}
+
+void _dispatchTendenciesUpdateMessages(
+    HumanCharacter entity,
+    EntityThrowBundle bundle,
+    DiceThrowEvaluation evaluation,
+) {
+  if(!bundle.result.usedTendencies) return;
+  var messageBus = SessionMessageBusClient.instance;
+  if(messageBus == null) return;
+
+  var updates = <CharacterTendencyUpdate>[];
+
+  if(bundle.result.announcedTendency == bundle.result.keptTendency) {
+    if(evaluation.criticalType == DiceThrowResultType.criticalSuccess) {
+      updates.add(
+        CharacterTendencyUpdate(
+          tendency: bundle.result.keptTendency!,
+          circlesDelta: 2,
+        )
+      );
+    }
+    else if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
+      updates.add(
+        CharacterTendencyUpdate(
+          tendency: bundle.result.keptTendency!,
+          circlesDelta: -1,
+        )
+      );
+    }
+    else if(evaluation.resultType == DiceThrowResultType.success) {
+      updates.add(
+        CharacterTendencyUpdate(
+          tendency: bundle.result.keptTendency!,
+          circlesDelta: 1,
+        )
+      );
+    }
+  }
+  else {
+    int announcedUpdate;
+    int keptUpdate;
+
+    if(evaluation.criticalType == DiceThrowResultType.criticalSuccess) {
+      announcedUpdate = -3;
+      keptUpdate = 3;
+    }
+    else {
+      int keptDie;
+
+      switch(bundle.result.keptTendency!) {
+        case Tendency.dragon:
+          keptDie = bundle.result.dragonDie!;
+        case Tendency.fatality:
+          keptDie = bundle.result.fatalityDie!;
+        case Tendency.human:
+          keptDie = bundle.result.humanDie!;
+      }
+
+      if(keptDie == 10) {
+        announcedUpdate = -2;
+        keptUpdate = 2;
+      }
+      else {
+        announcedUpdate = -1;
+        keptUpdate = 1;
+      }
+    }
+
+    updates.add(
+      CharacterTendencyUpdate(
+        tendency: bundle.result.announcedTendency!,
+        circlesDelta: announcedUpdate,
+      )
+    );
+    updates.add(
+      CharacterTendencyUpdate(
+        tendency: bundle.result.keptTendency!,
+        circlesDelta: keptUpdate,
+      )
+    );
+  }
+
+  for(var update in updates) {
+    messageBus.publish(
+      SessionEntitySetPropertyMessage(
+        broadcastIncludesSelf: true,
+        entityId: entity.id,
+        property: EntityMessageProperty.updateTendency,
+        value: update,
       )
     );
   }

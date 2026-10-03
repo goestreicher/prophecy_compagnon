@@ -19,6 +19,7 @@ import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/pc_review_dialog.dart';
+import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
@@ -185,6 +186,8 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
         entity.usedProficiency += m.value as int;
       case EntityMessageProperty.gainProficiencyPoints:
         entity.gainProficiencyPoints(m.value as int);
+      case EntityMessageProperty.updateTendency:
+        entity.tendencies.update(m.value as CharacterTendencyUpdate);
     }
   }
 

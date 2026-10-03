@@ -157,6 +157,10 @@ class _DiceThrowMenuWidgetState extends State<_DiceThrowMenuWidget> {
               );
               if(bundles == null || bundles.isEmpty) return;
               if(!context.mounted) return;
+
+              for(var bundle in bundles) {
+                var evaluation = evaluateDiceThrow(bundle);
+              }
             },
             icon: Icon(CustomIcons.d10),
           ),

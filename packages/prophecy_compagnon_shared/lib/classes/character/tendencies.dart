@@ -37,11 +37,72 @@ class TendencyAttribute {
   int value;
   int circles;
 
+  void updateValue(int delta) {
+    if(delta == 0) return;
+
+    var target = value + delta;
+
+    if(target < 0) {
+      target = 0;
+    }
+    else if(target > 5) {
+      target = 5;
+    }
+
+    value = target;
+  }
+
+  void updateCircles(int delta) {
+    if(delta == 0) return;
+
+    var target = circles + delta;
+    var valueDelta = 0;
+
+    if(target < 0) {
+      if(value == 0) {
+        target = 0;
+      }
+      else {
+        valueDelta = -1 - (target ~/ 10);
+        target = (-1 - (target % 10)).abs();
+      }
+    }
+    else if(target > 10) {
+      if(value == 5) {
+        target = 10;
+      }
+      else {
+        valueDelta = target ~/ 10;
+        target = 1 - (target % 10);
+      }
+    }
+
+    if(valueDelta != 0) {
+      updateValue(valueDelta);
+    }
+
+    if(target != 0) {
+      circles = target;
+    }
+  }
+
   factory TendencyAttribute.fromJson(Map<String, dynamic> json) =>
       _$TendencyAttributeFromJson(json);
 
   Map<String, dynamic> toJson() =>
       _$TendencyAttributeToJson(this);
+}
+
+class CharacterTendencyUpdate {
+  const CharacterTendencyUpdate({
+    required this.tendency,
+    required this.circlesDelta,
+    this.valueDelta = 0,
+  });
+
+  final Tendency tendency;
+  final int circlesDelta;
+  final int valueDelta;
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
@@ -72,6 +133,19 @@ class CharacterTendencies {
     }
   }
 
-  factory CharacterTendencies.fromJson(Map<String, dynamic> json) => _$CharacterTendenciesFromJson(json);
-  Map<String, dynamic> toJson() => _$CharacterTendenciesToJson(this);
+  void update(CharacterTendencyUpdate delta) {
+    if(delta.valueDelta != 0) {
+      this[delta.tendency].updateValue(delta.valueDelta);
+    }
+
+    if(delta.circlesDelta != 0) {
+      this[delta.tendency].updateCircles(delta.circlesDelta);
+    }
+  }
+
+  factory CharacterTendencies.fromJson(Map<String, dynamic> json) =>
+      _$CharacterTendenciesFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$CharacterTendenciesToJson(this);
 }
