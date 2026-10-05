@@ -22,6 +22,7 @@ import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/widget_group_container.dart';
@@ -169,24 +170,41 @@ class DiceThrowResultSimpleWidget extends StatelessWidget {
     var theme = Theme.of(context);
 
     String? totalText;
+    Widget? nrWidget;
+
     var totalColor = Colors.indigo;
     if(bundle != null) {
-      var evaluation = evaluateDiceThrow(bundle!, dispatchPropertyUpdates: false);
-      if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
-        totalText = 'Échec critique';
-        totalColor = Colors.red;
-      }
+      totalText =
+        (bundle!.request.base.value(bundle!.entity)
+        + bundle!.result.total())
+        .toString();
 
-      if(totalText == null) {
-        totalText =
-            (bundle!.request.base.value(bundle!.entity)
-            + bundle!.result.total()).toString();
-
-        if(evaluation.resultType == DiceThrowResultType.fail) {
+      if(bundle!.request.difficulty != null) {
+        var evaluation = evaluateDiceThrow(bundle!, dispatchPropertyUpdates: false);
+        if (evaluation.criticalType == DiceThrowResultType.criticalFail) {
+          totalText = 'Échec critique';
           totalColor = Colors.red;
         }
-        else if(evaluation.resultType == DiceThrowResultType.success) {
+        else if (evaluation.resultType == DiceThrowResultType.fail) {
+          totalColor = Colors.red;
+        }
+        else if (evaluation.resultType == DiceThrowResultType.success) {
           totalColor = Colors.green;
+
+          nrWidget = Container(
+            decoration: BoxDecoration(
+              color: totalColor,
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+              child: Text(
+                '+${evaluation.margin.toString()} / ${evaluation.nr.toString()} NR',
+                style: theme.textTheme.headlineSmall!
+                  .copyWith(color: Colors.white),
+              ),
+            ),
+          );
         }
       }
     }
@@ -232,19 +250,165 @@ class DiceThrowResultSimpleWidget extends StatelessWidget {
     }
 
     return Row(
+      spacing: 8.0,
       children: [
-        Text(
-          'Total',
-          style: theme.textTheme.headlineSmall,
-        ),
         Spacer(),
         totalWidget,
         if(difficultyTotalWidget != null)
           Text(
-            ' vs. ',
+            'vs.',
             style: theme.textTheme.headlineSmall,
           ),
         ?difficultyTotalWidget,
+        ?nrWidget,
+      ],
+    );
+  }
+}
+
+class DiceThrowResultOppositionWidget extends StatelessWidget {
+  const DiceThrowResultOppositionWidget({
+    super.key,
+    this.actorBundle,
+    this.opposingBundle,
+  });
+
+  final EntityThrowBundle? actorBundle;
+  final EntityThrowBundle? opposingBundle;
+
+  Widget getResultWidget(BuildContext context, EntityThrowBundle? actor, EntityThrowBundle? opposing) {
+    var theme = Theme.of(context);
+    var totalColor = Colors.indigo;
+    String? totalText;
+
+    if(actor != null) {
+      totalText =
+        (
+          actor.request.base.value(actor.entity)
+          + actor.result.total()
+        )
+        .toString();
+
+      var criticalType = actor.result.criticalType(actor.request.base.componentValue(actor.entity));
+      if(criticalType == DiceThrowResultType.criticalFail) {
+        totalText = 'Échec critique';
+        totalColor = Colors.red;
+      }
+      else if(opposing != null) {
+        var evaluation = evaluateDiceThrow(actor, opposing: opposing, dispatchPropertyUpdates: false);
+        if (evaluation.criticalType == DiceThrowResultType.criticalFail) {
+          totalText = 'Échec critique';
+          totalColor = Colors.red;
+        }
+        else if (evaluation.resultType == DiceThrowResultType.fail) {
+          totalColor = Colors.red;
+        }
+        else if (evaluation.resultType == DiceThrowResultType.success) {
+          totalColor = Colors.green;
+        }
+      }
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: totalColor,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+        child: Text(
+          totalText ?? '?',
+          style: theme.textTheme.headlineSmall!
+            .copyWith(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+    var actorResultWidget = getResultWidget(context, actorBundle, opposingBundle);
+    var opposingResultWidget = getResultWidget(context, opposingBundle, actorBundle);
+    Widget? resultWidget;
+
+    if(actorBundle != null && opposingBundle != null) {
+      if(![DiceThrowRequestType.oppositionDirect, DiceThrowRequestType.oppositionNR].contains(actorBundle!.request.type)) {
+        throw(ArgumentError("Un résultat d'opposition nécessite un jet d'opposition"));
+      }
+
+      var actorEvaluation = evaluateDiceThrow(
+          actorBundle!,
+          opposing: opposingBundle!,
+          dispatchPropertyUpdates: false
+      );
+      var opposingEvaluation = evaluateDiceThrow(
+        opposingBundle!,
+        opposing: actorBundle!,
+        dispatchPropertyUpdates: false,
+      );
+
+      String resultText;
+
+      if(
+          actorEvaluation.resultType == DiceThrowResultType.fail
+          && opposingEvaluation.resultType == DiceThrowResultType.fail
+      ) {
+        resultText = "Pas de gagnant, double échec";
+      }
+      else {
+        int actorValue;
+        int opposingValue;
+        String unit = "";
+
+        if(actorBundle!.request.type == DiceThrowRequestType.oppositionDirect) {
+          actorValue = actorEvaluation.margin;
+          opposingValue = opposingEvaluation.margin;
+        }
+        else {
+          actorValue = actorEvaluation.nr;
+          opposingValue = opposingEvaluation.nr;
+          unit = " NR";
+        }
+
+        if(
+            actorEvaluation.resultType == DiceThrowResultType.none
+            && opposingEvaluation.resultType == DiceThrowResultType.none
+        ) {
+          resultText = "Égalité";
+        }
+        else if(
+            actorEvaluation.resultType == DiceThrowResultType.success
+            && opposingEvaluation.resultType == DiceThrowResultType.fail
+        ) {
+          resultText = "${actorBundle!.entity.name} remporte le jet (+$actorValue$unit)";
+        }
+        else if(
+            actorEvaluation.resultType == DiceThrowResultType.fail
+            && opposingEvaluation.resultType == DiceThrowResultType.success
+        ) {
+          resultText = "${opposingBundle!.entity.name} remporte le jet (+$opposingValue$unit)";
+        }
+        else {
+          resultText = "Double succès, c'est impossible normalement…";
+        }
+      }
+
+      resultWidget = Text(
+        resultText,
+        style: theme.textTheme.bodyLarge!
+          .copyWith(fontWeight: FontWeight.bold),
+      );
+    }
+
+    return Row(
+      spacing: 8.0,
+      children: [
+        actorResultWidget,
+        Spacer(),
+        ?resultWidget,
+        Spacer(),
+        opposingResultWidget,
       ],
     );
   }

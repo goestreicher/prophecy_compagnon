@@ -80,15 +80,7 @@ class EntityThrowBundle {
     return request.difficulty! + modSum;
   }
 
-  int get _total {
-    var sum = request.base.value(entity) + result.total();
-
-    if(result.criticalType(request.base.componentValue(entity)) == DiceThrowResultType.criticalSuccess) {
-      sum += 5;
-    }
-
-    return sum;
-  }
+  int get _total => request.base.value(entity) + result.total();
 
   int _margin(int threshold) => _total - threshold;
 
@@ -99,7 +91,7 @@ class EntityThrowBundle {
         && (entity as HumanCharacter).advantages.has(Advantage.chanceInouie)
       )
           ? 0
-          : _margin(threshold) ~/ 5;
+          : _margin(threshold) < 0 ? 0 : _margin(threshold) ~/ 5;
 }
 
 DiceThrowEvaluation evaluateDiceThrow(
@@ -111,19 +103,23 @@ DiceThrowEvaluation evaluateDiceThrow(
 ) {
   switch(actor.request.type) {
     case DiceThrowRequestType.threshold:
-      return _evaluateThresholdThrow(actor);
+      return evaluateThresholdThrow(actor);
     case DiceThrowRequestType.simple:
+      return evaluateStandardThrow(
+        actor,
+        dispatchPropertyUpdates: dispatchPropertyUpdates,
+      );
     case DiceThrowRequestType.oppositionDirect:
     case DiceThrowRequestType.oppositionNR:
-      return _evaluateStandardThrow(
+      return evaluateOppositionThrow(
         actor,
-        opposing: opposing,
+        opposing!,
         dispatchPropertyUpdates: dispatchPropertyUpdates,
       );
   }
 }
 
-DiceThrowEvaluation _evaluateThresholdThrow(EntityThrowBundle actor) {
+DiceThrowEvaluation evaluateThresholdThrow(EntityThrowBundle actor) {
   DiceThrowResultType type;
   int total = actor.result.total();
   int threshold = actor.request.base.value(actor.entity);
@@ -144,21 +140,18 @@ DiceThrowEvaluation _evaluateThresholdThrow(EntityThrowBundle actor) {
   );
 }
 
-DiceThrowEvaluation _evaluateStandardThrow(
+DiceThrowEvaluation evaluateStandardThrow(
     EntityThrowBundle actor,
     {
-      EntityThrowBundle? opposing,
       dispatchPropertyUpdates = true,
     }
 ) {
-  if(actor.request.difficulty == null && opposing == null) {
-    throw(ArgumentError('One of "difficulty" or "opposing" must be set'));
+  if(actor.request.difficulty == null) {
+    throw(ArgumentError('La difficulté doit être définie'));
   }
 
-  var actorEvaluation = _doEvaluation(actor, actor._difficulty ?? opposing!._total);
-  if(opposing == null && actorEvaluation.resultType == DiceThrowResultType.none) {
-    actorEvaluation.resultType = DiceThrowResultType.success;
-  }
+  var actorEvaluation = _doEvaluation(actor, actor._difficulty!);
+
   if(dispatchPropertyUpdates && !actor._evaluated) {
     _dispatchUsedLuckProficiencyMessages(actor);
     _dispatchGainedLuckProficiencyMessages(actorEvaluation, actor.entity);
@@ -172,13 +165,115 @@ DiceThrowEvaluation _evaluateStandardThrow(
     actor._evaluated = true;
   }
 
-  DiceThrowEvaluation? opposingEvaluation;
-  if(opposing != null) {
+  return actorEvaluation;
+}
+
+DiceThrowEvaluation evaluateOppositionThrow(
+    EntityThrowBundle actor,
+    EntityThrowBundle opposing,
+    {
+      dispatchPropertyUpdates = true,
+    }
+) {
+  DiceThrowEvaluation actorEvaluation;
+  int actorValue;
+  DiceThrowEvaluation opposingEvaluation;
+  int opposingValue;
+
+  if(actor.request.difficulty != null) {
+    actorEvaluation = _doEvaluation(actor, actor._difficulty!);
+    opposingEvaluation = _doEvaluation(opposing, opposing._difficulty!);
+
+    if(
+        actorEvaluation.resultType == DiceThrowResultType.success
+        && opposingEvaluation.resultType == DiceThrowResultType.success
+    ) {
+      if(actor.request.type == DiceThrowRequestType.oppositionDirect) {
+        actorValue = actorEvaluation.margin;
+        opposingValue = opposingEvaluation.margin;
+      }
+      else {
+        actorValue = actorEvaluation.nr;
+        opposingValue = opposingEvaluation.nr;
+      }
+
+      if(actorEvaluation.criticalType == DiceThrowResultType.criticalFail) {
+        actorValue = 0;
+      }
+
+      if(actorValue > opposingValue) {
+        opposingEvaluation.resultType = DiceThrowResultType.fail;
+      }
+      else if(actorValue < opposingValue) {
+        actorEvaluation.resultType = DiceThrowResultType.fail;
+      }
+      else {
+        actorEvaluation.resultType = DiceThrowResultType.none;
+        opposingEvaluation.resultType = DiceThrowResultType.none;
+      }
+
+      if(actor.request.type == DiceThrowRequestType.oppositionDirect) {
+        actorEvaluation.margin = actorValue - opposingValue;
+        opposingEvaluation.margin = opposingValue - actorValue;
+      }
+      else {
+        actorEvaluation.nr = (actorValue - opposingValue < 0) ? 0 : actorValue - opposingValue;
+        opposingEvaluation.nr = (opposingValue - actorValue < 0) ? 0 : opposingValue - actorValue;
+      }
+    }
+  }
+  else {
+    actorEvaluation = _doEvaluation(actor, opposing._total);
     opposingEvaluation = _doEvaluation(opposing, actor._total);
-    if(dispatchPropertyUpdates && !opposing._evaluated) {
+
+    if(actor.request.type == DiceThrowRequestType.oppositionDirect) {
+      actorValue = actorEvaluation.margin;
+      opposingValue = opposingEvaluation.margin;
+    }
+    else {
+      actorValue = actorEvaluation.nr;
+      opposingValue = opposingEvaluation.nr;
+    }
+
+    if(actorEvaluation.criticalType == DiceThrowResultType.criticalFail) {
+      actorValue = 0;
+      actorEvaluation.margin = 0;
+    }
+    if(opposingEvaluation.criticalType == DiceThrowResultType.criticalFail) {
+      actorValue += opposing._total;
+      actorEvaluation.margin += opposing._total;
+    }
+
+    if(actorValue > opposingValue) {
+      opposingEvaluation.resultType = DiceThrowResultType.fail;
+    }
+    else if(actorValue < opposingValue) {
+      actorEvaluation.resultType = DiceThrowResultType.fail;
+    }
+    else {
+      actorEvaluation.resultType = DiceThrowResultType.none;
+      opposingEvaluation.resultType = DiceThrowResultType.none;
+    }
+  }
+
+  if(dispatchPropertyUpdates) {
+    if(!actor._evaluated) {
+      _dispatchUsedLuckProficiencyMessages(actor);
+      _dispatchGainedLuckProficiencyMessages(actorEvaluation, actor.entity);
+      if (actor.entity is HumanCharacter) {
+        _dispatchTendenciesUpdateMessages(
+          actor.entity as HumanCharacter,
+          actor,
+          actorEvaluation,
+        );
+      }
+      actor._evaluated = true;
+    }
+
+    if(!opposing._evaluated) {
       _dispatchUsedLuckProficiencyMessages(opposing);
       _dispatchGainedLuckProficiencyMessages(opposingEvaluation, opposing.entity);
-      if(opposing.entity is HumanCharacter) {
+      if (opposing.entity is HumanCharacter) {
         _dispatchTendenciesUpdateMessages(
           opposing.entity as HumanCharacter,
           opposing,
@@ -199,17 +294,11 @@ DiceThrowEvaluation _doEvaluation(EntityThrowBundle actor, int difficulty) {
           actor.entity
       )
   );
-  int margin;
-  int nr;
-
-  margin = actor._margin(difficulty);
-  nr = actor._nr(difficulty);
+  var margin = actor._margin(difficulty);
+  var nr = actor._nr(difficulty);
 
   if(margin < 0 || criticalType == DiceThrowResultType.criticalFail) {
     resultType = DiceThrowResultType.fail;
-  }
-  else if(margin == 0) {
-    resultType = DiceThrowResultType.none;
   }
   else {
     resultType = DiceThrowResultType.success;

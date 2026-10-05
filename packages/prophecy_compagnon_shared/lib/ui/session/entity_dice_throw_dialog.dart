@@ -21,6 +21,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart'
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/ui/entity/pill_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/num_input_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/dice_throw_shared_widgets.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_simple_widget.dart';
@@ -176,6 +177,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
     }
 
     var throwWidgets = <Widget>[];
+    Widget? resultWidget;
     switch(localRequest.type) {
       case DiceThrowRequestType.threshold:
         for(var entity in widget.entities) {
@@ -237,6 +239,89 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
         if(widget.entities.length != 2) {
           throw(ArgumentError("Seulement deux personnages autorisés pour un jet d'opposition"));
         }
+
+        throwWidgets.add(
+          SizedBox(
+            width: _singleThrowColumnWidth,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 8.0,
+              children: [
+                Row(
+                  spacing: 8.0,
+                  children: [
+                    EntityPillWidget(
+                      entity: widget.entities[0],
+                      width: 40.0,
+                      height: 40.0
+                    ),
+                    Text(
+                      widget.entities[0].name,
+                      overflow: TextOverflow.fade,
+                      style: theme.textTheme.headlineSmall,
+                    ),
+                  ],
+                ),
+                EntityDiceThrowSimpleWidget(
+                  entity: widget.entities[0],
+                  request: localRequest,
+                  canChangeDifficulty: widget.canChangeDifficulty,
+                  difficultyHints: widget.difficultyHints,
+                  contextModifierHints: widget.contextModifierHints,
+                  onBundleReady: (EntityThrowBundle b) {
+                    setState(() {
+                      bundles[widget.entities[0].id] = b;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )
+        );
+
+        throwWidgets.add(
+          SizedBox(
+            width: _singleThrowColumnWidth,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 8.0,
+              children: [
+                Row(
+                  spacing: 8.0,
+                  children: [
+                    EntityPillWidget(
+                      entity: widget.entities[1],
+                      width: 40.0,
+                      height: 40.0
+                    ),
+                    Text(
+                      widget.entities[1].name,
+                      overflow: TextOverflow.fade,
+                      style: theme.textTheme.headlineSmall,
+                    ),
+                  ],
+                ),
+                EntityDiceThrowSimpleWidget(
+                  entity: widget.entities[1],
+                  request: localRequest,
+                  canChangeDifficulty: widget.canChangeDifficulty,
+                  difficultyHints: widget.difficultyHints,
+                  contextModifierHints: widget.contextModifierHints,
+                  onBundleReady: (EntityThrowBundle b) {
+                    setState(() {
+                      bundles[widget.entities[1].id] = b;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )
+        );
+
+        resultWidget = DiceThrowResultOppositionWidget(
+          actorBundle: bundles[widget.entities[0].id],
+          opposingBundle: bundles[widget.entities[1].id],
+        );
     }
 
     return AlertDialog(
@@ -257,6 +342,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
                 children: throwWidgets,
               ),
             ),
+            ?resultWidget,
           ],
         ),
       ),

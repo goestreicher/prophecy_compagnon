@@ -147,15 +147,28 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
     }
 
     if(widget.request.base.difficultyModifier(widget.entity) != 0) {
-      modifiers.add(
-        OneOffDiceThrowModifier(
-          type: DiceThrowModifierType.difficulty,
-          family: DiceThrowModifierFamily.context,
-          label: widget.request.base.difficultyModifierLabel(widget.entity),
-          value: widget.request.base.difficultyModifier(widget.entity),
-          name: 'baseDifficultyModifier',
-        )
-      );
+      if(widget.request.difficulty != null) {
+        modifiers.add(
+          OneOffDiceThrowModifier(
+            type: DiceThrowModifierType.difficulty,
+            family: DiceThrowModifierFamily.context,
+            label: widget.request.base.difficultyModifierLabel(widget.entity),
+            value: widget.request.base.difficultyModifier(widget.entity),
+            name: 'baseDifficultyModifier',
+          )
+        );
+      }
+      else {
+        modifiers.add(
+          OneOffDiceThrowModifier(
+            type: DiceThrowModifierType.malus,
+            family: DiceThrowModifierFamily.context,
+            label: widget.request.base.difficultyModifierLabel(widget.entity),
+            value: -widget.request.base.difficultyModifier(widget.entity),
+            name: 'baseDifficultyModifierAsMalus',
+          )
+        );
+      }
     }
 
     if(isCriticalSuccess) {
