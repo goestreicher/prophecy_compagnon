@@ -19,6 +19,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/threshold.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
@@ -171,6 +172,17 @@ class _DiceThrowMenuWidgetState extends State<_DiceThrowMenuWidget> {
 }
 
 final _sharedDiceThrowMenuItems = [
+  _DiceThrowMenuItem(
+    label: 'Chance (inf. ou égal)',
+    canChangeDifficulty: false,
+    request: DiceThrowRequest(
+      type: DiceThrowRequestType.threshold,
+      context: DiceThrowRequestContext.luck,
+      base: DiceThrowEntityBaseThresholdLuck(
+        comparison: DiceThrowThresholdComparison.lowerThanOrEqual,
+      ),
+    )
+  ),
   _DiceThrowMenuItem(
     label: 'Discrétion',
     canChangeDifficulty: true,

@@ -38,3 +38,18 @@ const _$AbilityEnumMap = {
   Ability.perception: 'perception',
   Ability.empathie: 'empathie',
 };
+
+DiceThrowEntityBaseThresholdLuck _$DiceThrowEntityBaseThresholdLuckFromJson(
+  Map<String, dynamic> json,
+) => DiceThrowEntityBaseThresholdLuck(
+  comparison: $enumDecode(
+    _$DiceThrowThresholdComparisonEnumMap,
+    json['comparison'],
+  ),
+);
+
+Map<String, dynamic> _$DiceThrowEntityBaseThresholdLuckToJson(
+  DiceThrowEntityBaseThresholdLuck instance,
+) => <String, dynamic>{
+  'comparison': _$DiceThrowThresholdComparisonEnumMap[instance.comparison]!,
+};

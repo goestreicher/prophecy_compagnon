@@ -27,4 +27,9 @@ void registerDiceThrowEntityBases() {
     (Map<String, dynamic> json) => DiceThrowEntityBaseThresholdAbility.fromJson(json),
   );
 
+  DiceThrowEntityBase.registerDiceThrowEntityBaseJsonFactory(
+    "DiceThrowEntityBaseThresholdLuck",
+    (Map<String, dynamic> json) => DiceThrowEntityBaseThresholdLuck.fromJson(json),
+  );
+
 }

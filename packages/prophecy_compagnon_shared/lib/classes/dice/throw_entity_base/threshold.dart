@@ -19,6 +19,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 
 part 'threshold.g.dart';
 
@@ -74,4 +75,27 @@ class DiceThrowEntityBaseThresholdAbility extends DiceThrowEntityBaseThreshold {
 
   factory DiceThrowEntityBaseThresholdAbility.fromJson(Map<String, dynamic> json) =>
       _$DiceThrowEntityBaseThresholdAbilityFromJson(json);
+}
+
+@JsonSerializable()
+class DiceThrowEntityBaseThresholdLuck extends DiceThrowEntityBaseThreshold {
+  const DiceThrowEntityBaseThresholdLuck({
+    required super.comparison,
+  });
+
+  @override
+  String get label => 'Chance';
+
+  @override
+  String baseLabel(EntityBase entity) => label;
+
+  @override
+  int baseValue(EntityBase entity) => entity is HumanCharacter ? entity.luck : 0;
+
+  @override
+  Map<String, dynamic> diceThrowEntityBaseToJson() =>
+      _$DiceThrowEntityBaseThresholdLuckToJson(this);
+
+  factory DiceThrowEntityBaseThresholdLuck.fromJson(Map<String, dynamic> json) =>
+      _$DiceThrowEntityBaseThresholdLuckFromJson(json);
 }

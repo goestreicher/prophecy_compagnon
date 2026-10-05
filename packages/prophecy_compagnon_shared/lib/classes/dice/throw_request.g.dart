@@ -34,6 +34,7 @@ const _$DiceThrowRequestTypeEnumMap = {
 const _$DiceThrowRequestContextEnumMap = {
   DiceThrowRequestContext.none: 'none',
   DiceThrowRequestContext.discretion: 'discretion',
+  DiceThrowRequestContext.luck: 'luck',
   DiceThrowRequestContext.perception: 'perception',
   DiceThrowRequestContext.reaction: 'reaction',
   DiceThrowRequestContext.resistance: 'resistance',

@@ -39,4 +39,5 @@ const _$EntityMessagePropertyEnumMap = {
   EntityMessageProperty.gainLuckPoints: 'gainLuckPoints',
   EntityMessageProperty.useProficiencyPoints: 'useProficiencyPoints',
   EntityMessageProperty.gainProficiencyPoints: 'gainProficiencyPoints',
+  EntityMessageProperty.updateTendency: 'updateTendency',
 };

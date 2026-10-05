@@ -31,6 +31,7 @@ enum DiceThrowRequestType {
 enum DiceThrowRequestContext {
   none,
   discretion,
+  luck,
   perception,
   reaction,
   resistance,
