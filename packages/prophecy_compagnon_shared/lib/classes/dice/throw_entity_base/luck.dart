@@ -17,47 +17,36 @@
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 
-part 'throw_request.g.dart';
-
-enum DiceThrowRequestType {
-  oppositionDirect,
-  oppositionNR,
-  raw,
-  simple,
-  threshold,
-  ;
-}
-
-enum DiceThrowRequestContext {
-  none,
-  discretion,
-  luck,
-  perception,
-  reaction,
-  resistance,
-  ;
-}
+part 'luck.g.dart';
 
 @JsonSerializable()
-class DiceThrowRequest {
-  const DiceThrowRequest({
-    required this.type,
-    required this.context,
-    this.difficulty,
-    required this.base,
-    this.allowTendencies = true,
-  });
+class DiceThrowEntityBaseLuck extends DiceThrowEntityBase {
+  const DiceThrowEntityBaseLuck();
 
-  final DiceThrowRequestType type;
-  final DiceThrowRequestContext context;
-  final int? difficulty;
-  final bool allowTendencies;
-  final DiceThrowEntityBase base;
+  @override
+  String get label => 'Chance';
 
-  factory DiceThrowRequest.fromJson(Map<String, dynamic> json) =>
-    _$DiceThrowRequestFromJson(json);
+  @override
+  String baseLabel(EntityBase entity) => '';
 
-  Map<String, dynamic> toJson() =>
-      _$DiceThrowRequestToJson(this);
+  @override
+  int baseValue(EntityBase entity) => 0;
+
+  @override
+  String componentLabel(EntityBase entity) => label;
+
+  @override
+  int componentValue(EntityBase entity) => entity is HumanCharacter
+      ? entity.luck
+      : 0;
+
+  @override
+  Map<String, dynamic> diceThrowEntityBaseToJson() =>
+      _$DiceThrowEntityBaseLuckToJson(this);
+
+  factory DiceThrowEntityBaseLuck.fromJson(Map<String, dynamic> json) =>
+      _$DiceThrowEntityBaseLuckFromJson(json);
 }

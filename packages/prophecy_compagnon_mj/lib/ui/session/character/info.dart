@@ -16,8 +16,10 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_mj/ui/session/character/dice_throw_menu_item.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/luck.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/threshold.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
@@ -29,7 +31,6 @@ import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
-import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/base/injury_manager_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
@@ -73,8 +74,8 @@ class SessionCharacterInfoWidget extends StatelessWidget {
               child: Column(
                 spacing: 8.0,
                 children: [
-                  _DiceThrowMenuWidget(
-                    entity: character,
+                  DiceThrowMenuWidget(
+                    entities: [character],
                     items: _sharedDiceThrowMenuItems,
                   ),
                   _EffectsMenuWidget(
@@ -90,89 +91,8 @@ class SessionCharacterInfoWidget extends StatelessWidget {
   }
 }
 
-class _DiceThrowMenuItem {
-  const _DiceThrowMenuItem({
-    required this.label,
-    required this.request,
-    this.canChangeDifficulty = true,
-    this.difficultyHints,
-    this.contextModifierHints,
-  });
-
-  final String label;
-  final DiceThrowRequest request;
-  final bool canChangeDifficulty;
-  final Map<String, int>? difficultyHints;
-  final List<String>? contextModifierHints;
-}
-
-class _DiceThrowMenuWidget extends StatefulWidget {
-  const _DiceThrowMenuWidget({
-    required this.entity,
-    required this.items,
-  });
-
-  final EntityBase entity;
-  final List<_DiceThrowMenuItem> items;
-
-  @override
-  State<_DiceThrowMenuWidget> createState() => _DiceThrowMenuWidgetState();
-}
-
-class _DiceThrowMenuWidgetState extends State<_DiceThrowMenuWidget> {
-  _DiceThrowMenuItem? selected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4.0),
-      child: Row(
-        spacing: 8.0,
-        children: [
-          DropdownMenu(
-            label: Text(
-              'Jets',
-            ),
-            onSelected: (_DiceThrowMenuItem? i) {
-              setState(() {
-                selected = i;
-              });
-            },
-            dropdownMenuEntries: widget.items.map(
-                (_DiceThrowMenuItem i) => DropdownMenuEntry(value: i, label: i.label)
-              )
-              .toList(),
-          ),
-          IconButton(
-            onPressed: selected == null ? null : () async {
-              var bundles = await showDialog<List<EntityThrowBundle>>(
-                context: context,
-                barrierDismissible: false,
-                builder: (BuildContext context) => EntityDiceThrowDialog(
-                  entities: [widget.entity],
-                  request: selected!.request,
-                  canChangeDifficulty: selected!.canChangeDifficulty,
-                  difficultyHints: selected!.difficultyHints,
-                  contextModifierHints: selected!.contextModifierHints,
-                )
-              );
-              if(bundles == null || bundles.isEmpty) return;
-              if(!context.mounted) return;
-
-              for(var bundle in bundles) {
-                var evaluation = evaluateDiceThrow(bundle);
-              }
-            },
-            icon: Icon(CustomIcons.d10),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 final _sharedDiceThrowMenuItems = [
-  _DiceThrowMenuItem(
+  DiceThrowMenuItem(
     label: 'Chance (inf. ou égal)',
     canChangeDifficulty: false,
     request: DiceThrowRequest(
@@ -183,7 +103,19 @@ final _sharedDiceThrowMenuItems = [
       ),
     )
   ),
-  _DiceThrowMenuItem(
+  DiceThrowMenuItem(
+    label: 'Chance + 1D10',
+    canChangeDifficulty: false,
+    request: DiceThrowRequest(
+      type: DiceThrowRequestType.raw,
+      context: DiceThrowRequestContext.luck,
+      base: DiceThrowEntityBaseLuck(),
+    ),
+    canUseProficiency: false,
+    canUseTendencies: false,
+    canUseLuck: false,
+  ),
+  DiceThrowMenuItem(
     label: 'Discrétion',
     canChangeDifficulty: true,
     request: DiceThrowRequest(
@@ -198,7 +130,7 @@ final _sharedDiceThrowMenuItems = [
     ),
   ),
   for(var attr in [Attribute.mental, Attribute.manuel])
-    _DiceThrowMenuItem(
+    DiceThrowMenuItem(
       label: 'Perception (${attr.title})',
       canChangeDifficulty: true,
       request: DiceThrowRequest(
@@ -250,6 +182,8 @@ class _EffectsMenuWidgetState extends State<_EffectsMenuWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
     return Padding(
       padding: const EdgeInsets.only(top: 4.0),
       child: Row(
@@ -258,6 +192,13 @@ class _EffectsMenuWidgetState extends State<_EffectsMenuWidget> {
           DropdownMenu(
             label: Text(
               'Effets',
+            ),
+            textStyle: theme.textTheme.bodySmall,
+            inputDecorationTheme: const InputDecorationTheme(
+              border: OutlineInputBorder(),
+              isCollapsed: true,
+              constraints: BoxConstraints(maxHeight: 36.0),
+              contentPadding: EdgeInsets.all(12.0),
             ),
             onSelected: (EntityEffect? e) {
               setState(() {

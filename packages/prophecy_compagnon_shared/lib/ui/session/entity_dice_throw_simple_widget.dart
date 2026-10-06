@@ -44,6 +44,9 @@ class EntityDiceThrowSimpleWidget extends StatefulWidget {
     this.canChangeDifficulty = false,
     this.difficultyHints,
     this.contextModifierHints,
+    this.canUseProficiency = true,
+    this.canUseTendencies = true,
+    this.canUseLuck = true,
   });
 
   final void Function(EntityThrowBundle) onBundleReady;
@@ -52,6 +55,9 @@ class EntityDiceThrowSimpleWidget extends StatefulWidget {
   final bool canChangeDifficulty;
   final Map<String, int>? difficultyHints;
   final List<String>? contextModifierHints;
+  final bool canUseProficiency;
+  final bool canUseTendencies;
+  final bool canUseLuck;
 
   @override
   State<EntityDiceThrowSimpleWidget> createState() => _EntityDiceThrowSimpleWidgetState();
@@ -233,6 +239,22 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
+
+    var baseScoreWidgets = <Widget>[];
+    if(widget.request.base.baseLabel(widget.entity).isNotEmpty) {
+      baseScoreWidgets.add(
+        Text(
+          '${widget.request.base.baseLabel(widget.entity)} : ${widget.request.base.baseValue(widget.entity)}',
+        )
+      );
+    }
+    if(widget.request.base.componentLabel(widget.entity).isNotEmpty) {
+      baseScoreWidgets.add(
+        Text(
+          '${widget.request.base.componentLabel(widget.entity)} : ${widget.request.base.componentValue(widget.entity)}',
+        )
+      );
+    }
 
     var entityEffectRows = <Widget>[];
     for(var e in widget.entity.effects.where((EntityEffect e) => e.trigger == EntityEffectTrigger.diceThrow)) {
@@ -451,29 +473,23 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
             child: Column(
               spacing: 12.0,
               children: [
-                DiceThrowRow(
-                  title: Text(
-                    'Score de base',
-                    style: theme.textTheme.bodySmall,
-                  ),
-                  label: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${widget.request.base.baseLabel(widget.entity)} : ${widget.request.base.baseValue(widget.entity)}',
-                        ),
-                        Text(
-                          '${widget.request.base.componentLabel(widget.entity)} : ${widget.request.base.componentValue(widget.entity)}',
-                        )
-                      ],
+                if(baseScoreWidgets.isNotEmpty)
+                  DiceThrowRow(
+                    title: Text(
+                      'Score de base',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    label: Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: baseScoreWidgets,
+                      ),
+                    ),
+                    child: DiceThrowValuePill(
+                      value: widget.request.base.value(widget.entity),
                     ),
                   ),
-                  child: DiceThrowValuePill(
-                    value: widget.request.base.value(widget.entity),
-                  ),
-                ),
                 if(entityEffectRows.isNotEmpty)
                   WidgetGroupContainer(
                     title: Text(
@@ -597,7 +613,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
                     ],
                   )
                 ),
-                if(widget.entity is HumanCharacter)
+                if(widget.entity is HumanCharacter && widget.canUseProficiency)
                   DiceThrowRow(
                     label: Text('Maîtrise (max ${(widget.entity as HumanCharacter).availableProficiency})'),
                     child: SizedBox(
@@ -615,7 +631,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
                       ),
                     ),
                   ),
-                if(widget.entity is HumanCharacter)
+                if(widget.entity is HumanCharacter && widget.canUseTendencies)
                   Row(
                     children: [
                       Switch(
@@ -779,7 +795,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
                       text: criticalDie?.toString(),
                     ),
                   ),
-                if(widget.entity is HumanCharacter)
+                if(widget.entity is HumanCharacter && widget.canUseLuck)
                   DiceThrowRow(
                     label: Text('Chance (max ${(widget.entity as HumanCharacter).availableLuck})'),
                     child: SizedBox(

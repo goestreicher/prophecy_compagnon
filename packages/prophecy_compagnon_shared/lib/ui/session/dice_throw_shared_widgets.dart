@@ -179,13 +179,14 @@ class DiceThrowResultSimpleWidget extends StatelessWidget {
         + bundle!.result.total())
         .toString();
 
-      if(bundle!.request.difficulty != null) {
+      if(bundle!.result.criticalType(bundle!.request.base.componentValue(bundle!.entity)) == DiceThrowResultType.criticalFail) {
+        totalText = 'Échec critique';
+        totalColor = Colors.red;
+      }
+      else if(bundle!.request.difficulty != null) {
         var evaluation = evaluateDiceThrow(bundle!, dispatchPropertyUpdates: false);
-        if (evaluation.criticalType == DiceThrowResultType.criticalFail) {
-          totalText = 'Échec critique';
-          totalColor = Colors.red;
-        }
-        else if (evaluation.resultType == DiceThrowResultType.fail) {
+
+        if (evaluation.resultType == DiceThrowResultType.fail) {
           totalColor = Colors.red;
         }
         else if (evaluation.resultType == DiceThrowResultType.success) {

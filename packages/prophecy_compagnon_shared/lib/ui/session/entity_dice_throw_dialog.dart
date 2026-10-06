@@ -37,6 +37,9 @@ class EntityDiceThrowDialog extends StatefulWidget {
     this.canChangeDifficulty = false,
     this.difficultyHints,
     this.contextModifierHints,
+    this.canUseProficiency = true,
+    this.canUseTendencies = true,
+    this.canUseLuck = true,
   });
 
   final List<EntityBase> entities;
@@ -44,6 +47,9 @@ class EntityDiceThrowDialog extends StatefulWidget {
   final bool canChangeDifficulty;
   final Map<String, int>? difficultyHints;
   final List<String>? contextModifierHints;
+  final bool canUseProficiency;
+  final bool canUseTendencies;
+  final bool canUseLuck;
 
   @override
   State<EntityDiceThrowDialog> createState() => _EntityDiceThrowDialogState();
@@ -205,6 +211,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
             )
           );
         }
+      case DiceThrowRequestType.raw:
       case DiceThrowRequestType.simple:
         for(var entity in widget.entities) {
           throwWidgets.add(
@@ -220,6 +227,9 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
                     canChangeDifficulty: widget.canChangeDifficulty,
                     difficultyHints: widget.difficultyHints,
                     contextModifierHints: widget.contextModifierHints,
+                    canUseProficiency: widget.canUseProficiency,
+                    canUseTendencies: widget.canUseTendencies,
+                    canUseLuck: widget.canUseLuck,
                     onBundleReady: (EntityThrowBundle b) {
                       setState(() {
                         bundles[entity.id] = b;

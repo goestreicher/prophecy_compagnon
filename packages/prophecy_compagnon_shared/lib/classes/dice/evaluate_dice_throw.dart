@@ -102,6 +102,8 @@ DiceThrowEvaluation evaluateDiceThrow(
     }
 ) {
   switch(actor.request.type) {
+    case DiceThrowRequestType.raw:
+      throw(ArgumentError("Impossible d'évaluer ce type de jets"));
     case DiceThrowRequestType.threshold:
       return evaluateThresholdThrow(actor);
     case DiceThrowRequestType.simple:
