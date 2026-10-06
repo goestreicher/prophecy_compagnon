@@ -23,6 +23,10 @@ import 'package:prophecy_compagnon_shared/classes/exportable_binary_data.dart';
 import 'package:prophecy_compagnon_shared/classes/generic_image.dart';
 
 Future<GenericImage?> buildEntityIcon(EntityBase entity) async {
+  if(_iconsCache.containsKey(entity.name[0])) {
+    return _iconsCache[entity.name[0]];
+  }
+
   GenericImage? ret;
 
   var pBuilder = ParagraphBuilder(
@@ -45,7 +49,10 @@ Future<GenericImage?> buildEntityIcon(EntityBase entity) async {
   ByteData? data = await res.toByteData(format: ImageByteFormat.png);
   if(data != null) {
     ret = GenericImage.memory(binary: ExportableBinaryData(data: Uint8List.view(data.buffer)));
+    _iconsCache[entity.name[0]] = ret;
   }
 
   return ret;
 }
+
+final Map<String, GenericImage> _iconsCache = <String, GenericImage>{};
