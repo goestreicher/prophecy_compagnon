@@ -16,24 +16,217 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_mj/ui/session/character/dice_throw_menu_item.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/info.dart';
+import 'package:prophecy_compagnon_mj/ui/session/character/shared_dice_throw_items.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
+import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 import 'package:provider/provider.dart';
 
-class PlayCharactersPage extends StatelessWidget {
+class PlayCharactersPage extends StatefulWidget {
   const PlayCharactersPage({
     super.key,
   });
 
   @override
+  State<PlayCharactersPage> createState() => _PlayCharactersPageState();
+}
+
+class _PlayCharactersPageState extends State<PlayCharactersPage> {
+  final List<EntityBase> selected = <EntityBase>[];
+
+  @override
   Widget build(BuildContext context) {
     var session = context.read<GameSession>();
 
-    var pcWidgets = <Widget>[];
+    var pcWidgets = <Widget>[
+      Row(
+        children: [
+          Expanded(
+            child: const Divider(
+              indent: 16.0,
+              endIndent: 16.0,
+            )
+          ),
+          Checkbox(
+            value: session.table.players
+              .every((EntityBase pc) => selected.contains(pc)),
+            onChanged: (bool? v) {
+              if(v == null) return;
+
+              setState(() {
+                for(var e in session.table.players) {
+                  if(v && !selected.contains(e)) {
+                    selected.add(e);
+                  }
+                  else if(!v && selected.contains(e)) {
+                    selected.remove(e);
+                  }
+                }
+              });
+            }
+          ),
+          Text('PJs'),
+          Expanded(
+            child: const Divider(
+              indent: 16.0,
+              endIndent: 16.0,
+            )
+          ),
+        ],
+      ),
+    ];
     for(var pc in session.table.players) {
       pcWidgets.add(
-        SessionCharacterInfoWidget(
-          character: pc,
+        Row(
+          children: [
+            Checkbox(
+              value: selected.contains(pc),
+              onChanged: (bool? v) {
+                if(v == null) return;
+
+                setState(() {
+                  v ? selected.add(pc) : selected.remove(pc);
+                });
+              }
+            ),
+            SessionCharacterInfoWidget(
+              character: pc,
+            ),
+          ],
+        )
+      );
+    }
+
+    var encounterNpcWidgets = <Widget>[];
+    for(var npc in (session.encounter.value?.npcs ?? <EntityBase>[])) {
+      encounterNpcWidgets.add(
+        Row(
+          children: [
+            Checkbox(
+              value: selected.contains(npc),
+              onChanged: (bool? v) {
+                if(v == null) return;
+
+                setState(() {
+                  v ? selected.add(npc) : selected.remove(npc);
+                });
+              }
+            ),
+            SessionCharacterInfoWidget(
+              character: npc,
+            ),
+          ],
+        )
+      );
+    }
+    if(encounterNpcWidgets.isNotEmpty) {
+      encounterNpcWidgets.insert(
+        0,
+        Row(
+          children: [
+            Expanded(
+              child: const Divider(
+                indent: 16.0,
+                endIndent: 16.0,
+              )
+            ),
+            Checkbox(
+              value: (session.encounter.value?.npcs ?? <EntityBase>[])
+                  .every((EntityBase npc) => selected.contains(npc)),
+              onChanged: (bool? v) {
+                if(v == null) return;
+
+                setState(() {
+                  for(var e in (session.encounter.value?.npcs ?? <EntityBase>[])) {
+                    if(v && !selected.contains(e)) {
+                      selected.add(e);
+                    }
+                    else if(!v && selected.contains(e)) {
+                      selected.remove(e);
+                    }
+                  }
+                });
+              }
+            ),
+            Text('PNJ de la rencontre'),
+            Expanded(
+              child: const Divider(
+                indent: 16.0,
+                endIndent: 16.0,
+              )
+            ),
+          ],
+        )
+      );
+    }
+
+    var scenarioNpcWidgets = <Widget>[];
+    for(var npc in (session.scenario?.entities() ?? <EntityBase>[])) {
+      scenarioNpcWidgets.add(
+        Row(
+          children: [
+            Checkbox(
+              value: selected.contains(npc),
+              onChanged: (bool? v) {
+                if(v == null) return;
+
+                setState(() {
+                  v ? selected.add(npc) : selected.remove(npc);
+                });
+              }
+            ),
+            SessionCharacterInfoWidget(
+              character: npc,
+            ),
+          ],
+        )
+      );
+    }
+    if(scenarioNpcWidgets.isNotEmpty) {
+      scenarioNpcWidgets.insert(
+        0,
+        Row(
+          children: [
+            Expanded(
+              child: const Divider(
+                indent: 16.0,
+                endIndent: 16.0,
+              )
+            ),
+            Checkbox(
+              value: (session.scenario?.entities() ?? <EntityBase>[])
+                  .every((EntityBase npc) => selected.contains(npc)),
+              onChanged: (bool? v) {
+                if(v == null) return;
+
+                setState(() {
+                  for(var e in (session.scenario?.entities() ?? <EntityBase>[])) {
+                    if(v && !selected.contains(e)) {
+                      selected.add(e);
+                    }
+                    else if(!v && selected.contains(e)) {
+                      selected.remove(e);
+                    }
+                  }
+                });
+              }
+            ),
+            Text('PNJ du scénario'),
+            Expanded(
+              child: const Divider(
+                indent: 16.0,
+                endIndent: 16.0,
+              )
+            ),
+          ],
         )
       );
     }
@@ -41,7 +234,28 @@ class PlayCharactersPage extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         spacing: 12.0,
-        children: pcWidgets,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              spacing: 8.0,
+              children: [
+                DiceThrowMenuWidget(
+                  label: 'Jets communs',
+                  entities: selected,
+                  items: [
+                    ...sharedDiceThrowItems['perception']!,
+                    ...sharedDiceThrowItems['discretion']!,
+                    ...sharedDiceThrowItems['luck']!,
+                  ],
+                )
+              ],
+            ),
+          ),
+          ...pcWidgets,
+          ...encounterNpcWidgets,
+          ...scenarioNpcWidgets,
+        ],
       ),
     );
   }

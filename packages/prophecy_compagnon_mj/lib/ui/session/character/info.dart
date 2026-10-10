@@ -17,16 +17,9 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/dice_throw_menu_item.dart';
+import 'package:prophecy_compagnon_mj/ui/session/character/shared_dice_throw_items.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/luck.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/threshold.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/player_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
@@ -42,7 +35,7 @@ class SessionCharacterInfoWidget extends StatelessWidget {
     required this.character,
   });
 
-  final PlayerCharacter character;
+  final EntityBase character;
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +68,13 @@ class SessionCharacterInfoWidget extends StatelessWidget {
                 spacing: 8.0,
                 children: [
                   DiceThrowMenuWidget(
+                    label: 'Jets communs',
                     entities: [character],
-                    items: _sharedDiceThrowMenuItems,
+                    items: [
+                      ...sharedDiceThrowItems['perception']!,
+                      ...sharedDiceThrowItems['discretion']!,
+                      ...sharedDiceThrowItems['luck']!,
+                    ],
                   ),
                   _EffectsMenuWidget(
                     entity: character,
@@ -90,81 +88,6 @@ class SessionCharacterInfoWidget extends StatelessWidget {
     );
   }
 }
-
-final _sharedDiceThrowMenuItems = [
-  DiceThrowMenuItem(
-    label: 'Chance (inf. ou égal)',
-    canChangeDifficulty: false,
-    request: DiceThrowRequest(
-      type: DiceThrowRequestType.threshold,
-      context: DiceThrowRequestContext.luck,
-      base: DiceThrowEntityBaseThresholdLuck(
-        comparison: DiceThrowThresholdComparison.lowerThanOrEqual,
-      ),
-    )
-  ),
-  DiceThrowMenuItem(
-    label: 'Chance + 1D10',
-    canChangeDifficulty: false,
-    request: DiceThrowRequest(
-      type: DiceThrowRequestType.raw,
-      context: DiceThrowRequestContext.luck,
-      base: DiceThrowEntityBaseLuck(),
-    ),
-    canUseProficiency: false,
-    canUseTendencies: false,
-    canUseLuck: false,
-  ),
-  DiceThrowMenuItem(
-    label: 'Discrétion',
-    canChangeDifficulty: true,
-    request: DiceThrowRequest(
-      type: DiceThrowRequestType.simple,
-      context: DiceThrowRequestContext.discretion,
-      difficulty: 15,
-      base: DiceThrowEntityBaseSkill(
-        attribute: Attribute.physique,
-        skill: Skill.discretion,
-        ability: Ability.coordination,
-      ),
-    ),
-  ),
-  for(var attr in [Attribute.mental, Attribute.manuel])
-    DiceThrowMenuItem(
-      label: 'Perception (${attr.title})',
-      canChangeDifficulty: true,
-      request: DiceThrowRequest(
-        type: DiceThrowRequestType.simple,
-        context: DiceThrowRequestContext.perception,
-        difficulty: 15,
-        base: DiceThrowEntityBaseAbility(
-          attribute: attr,
-          ability: Ability.perception,
-        ),
-      ),
-      difficultyHints: {
-        'Cible de grande taille ou très bruyante': 10,
-        "La cible manque d'évidence sans être précisément dissimulée": 15,
-        "La cible prend soin de se cacher ou a été cachée rapidement": 20,
-        "La cible est minuscule ou presque invisible": 25,
-        "La cible est indétectable sans recherche poussée": 30,
-        "La cible est indétectable par un humain non averti": 35,
-      },
-      contextModifierHints: _perceptionContextModifierHints,
-    ),
-];
-
-const _perceptionContextModifierHints = [
-  "Personnage en alerte : +1 à +4",
-  "Personnage attentif : +1 à +3",
-  "Personnage fatigué, distrait : -1 à -2",
-  "En pleine agitation : -1 à -3",
-  "En plein chaos : -3 à -5",
-  "Recherche à la hâte : -1 à -3",
-  "Recherche soigneuse : +1 à +3",
-  "Mauvaise visibilité : -1 à -5",
-  "Dans l'obscurité presque totale : -10",
-];
 
 class _EffectsMenuWidget extends StatefulWidget {
   const _EffectsMenuWidget({

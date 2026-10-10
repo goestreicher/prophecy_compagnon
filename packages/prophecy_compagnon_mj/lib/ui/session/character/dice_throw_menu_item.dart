@@ -49,10 +49,12 @@ class DiceThrowMenuWidget extends StatefulWidget {
     super.key,
     required this.entities,
     required this.items,
+    this.label,
   });
 
   final List<EntityBase> entities;
   final List<DiceThrowMenuItem> items;
+  final String? label;
 
   @override
   State<DiceThrowMenuWidget> createState() => _DiceThrowMenuWidgetState();
@@ -71,8 +73,8 @@ class _DiceThrowMenuWidgetState extends State<DiceThrowMenuWidget> {
         spacing: 8.0,
         children: [
           DropdownMenu(
-            label: Text(
-              'Jets',
+            label: widget.label == null ? null : Text(
+              widget.label!,
             ),
             textStyle: theme.textTheme.bodySmall,
             inputDecorationTheme: const InputDecorationTheme(

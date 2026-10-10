@@ -18,6 +18,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/calendar.dart';
 import 'package:prophecy_compagnon_shared/classes/creature.dart';
+import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
 import 'package:prophecy_compagnon_shared/classes/faction.dart';
 import 'package:prophecy_compagnon_shared/classes/non_player_character.dart';
@@ -409,6 +410,12 @@ class Scenario {
     subtitle: subtitle,
     source: source,
   );
+
+  Iterable<EntityBase> entities() =>
+      [
+        ...creatures,
+        ...npcs,
+      ];
 
   ScenarioMap? defaultMap() {
     var idx = maps.indexWhere((ScenarioMap m) => m.isDefault);

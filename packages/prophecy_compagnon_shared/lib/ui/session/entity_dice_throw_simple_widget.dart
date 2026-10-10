@@ -598,7 +598,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
                           constraints: BoxConstraints(maxHeight: 36.0),
                           contentPadding: EdgeInsets.all(12.0),
                         ),
-                        dropdownMenuEntries: (GameSession.instance?.entities() ?? <EntityBase>[])
+                        dropdownMenuEntries: (GameSession.instance?.declaredEntities() ?? <EntityBase>[])
                           .where((EntityBase e) => e.id != widget.entity.id)
                           .map((EntityBase e) => DropdownMenuEntry(value: e, label: e.name))
                           .toList(),

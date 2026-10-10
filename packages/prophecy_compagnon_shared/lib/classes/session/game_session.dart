@@ -163,10 +163,16 @@ class GameSession extends ChangeNotifier {
   @JsonKey(includeFromJson: false, includeToJson: false)
     SessionGameBoard board;
 
-  Iterable<EntityBase> entities() =>
+  Iterable<EntityBase> declaredEntities() =>
       [
         ...table.players,
-        ...(encounter.value?.npcs ?? []),
+        ...(scenario?.entities() ?? <EntityBase>[]),
+      ];
+
+  Iterable<EntityBase> instantiatedEntities() =>
+      [
+        ...table.players,
+        ...(encounter.value?.npcs ?? <EntityBase>[]),
       ];
 
   EntityBase? entity(String id) {
@@ -207,7 +213,7 @@ class GameSession extends ChangeNotifier {
       }
     }
 
-    for(var entity in entities()) {
+    for(var entity in instantiatedEntities()) {
       if(event.entityId != null && event.entityId != entity.id) {
         continue;
       }
