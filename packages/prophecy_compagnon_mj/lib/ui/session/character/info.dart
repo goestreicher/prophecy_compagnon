@@ -117,7 +117,7 @@ class _SessionCharacterInfoWidgetState extends State<SessionCharacterInfoWidget>
                 ],
               ),
             ),
-            viewWidget,
+            Expanded(child: viewWidget),
           ],
         )
       ),

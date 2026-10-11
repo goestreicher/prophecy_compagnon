@@ -46,188 +46,225 @@ class _PlayCharactersPageState extends State<PlayCharactersPage> {
   Widget build(BuildContext context) {
     var session = context.read<GameSession>();
 
-    var pcWidgets = <Widget>[
-      Row(
-        children: [
-          Expanded(
-            child: const Divider(
-              indent: 16.0,
-              endIndent: 16.0,
-            )
-          ),
-          Checkbox(
-            value: session.table.players
-              .every((EntityBase pc) => selected.contains(pc)),
-            onChanged: (bool? v) {
-              if(v == null) return;
-
-              setState(() {
-                for(var e in session.table.players) {
-                  if(v && !selected.contains(e)) {
-                    selected.add(e);
-                  }
-                  else if(!v && selected.contains(e)) {
-                    selected.remove(e);
-                  }
-                }
-              });
-            }
-          ),
-          Text('PJs'),
-          Expanded(
-            child: const Divider(
-              indent: 16.0,
-              endIndent: 16.0,
-            )
-          ),
-        ],
-      ),
-    ];
+    var pcWidgets = <Widget>[];
     for(var pc in session.table.players) {
       pcWidgets.add(
-        Row(
-          children: [
-            Checkbox(
-              value: selected.contains(pc),
-              onChanged: (bool? v) {
-                if(v == null) return;
-
-                setState(() {
-                  v ? selected.add(pc) : selected.remove(pc);
-                });
-              }
-            ),
-            SessionCharacterInfoWidget(
-              character: pc,
-            ),
-          ],
+        IntrinsicWidth(
+          child: Row(
+            children: [
+              Checkbox(
+                value: selected.contains(pc),
+                onChanged: (bool? v) {
+                  if(v == null) return;
+          
+                  setState(() {
+                    v ? selected.add(pc) : selected.remove(pc);
+                  });
+                }
+              ),
+              Expanded(
+                child: SessionCharacterInfoWidget(
+                  character: pc,
+                ),
+              ),
+            ],
+          ),
         )
       );
     }
-
-    var encounterNpcWidgets = <Widget>[];
-    for(var npc in (session.encounter.value?.npcs ?? <EntityBase>[])) {
-      encounterNpcWidgets.add(
+    var pcWidget = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 16.0,
+      children: [
         Row(
           children: [
+            Expanded(
+              child: const Divider(
+                indent: 16.0,
+                endIndent: 16.0,
+              )
+            ),
             Checkbox(
-              value: selected.contains(npc),
+              value: session.table.players
+                  .every((EntityBase pc) => selected.contains(pc)),
               onChanged: (bool? v) {
                 if(v == null) return;
 
                 setState(() {
-                  v ? selected.add(npc) : selected.remove(npc);
+                  for(var e in session.table.players) {
+                    if(v && !selected.contains(e)) {
+                      selected.add(e);
+                    }
+                    else if(!v && selected.contains(e)) {
+                      selected.remove(e);
+                    }
+                  }
                 });
               }
             ),
-            SessionCharacterInfoWidget(
-              character: npc,
+            Text('PJs'),
+            Expanded(
+              child: const Divider(
+                indent: 16.0,
+                endIndent: 16.0,
+              )
             ),
           ],
+        ),
+        Wrap(
+          spacing: 16.0,
+          children: pcWidgets,
+        )
+      ],
+    );
+
+    Widget? encounterNpcWidget;
+    var encounterNpcWidgets = <Widget>[];
+    for(var npc in (session.encounter.value?.npcs ?? <EntityBase>[])) {
+      encounterNpcWidgets.add(
+        IntrinsicWidth(
+          child: Row(
+            children: [
+              Checkbox(
+                value: selected.contains(npc),
+                onChanged: (bool? v) {
+                  if(v == null) return;
+          
+                  setState(() {
+                    v ? selected.add(npc) : selected.remove(npc);
+                  });
+                }
+              ),
+              Expanded(
+                child: SessionCharacterInfoWidget(
+                  character: npc,
+                ),
+              ),
+            ],
+          ),
         )
       );
     }
     if(encounterNpcWidgets.isNotEmpty) {
-      encounterNpcWidgets.insert(
-        0,
-        Row(
-          children: [
-            Expanded(
-              child: const Divider(
-                indent: 16.0,
-                endIndent: 16.0,
-              )
-            ),
-            Checkbox(
-              value: (session.encounter.value?.npcs ?? <EntityBase>[])
-                  .every((EntityBase npc) => selected.contains(npc)),
-              onChanged: (bool? v) {
-                if(v == null) return;
+      encounterNpcWidget = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 16.0,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: const Divider(
+                  indent: 16.0,
+                  endIndent: 16.0,
+                )
+              ),
+              Checkbox(
+                value: (session.encounter.value?.npcs ?? <EntityBase>[])
+                    .every((EntityBase npc) => selected.contains(npc)),
+                onChanged: (bool? v) {
+                  if(v == null) return;
 
-                setState(() {
-                  for(var e in (session.encounter.value?.npcs ?? <EntityBase>[])) {
-                    if(v && !selected.contains(e)) {
-                      selected.add(e);
+                  setState(() {
+                    for(var e in (session.encounter.value?.npcs ?? <EntityBase>[])) {
+                      if(v && !selected.contains(e)) {
+                        selected.add(e);
+                      }
+                      else if(!v && selected.contains(e)) {
+                        selected.remove(e);
+                      }
                     }
-                    else if(!v && selected.contains(e)) {
-                      selected.remove(e);
-                    }
-                  }
-                });
-              }
-            ),
-            Text('PNJ de la rencontre'),
-            Expanded(
-              child: const Divider(
-                indent: 16.0,
-                endIndent: 16.0,
-              )
-            ),
-          ],
-        )
+                  });
+                }
+              ),
+              Text('PNJ de la rencontre'),
+              Expanded(
+                child: const Divider(
+                  indent: 16.0,
+                  endIndent: 16.0,
+                )
+              ),
+            ],
+          ),
+          Wrap(
+            spacing: 16.0,
+            children: encounterNpcWidgets,
+          ),
+        ],
       );
     }
 
+    Widget? scenarioNpcWidget;
     var scenarioNpcWidgets = <Widget>[];
     for(var npc in (session.scenario?.entities() ?? <EntityBase>[])) {
       scenarioNpcWidgets.add(
-        Row(
-          children: [
-            Checkbox(
-              value: selected.contains(npc),
-              onChanged: (bool? v) {
-                if(v == null) return;
-
-                setState(() {
-                  v ? selected.add(npc) : selected.remove(npc);
-                });
-              }
-            ),
-            SessionCharacterInfoWidget(
-              character: npc,
-            ),
-          ],
+        IntrinsicWidth(
+          child: Row(
+            children: [
+              Checkbox(
+                value: selected.contains(npc),
+                onChanged: (bool? v) {
+                  if(v == null) return;
+          
+                  setState(() {
+                    v ? selected.add(npc) : selected.remove(npc);
+                  });
+                }
+              ),
+              Expanded(
+                child: SessionCharacterInfoWidget(
+                  character: npc,
+                ),
+              ),
+            ],
+          ),
         )
       );
     }
     if(scenarioNpcWidgets.isNotEmpty) {
-      scenarioNpcWidgets.insert(
-        0,
-        Row(
-          children: [
-            Expanded(
-              child: const Divider(
-                indent: 16.0,
-                endIndent: 16.0,
-              )
-            ),
-            Checkbox(
-              value: (session.scenario?.entities() ?? <EntityBase>[])
-                  .every((EntityBase npc) => selected.contains(npc)),
-              onChanged: (bool? v) {
-                if(v == null) return;
+      scenarioNpcWidget = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 16.0,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: const Divider(
+                  indent: 16.0,
+                  endIndent: 16.0,
+                )
+              ),
+              Checkbox(
+                value: (session.scenario?.entities() ?? <EntityBase>[])
+                    .every((EntityBase npc) => selected.contains(npc)),
+                onChanged: (bool? v) {
+                  if(v == null) return;
 
-                setState(() {
-                  for(var e in (session.scenario?.entities() ?? <EntityBase>[])) {
-                    if(v && !selected.contains(e)) {
-                      selected.add(e);
+                  setState(() {
+                    for(var e in (session.scenario?.entities() ?? <EntityBase>[])) {
+                      if(v && !selected.contains(e)) {
+                        selected.add(e);
+                      }
+                      else if(!v && selected.contains(e)) {
+                        selected.remove(e);
+                      }
                     }
-                    else if(!v && selected.contains(e)) {
-                      selected.remove(e);
-                    }
-                  }
-                });
-              }
-            ),
-            Text('PNJ du scénario'),
-            Expanded(
-              child: const Divider(
-                indent: 16.0,
-                endIndent: 16.0,
-              )
-            ),
-          ],
-        )
+                  });
+                }
+              ),
+              Text('PNJ du scénario'),
+              Expanded(
+                child: const Divider(
+                  indent: 16.0,
+                  endIndent: 16.0,
+                )
+              ),
+            ],
+          ),
+          Wrap(
+            spacing: 16.0,
+            children: scenarioNpcWidgets,
+          ),
+        ],
       );
     }
 
@@ -252,9 +289,9 @@ class _PlayCharactersPageState extends State<PlayCharactersPage> {
               ],
             ),
           ),
-          ...pcWidgets,
-          ...encounterNpcWidgets,
-          ...scenarioNpcWidgets,
+          pcWidget,
+          ?encounterNpcWidget,
+          ?scenarioNpcWidget,
         ],
       ),
     );
