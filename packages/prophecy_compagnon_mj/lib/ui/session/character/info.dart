@@ -21,17 +21,156 @@ import 'package:prophecy_compagnon_mj/ui/session/character/shared_dice_throw_ite
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
-import 'package:prophecy_compagnon_shared/classes/player_character.dart';
+import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
+import 'package:prophecy_compagnon_shared/ui/character/base/display_secondary_attributes_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/entity/base/display_abilities_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/entity/base/display_attributes_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/base/injury_manager_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 import 'package:prophecy_compagnon_shared/ui/widget_group_container.dart';
 
-class SessionCharacterInfoWidget extends StatelessWidget {
+class SessionCharacterInfoWidget extends StatefulWidget {
   const SessionCharacterInfoWidget({
     super.key,
+    required this.character,
+  });
+
+  final EntityBase character;
+
+  @override
+  State<SessionCharacterInfoWidget> createState() => _SessionCharacterInfoWidgetState();
+}
+
+class _SessionCharacterInfoWidgetState extends State<SessionCharacterInfoWidget> {
+  _SessionCharacterInfoSelectedView selectedView = _SessionCharacterInfoSelectedView.actions;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget? viewWidget;
+    switch(selectedView) {
+      case _SessionCharacterInfoSelectedView.actions:
+        viewWidget = _SessionCharacterInfoViewActions(
+          character: widget.character
+        );
+      case _SessionCharacterInfoSelectedView.injuries:
+        viewWidget = _SessionCharacterInfoViewInjuries(
+          character: widget.character
+        );
+      case _SessionCharacterInfoSelectedView.attributes:
+        viewWidget = _SessionCharacterInfoViewAttributes(
+          character: widget.character
+        );
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            IntrinsicWidth(
+              child: Column(
+                spacing: 16.0,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: EntityStatusWidget(
+                      entity: widget.character,
+                      iconWidth: 50.0,
+                      iconHeight: 50.0,
+                    ),
+                  ),
+                  ListBody(
+                    children: [
+                      _SessionCharacterInfoSelectViewWidget(
+                        view: _SessionCharacterInfoSelectedView.actions,
+                        selected: selectedView == _SessionCharacterInfoSelectedView.actions,
+                        onSelected: () {
+                          setState(() {
+                            selectedView = _SessionCharacterInfoSelectedView.actions;
+                          });
+                        },
+                      ),
+                      _SessionCharacterInfoSelectViewWidget(
+                        view: _SessionCharacterInfoSelectedView.injuries,
+                        selected: selectedView == _SessionCharacterInfoSelectedView.injuries,
+                        onSelected: () {
+                          setState(() {
+                            selectedView = _SessionCharacterInfoSelectedView.injuries;
+                          });
+                        },
+                      ),
+                      _SessionCharacterInfoSelectViewWidget(
+                        view: _SessionCharacterInfoSelectedView.attributes,
+                        selected: selectedView == _SessionCharacterInfoSelectedView.attributes,
+                        onSelected: () {
+                          setState(() {
+                            selectedView = _SessionCharacterInfoSelectedView.attributes;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            viewWidget,
+          ],
+        )
+      ),
+    );
+  }
+}
+
+enum _SessionCharacterInfoSelectedView {
+  actions(title: 'Actions'),
+  injuries(title: 'Blessures'),
+  attributes(title: 'Attributs'),
+  ;
+
+  final String title;
+
+  const _SessionCharacterInfoSelectedView({ required this.title });
+}
+
+class _SessionCharacterInfoSelectViewWidget extends StatelessWidget {
+  const _SessionCharacterInfoSelectViewWidget({
+    required this.view,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final _SessionCharacterInfoSelectedView view;
+  final bool selected;
+  final void Function() onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
+    return InkWell(
+      onTap: selected ? null : onSelected,
+      child: Container(
+        color: selected
+            ? theme.colorScheme.surfaceContainerHighest
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            view.title,
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionCharacterInfoViewActions extends StatelessWidget {
+  const _SessionCharacterInfoViewActions({
     required this.character,
   });
 
@@ -41,49 +180,85 @@ class SessionCharacterInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 16.0,
-          children: [
-            Column(
-              spacing: 16.0,
-              children: [
-                EntityStatusWidget(
-                  entity: character,
-                  iconWidth: 50.0,
-                  iconHeight: 50.0,
+    return WidgetGroupContainer(
+      title: Text('Actions'),
+      titleBackgroundColor: theme.colorScheme.surfaceContainerLow,
+      child: Column(
+        spacing: 8.0,
+        children: [
+          DiceThrowMenuWidget(
+            label: 'Jets communs',
+            entities: [character],
+            items: [
+              ...sharedDiceThrowItems['perception']!,
+              ...sharedDiceThrowItems['discretion']!,
+              ...sharedDiceThrowItems['luck']!,
+            ],
+          ),
+          _EffectsMenuWidget(
+            entity: character,
+          ),
+        ],
+      )
+    );
+  }
+}
+
+class _SessionCharacterInfoViewInjuries extends StatelessWidget {
+  const _SessionCharacterInfoViewInjuries({
+    required this.character,
+  });
+
+  final EntityBase character;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
+    return WidgetGroupContainer(
+      title: Text('Blessures'),
+      titleBackgroundColor: theme.colorScheme.surfaceContainerLow,
+      child: EntityInjuryManagerWidget(
+        manager: character.injuries.manager,
+      ),
+    );
+  }
+}
+
+class _SessionCharacterInfoViewAttributes extends StatelessWidget {
+  const _SessionCharacterInfoViewAttributes({
+    required this.character,
+  });
+
+  final EntityBase character;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 200.0,
+      child: Column(
+        spacing: 16.0,
+        children: [
+          EntityDisplayAbilitiesWidget(
+            entity: character
+          ),
+          Row(
+            spacing: 8.0,
+            children: [
+              Expanded(
+                child: EntityDisplayAttributesWidget(
+                  entity: character
                 ),
-                EntityInjuryManagerWidget(
-                  manager: character.injuries.manager,
+              ),
+              if(character is HumanCharacter)
+                Expanded(
+                  child: CharacterDisplaySecondaryAttributesWidget(
+                    character: character as HumanCharacter,
+                  ),
                 ),
-              ],
-            ),
-            WidgetGroupContainer(
-              title: Text('Actions'),
-              titleBackgroundColor: theme.colorScheme.surfaceContainerLow,
-              child: Column(
-                spacing: 8.0,
-                children: [
-                  DiceThrowMenuWidget(
-                    label: 'Jets communs',
-                    entities: [character],
-                    items: [
-                      ...sharedDiceThrowItems['perception']!,
-                      ...sharedDiceThrowItems['discretion']!,
-                      ...sharedDiceThrowItems['luck']!,
-                    ],
-                  ),
-                  _EffectsMenuWidget(
-                    entity: character,
-                  ),
-                ],
-              )
-            ),
-          ],
-        )
+            ],
+          ),
+        ],
       ),
     );
   }
