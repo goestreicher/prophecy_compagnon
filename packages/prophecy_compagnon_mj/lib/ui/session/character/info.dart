@@ -195,9 +195,10 @@ class _SessionCharacterInfoViewActions extends StatelessWidget {
               ...sharedDiceThrowItems['luck']!,
             ],
           ),
-          _EffectsMenuWidget(
-            entity: character,
-          ),
+          if(character.effects.isNotEmpty)
+            _EffectsMenuWidget(
+              entity: character,
+            ),
         ],
       )
     );
