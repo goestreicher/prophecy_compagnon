@@ -19,16 +19,24 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/dice_throw_menu_item.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/shared_dice_throw_items.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/specialized_skill.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/ui/character/base/display_secondary_attributes_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/base/display_abilities_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/base/display_attributes_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/base/injury_manager_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/num_input_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 import 'package:prophecy_compagnon_shared/ui/widget_group_container.dart';
 
@@ -184,7 +192,8 @@ class _SessionCharacterInfoViewActions extends StatelessWidget {
       title: Text('Actions'),
       titleBackgroundColor: theme.colorScheme.surfaceContainerLow,
       child: Column(
-        spacing: 8.0,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 16.0,
         children: [
           DiceThrowMenuWidget(
             label: 'Jets communs',
@@ -194,6 +203,9 @@ class _SessionCharacterInfoViewActions extends StatelessWidget {
               ...sharedDiceThrowItems['discretion']!,
               ...sharedDiceThrowItems['luck']!,
             ],
+          ),
+          _SkillThrowsMenuWidget(
+            entity: character,
           ),
           if(character.effects.isNotEmpty)
             _EffectsMenuWidget(
@@ -261,6 +273,299 @@ class _SessionCharacterInfoViewAttributes extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+abstract class _SkillThrowWrapper {
+  _SkillThrowWrapper();
+}
+
+class _SeparatorSkillThrowWrapper extends _SkillThrowWrapper {
+  _SeparatorSkillThrowWrapper();
+}
+
+class _StandardSkillThrowWrapper extends _SkillThrowWrapper {
+  _StandardSkillThrowWrapper({
+    required this.skill,
+    this.implementation,
+  });
+
+  final Skill skill;
+  final String? implementation;
+}
+
+class _SpecializationSkillThrowWrapper extends _SkillThrowWrapper {
+  _SpecializationSkillThrowWrapper({
+    required this.specialization,
+  });
+
+  final SpecializedSkill specialization;
+}
+
+class _SkillThrowsMenuWidget extends StatefulWidget {
+  const _SkillThrowsMenuWidget({
+    required this.entity,
+  });
+
+  final EntityBase entity;
+
+  @override
+  State<_SkillThrowsMenuWidget> createState() => _SkillThrowsMenuWidgetState();
+}
+
+class _SkillThrowsMenuWidgetState extends State<_SkillThrowsMenuWidget> {
+  _SkillThrowWrapper? selected;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
+    var entries = <DropdownMenuEntry<_SkillThrowWrapper>>[];
+    for(var family in SkillFamily.values) {
+      var familyEntries = <DropdownMenuEntry<_SkillThrowWrapper>>[];
+
+      for(var skill in widget.entity.skills.forFamily(family)) {
+        familyEntries.add(
+          DropdownMenuEntry(
+            value: _StandardSkillThrowWrapper(
+              skill: skill.skill,
+              implementation: skill.implementation,
+            ),
+            label: skill.title,
+          )
+        );
+
+        for(var specialization in skill.specializations) {
+          familyEntries.add(
+            DropdownMenuEntry(
+              value: _SpecializationSkillThrowWrapper(
+                specialization: specialization.skill,
+              ),
+              label: '  - ${specialization.skill.name}',
+            )
+          );
+        }
+      }
+
+      if(familyEntries.isNotEmpty) {
+        entries.addAll([
+          DropdownMenuEntry(
+            enabled: false,
+            value: _SeparatorSkillThrowWrapper(),
+            label: '---- ${family.title}',
+            labelWidget: Row(
+              children: [
+                Expanded(
+                  child: const Divider(
+                    endIndent: 8.0,
+                  )
+                ),
+                Text(family.title),
+                Expanded(
+                  child: const Divider(
+                    indent: 8.0,
+                  )
+                )
+              ],
+            ),
+          ),
+          ...familyEntries,
+        ]);
+      }
+    }
+
+    if(entries.isEmpty) {
+      return SizedBox.shrink();
+    }
+
+    return Row(
+      spacing: 8.0,
+      children: [
+        Expanded(
+          child: DropdownMenu(
+            label: Text(
+              'Jet de compétence',
+            ),
+            textStyle: theme.textTheme.bodySmall,
+            expandedInsets: EdgeInsets.zero,
+            inputDecorationTheme: const InputDecorationTheme(
+              border: OutlineInputBorder(),
+              isCollapsed: true,
+              constraints: BoxConstraints(maxHeight: 36.0),
+              contentPadding: EdgeInsets.all(12.0),
+            ),
+            onSelected: (_SkillThrowWrapper? w) {
+              setState(() {
+                selected = w;
+              });
+            },
+            dropdownMenuEntries: entries,
+          ),
+        ),
+        IconButton(
+          onPressed: selected == null ? null : () async {
+            var result = await showDialog<_PrepareSkillThrowResult>(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) => _PrepareSkillThrowDialog(),
+            );
+            if(result == null) return;
+            if(!context.mounted) return;
+
+            DiceThrowEntityBaseSkill base;
+            if(selected is _StandardSkillThrowWrapper) {
+              base = DiceThrowEntityBaseSkill(
+                attribute: result.attribute,
+                skill: (selected as _StandardSkillThrowWrapper).skill,
+                implementation: (selected as _StandardSkillThrowWrapper).implementation,
+              );
+            }
+            else {
+              base = DiceThrowEntityBaseSkill(
+                attribute: result.attribute,
+                specialization: (selected as _SpecializationSkillThrowWrapper).specialization,
+                implementation: (selected as _SpecializationSkillThrowWrapper).specialization.parentImplementation,
+              );
+            }
+
+            var request = DiceThrowRequest(
+              type: DiceThrowRequestType.simple,
+              context: DiceThrowRequestContext.none,
+              difficulty: result.difficulty,
+              base: base,
+            );
+
+            var bundles = await showDialog<List<EntityThrowBundle>>(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) => EntityDiceThrowDialog(
+                entities: [widget.entity],
+                request: request,
+                canChangeDifficulty: true,
+              )
+            );
+            if(bundles == null || bundles.isEmpty) return;
+            if(!context.mounted) return;
+
+            var evaluation = evaluateDiceThrow(bundles.first);
+          },
+          icon: Icon(CustomIcons.d10),
+        )
+      ],
+    );
+  }
+}
+
+class _PrepareSkillThrowResult {
+  const _PrepareSkillThrowResult({
+    required this.attribute,
+    this.difficulty,
+  });
+
+  final Attribute attribute;
+  final int? difficulty;
+}
+
+class _PrepareSkillThrowDialog extends StatefulWidget {
+  const _PrepareSkillThrowDialog();
+
+  @override
+  State<_PrepareSkillThrowDialog> createState() => _PrepareSkillThrowDialogState();
+}
+
+class _PrepareSkillThrowDialogState extends State<_PrepareSkillThrowDialog> {
+  Attribute? attribute;
+  bool setDifficulty = false;
+  int difficulty = 15;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
+    return AlertDialog(
+      title: const Text('Configuration du jet'),
+      content: SizedBox(
+        width: 300,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 16.0,
+          children: [
+            DropdownMenu(
+              label: const Text('Attribut'),
+              expandedInsets: EdgeInsets.zero,
+              initialSelection: attribute,
+              dropdownMenuEntries: Attribute.values
+                .map((Attribute a) => DropdownMenuEntry(value: a, label: a.title))
+                .toList(),
+              onSelected: (Attribute? a) {
+                setState(() {
+                  attribute = a;
+                });
+              },
+            ),
+            Row(
+              spacing: 8.0,
+              children: [
+                Switch(
+                  value: setDifficulty,
+                  onChanged: (bool v) {
+                    setState(() {
+                      setDifficulty = v;
+                    });
+                  },
+                ),
+                Text(
+                  'Difficulté',
+                  style: TextStyle(
+                    color: setDifficulty ? null : theme.disabledColor,
+                  ),
+                ),
+                Spacer(),
+                SizedBox(
+                  width: 70,
+                  child: NumIntInputWidget(
+                    enabled: setDifficulty,
+                    initialValue: difficulty,
+                    minValue: 0,
+                    maxValue: 99,
+                    onChanged: (int v) {
+                      setState(() {
+                        difficulty = v;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton(
+          onPressed: attribute == null
+            ? null
+            : () {
+                Navigator.of(context, rootNavigator: true).pop(
+                  _PrepareSkillThrowResult(
+                    attribute: attribute!,
+                    difficulty: setDifficulty ? difficulty : null,
+                  )
+                );
+              },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
+          ),
+          child: const Text('OK'),
+        ),
+      ],
     );
   }
 }
