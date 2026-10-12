@@ -19,8 +19,10 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/dice_throw_menu_item.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/shared_dice_throw_items.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
@@ -206,6 +208,9 @@ class _SessionCharacterInfoViewActions extends StatelessWidget {
           ),
           _SkillThrowsMenuWidget(
             entity: character,
+          ),
+          _AbilityThrowMenuWidget(
+            entities: [character],
           ),
           if(character.effects.isNotEmpty)
             _EffectsMenuWidget(
@@ -565,6 +570,93 @@ class _PrepareSkillThrowDialogState extends State<_PrepareSkillThrowDialog> {
           ),
           child: const Text('OK'),
         ),
+      ],
+    );
+  }
+}
+
+class _AbilityThrowMenuWidget extends StatefulWidget {
+  const _AbilityThrowMenuWidget({
+    required this.entities,
+  });
+
+  final List<EntityBase> entities;
+
+  @override
+  State<_AbilityThrowMenuWidget> createState() => _AbilityThrowMenuWidgetState();
+}
+
+class _AbilityThrowMenuWidgetState extends State<_AbilityThrowMenuWidget> {
+  Ability? selected;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
+    return Row(
+      spacing: 8.0,
+      children: [
+        Expanded(
+          child: DropdownMenu(
+            label: Text(
+              'Jet de caractéristique',
+            ),
+            textStyle: theme.textTheme.bodySmall,
+            expandedInsets: EdgeInsets.zero,
+            inputDecorationTheme: const InputDecorationTheme(
+              border: OutlineInputBorder(),
+              isCollapsed: true,
+              constraints: BoxConstraints(maxHeight: 36.0),
+              contentPadding: EdgeInsets.all(12.0),
+            ),
+            onSelected: (Ability? a) {
+              setState(() {
+                selected = a;
+              });
+            },
+            dropdownMenuEntries: Ability.values
+              .map((Ability a) => DropdownMenuEntry(value: a, label: a.title))
+              .toList(),
+          ),
+        ),
+        IconButton(
+          onPressed: selected == null ? null : () async {
+            var result = await showDialog<_PrepareSkillThrowResult>(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) => _PrepareSkillThrowDialog(),
+            );
+            if(result == null) return;
+            if(!context.mounted) return;
+
+            var base = DiceThrowEntityBaseAbility(
+              attribute: result.attribute,
+              ability: selected!,
+            );
+
+            var request = DiceThrowRequest(
+              type: DiceThrowRequestType.simple,
+              context: DiceThrowRequestContext.none,
+              difficulty: result.difficulty,
+              base: base,
+            );
+
+            var bundles = await showDialog<List<EntityThrowBundle>>(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) => EntityDiceThrowDialog(
+                  entities: widget.entities,
+                  request: request,
+                  canChangeDifficulty: true,
+                )
+            );
+            if(bundles == null || bundles.isEmpty) return;
+            if(!context.mounted) return;
+
+            var evaluation = evaluateDiceThrow(bundles.first);
+          },
+          icon: Icon(CustomIcons.d10),
+        )
       ],
     );
   }
