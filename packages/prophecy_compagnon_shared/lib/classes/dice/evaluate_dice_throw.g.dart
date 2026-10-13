@@ -18,6 +18,7 @@ DiceThrowEvaluation _$DiceThrowEvaluationFromJson(Map<String, dynamic> json) =>
       ),
       margin: (json['margin'] as num).toInt(),
       nr: (json['nr'] as num).toInt(),
+      usedProficiency: json['used_proficiency'] as bool,
       usedLuck: json['used_luck'] as bool,
     );
 
@@ -28,6 +29,7 @@ Map<String, dynamic> _$DiceThrowEvaluationToJson(
   'critical_type': _$DiceThrowResultTypeEnumMap[instance.criticalType]!,
   'margin': instance.margin,
   'nr': instance.nr,
+  'used_proficiency': instance.usedProficiency,
   'used_luck': instance.usedLuck,
 };
 

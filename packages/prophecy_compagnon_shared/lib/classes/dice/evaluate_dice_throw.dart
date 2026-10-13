@@ -38,6 +38,7 @@ class DiceThrowEvaluation {
     required this.criticalType,
     required this.margin,
     required this.nr,
+    required this.usedProficiency,
     required this.usedLuck,
   });
 
@@ -45,6 +46,7 @@ class DiceThrowEvaluation {
   DiceThrowResultType criticalType;
   int margin;
   int nr;
+  bool usedProficiency;
   bool usedLuck;
 
   factory DiceThrowEvaluation.fromJson(Map<String, dynamic> json) =>
@@ -138,6 +140,7 @@ DiceThrowEvaluation evaluateThresholdThrow(EntityThrowBundle actor) {
     criticalType: DiceThrowResultType.none,
     margin: threshold - total,
     nr: (threshold - total) ~/ 5,
+    usedProficiency: false,
     usedLuck: false,
   );
 }
@@ -311,6 +314,7 @@ DiceThrowEvaluation _doEvaluation(EntityThrowBundle actor, int difficulty) {
     criticalType: criticalType,
     margin: margin,
     nr: nr,
+    usedProficiency: (actor.result.proficiency ?? 0) > 0,
     usedLuck: (actor.result.luck ?? 0) > 0,
   );
 }
@@ -382,7 +386,7 @@ void _dispatchGainedLuckProficiencyMessages(DiceThrowEvaluation evaluation, Enti
     );
   }
 
-  if(proficiencyGain > 0) {
+  if(proficiencyGain > 0 && !evaluation.usedProficiency && !evaluation.usedLuck) {
     messageBus.publish(
       SessionEntitySetPropertyMessage(
         broadcastIncludesSelf: true,
