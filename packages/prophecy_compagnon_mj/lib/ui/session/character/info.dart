@@ -453,7 +453,9 @@ class _SkillThrowsMenuWidgetState extends State<_SkillThrowsMenuWidget> {
             if(bundles == null || bundles.isEmpty) return;
             if(!context.mounted) return;
 
-            var evaluation = evaluateDiceThrow(bundles.first);
+            if(result.difficulty != null) {
+              var evaluation = evaluateDiceThrow(bundles.first);
+            }
           },
           icon: Icon(CustomIcons.d10),
         )
@@ -653,7 +655,9 @@ class _AbilityThrowMenuWidgetState extends State<_AbilityThrowMenuWidget> {
             if(bundles == null || bundles.isEmpty) return;
             if(!context.mounted) return;
 
-            var evaluation = evaluateDiceThrow(bundles.first);
+            if(result.difficulty != null) {
+              var evaluation = evaluateDiceThrow(bundles.first);
+            }
           },
           icon: Icon(CustomIcons.d10),
         )
