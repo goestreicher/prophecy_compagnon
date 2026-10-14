@@ -27,11 +27,13 @@ import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/action/dice_throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/assign_combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/get_usable_actions.dart';
@@ -105,6 +107,15 @@ class ActionConfigurationMovementSprint extends ActionConfiguration {
 
       // TODO: manage duration
       var evaluation = evaluateDiceThrow(bundle);
+
+      GameSession.instance!.diceThrowHistory.add(
+        DiceThrowHistoryEntry(
+          actor: bundle.entity,
+          request: bundle.request,
+          evaluation: evaluation,
+        )
+      );
+
       if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
         var setResponse = await messageBus.publishAndWaitForResponse(
           SessionEncounterTurnSetCombatActionMessage(

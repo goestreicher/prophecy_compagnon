@@ -26,9 +26,11 @@ import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/action/dice_throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/set_combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
@@ -91,6 +93,15 @@ class ActionConfigurationMovementGetUp extends ActionConfiguration {
     var bundle = diceThrowResponse as EntityThrowBundle;
 
     var evaluation = evaluateDiceThrow(bundle);
+
+    GameSession.instance!.diceThrowHistory.add(
+      DiceThrowHistoryEntry(
+        actor: bundle.entity,
+        request: bundle.request,
+        evaluation: evaluation,
+      )
+    );
+
     if(evaluation.resultType == DiceThrowResultType.success) {
       var candidates = action.entity.effects
           .where(

@@ -20,6 +20,8 @@ import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart'
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 
@@ -98,6 +100,15 @@ class _EffectsMenuWidgetState extends State<EffectsMenuWidget> {
                   if(!context.mounted) return;
 
                   activationDiceThrowEvaluation = evaluateDiceThrow(bundles.first);
+
+                  GameSession.instance!.diceThrowHistory.add(
+                    DiceThrowHistoryEntry(
+                      actor: bundles.first.entity,
+                      request: bundles.first.request,
+                      evaluation: activationDiceThrowEvaluation,
+                    )
+                  );
+
                   if(!selected!.canApply(target: widget.entity, activationDiceThrowEvaluation: activationDiceThrowEvaluation)) {
                     // TODO: display a message?
                     return;

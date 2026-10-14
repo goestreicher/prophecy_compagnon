@@ -49,6 +49,25 @@ class DiceThrowEvaluation {
   bool usedProficiency;
   bool usedLuck;
 
+  String get resultLabel {
+    if(criticalType == DiceThrowResultType.criticalFail) {
+      return 'Échec critique';
+    }
+    else {
+      String ret = "";
+      if(criticalType == DiceThrowResultType.criticalSuccess) {
+        ret += "Réussite critique / ";
+      }
+      if(resultType == DiceThrowResultType.success) {
+        ret += "Réussite";
+      }
+      else {
+        ret += "Échec";
+      }
+      return ret;
+    }
+  }
+
   factory DiceThrowEvaluation.fromJson(Map<String, dynamic> json) =>
       _$DiceThrowEvaluationFromJson(json);
 

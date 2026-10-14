@@ -23,6 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/scenario/scenario.dart';
 import 'package:prophecy_compagnon_shared/classes/scenario/scenario_event.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/board.dart';
+import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
 import 'package:prophecy_compagnon_shared/classes/session/event.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/storable.dart';
@@ -84,6 +85,7 @@ class GameSession extends ChangeNotifier {
     KorTime? time,
     SessionDays? sessionDays,
     SessionEncounter? encounter,
+    DiceThrowHistory? diceThrowHistory,
     SessionGameBoard? board,
   })
   {
@@ -110,11 +112,13 @@ class GameSession extends ChangeNotifier {
     KorTime? time,
     SessionDays? sessionDays,
     SessionEncounter? encounter,
+    DiceThrowHistory? diceThrowHistory,
     SessionGameBoard? board,
   })
     : uuid = uuid ?? const Uuid().v4().toString(),
       time = time ?? KorTime(hour: 0, minute: 0),
       encounter = ValueNotifier<SessionEncounter?>(encounter),
+      diceThrowHistory = diceThrowHistory ?? DiceThrowHistory(),
       board = board ?? SessionGameBoard()
   {
     if(scenario == null) {
@@ -159,6 +163,8 @@ class GameSession extends ChangeNotifier {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
     ValueNotifier<SessionEncounter?> encounter;
+
+  DiceThrowHistory diceThrowHistory;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
     SessionGameBoard board;

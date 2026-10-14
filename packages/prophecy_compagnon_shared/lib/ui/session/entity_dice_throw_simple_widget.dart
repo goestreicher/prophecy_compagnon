@@ -27,6 +27,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
+import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/dismissible_dialog.dart';
@@ -279,6 +280,15 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
                   if(!context.mounted) return;
 
                   activationDiceThrowEvaluation = evaluateDiceThrow(resultBundles.first);
+
+                  GameSession.instance!.diceThrowHistory.add(
+                    DiceThrowHistoryEntry(
+                      actor: resultBundles.first.entity,
+                      request: resultBundles.first.request,
+                      evaluation: activationDiceThrowEvaluation,
+                    )
+                  );
+
                   if(!e.canApply(target: widget.entity, activationDiceThrowEvaluation: activationDiceThrowEvaluation)) {
                     // TODO: display a message?
                     return;
@@ -337,8 +347,16 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
                     if(!context.mounted) return;
 
                     var evaluation = evaluateDiceThrow(resultBundles.first);
-                    var overrideMod = m.buildOverrideModifier(evaluation: evaluation);
 
+                    GameSession.instance!.diceThrowHistory.add(
+                      DiceThrowHistoryEntry(
+                        actor: resultBundles.first.entity,
+                        request: resultBundles.first.request,
+                        evaluation: evaluation,
+                      )
+                    );
+
+                    var overrideMod = m.buildOverrideModifier(evaluation: evaluation);
                     if(overrideMod != null) {
                       setState(() {
                         overrideEntityModifiers[m.id] = overrideMod;

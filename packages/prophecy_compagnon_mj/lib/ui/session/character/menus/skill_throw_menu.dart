@@ -22,6 +22,8 @@ import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart'
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 
@@ -181,11 +183,28 @@ class _SkillThrowMenuWidgetState extends State<SkillThrowMenuWidget> {
             if(bundles == null || bundles.isEmpty) return;
             if(!context.mounted) return;
 
+            DiceThrowEvaluation? evaluation;
             if(result.isOpposition) {
-              var evaluation = evaluateDiceThrow(bundles[0], opposing: bundles[1]);
+              evaluation = evaluateDiceThrow(bundles[0], opposing: bundles[1]);
             }
             else if(result.difficulty != null) {
-              var evaluation = evaluateDiceThrow(bundles.first);
+              evaluation = evaluateDiceThrow(bundles[0]);
+            }
+
+            if(evaluation != null) {
+              GameSession.instance!.diceThrowHistory.add(
+                DiceThrowHistoryEntry(
+                  actor: bundles[0].entity,
+                  opposing: result.isOpposition
+                    ? bundles[1].entity
+                    : null,
+                  request: bundles[0].request,
+                  opposingRequest: result.isOpposition
+                    ? bundles[0].request
+                    : null,
+                  evaluation: evaluation,
+                )
+              );
             }
           },
           icon: Icon(CustomIcons.d10),

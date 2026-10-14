@@ -30,13 +30,17 @@ enum DiceThrowRequestType {
 }
 
 enum DiceThrowRequestContext {
-  none,
-  discretion,
-  luck,
-  perception,
-  reaction,
-  resistance,
+  none(title: "Aucun"),
+  discretion(title: "Discrétion"),
+  luck(title: "Chance"),
+  perception(title: "Perception"),
+  reaction(title: "Réaction"),
+  resistance(title: "Résistance"),
   ;
+
+  final String title;
+
+  const DiceThrowRequestContext({ required this.title });
 }
 
 @JsonSerializable()

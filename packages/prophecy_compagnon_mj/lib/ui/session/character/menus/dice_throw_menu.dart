@@ -19,6 +19,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 
@@ -119,6 +121,13 @@ class _DiceThrowMenuWidgetState extends State<DiceThrowMenuWidget> {
                   case DiceThrowRequestType.threshold:
                   case DiceThrowRequestType.simple:
                     var evaluation = evaluateDiceThrow(bundle);
+                    GameSession.instance!.diceThrowHistory.add(
+                      DiceThrowHistoryEntry(
+                        actor: bundle.entity,
+                        request: bundle.request,
+                        evaluation: evaluation
+                      )
+                    );
                   case DiceThrowRequestType.oppositionDirect:
                   case DiceThrowRequestType.oppositionNR:
                     // TODO: manage opposition throws

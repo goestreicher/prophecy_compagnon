@@ -19,6 +19,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/info.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/menus/dice_throw_menu.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/menus/shared_dice_throw_items.dart';
+import 'package:prophecy_compagnon_mj/ui/session/dice_throw_history_widget.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +38,7 @@ class _PlayCharactersPageState extends State<PlayCharactersPage> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
     var session = context.read<GameSession>();
 
     var pcWidgets = <Widget>[];
@@ -261,32 +263,51 @@ class _PlayCharactersPageState extends State<PlayCharactersPage> {
       );
     }
 
-    return SingleChildScrollView(
-      child: Column(
-        spacing: 12.0,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              spacing: 8.0,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              spacing: 12.0,
               children: [
-                DiceThrowMenuWidget(
-                  label: 'Jets communs',
-                  entities: selected,
-                  items: [
-                    ...sharedDiceThrowItems['perception']!,
-                    ...sharedDiceThrowItems['discretion']!,
-                    ...sharedDiceThrowItems['luck']!,
-                  ],
-                )
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    spacing: 8.0,
+                    children: [
+                      DiceThrowMenuWidget(
+                        label: 'Jets communs',
+                        entities: selected,
+                        items: [
+                          ...sharedDiceThrowItems['perception']!,
+                          ...sharedDiceThrowItems['discretion']!,
+                          ...sharedDiceThrowItems['luck']!,
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                pcWidget,
+                ?encounterNpcWidget,
+                ?scenarioNpcWidget,
               ],
             ),
           ),
-          pcWidget,
-          ?encounterNpcWidget,
-          ?scenarioNpcWidget,
-        ],
-      ),
+        ),
+        SizedBox(
+          width: 400,
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainer,
+              border: Border(
+                left: BorderSide(color: theme.colorScheme.shadow.withAlpha(80)),
+              )
+            ),
+            child: DiceThrowHistoryWidget(),
+          ),
+        )
+      ],
     );
   }
 }

@@ -22,6 +22,8 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 
@@ -82,6 +84,8 @@ class _AbilityThrowMenuWidgetState extends State<AbilityThrowMenuWidget> {
             if(result == null) return;
             if(!context.mounted) return;
 
+            var entities = <EntityBase>[];
+
             var base = DiceThrowEntityBaseAbility(
               attribute: result.attribute,
               ability: selected!,
@@ -94,20 +98,58 @@ class _AbilityThrowMenuWidgetState extends State<AbilityThrowMenuWidget> {
               base: base,
             );
 
+            DiceThrowRequest? opposingRequest;
+            if(result.isOpposition) {
+              entities = [widget.entities[0], result.opposing!];
+              if(result.opposingBase != null) {
+                opposingRequest = DiceThrowRequest(
+                  type: result.requestType,
+                  context: DiceThrowRequestContext.none,
+                  difficulty: result.difficulty,
+                  base: result.opposingBase!,
+                );
+              }
+            }
+            else {
+              entities = widget.entities;
+            }
+
             var bundles = await showDialog<List<EntityThrowBundle>>(
-                context: context,
-                barrierDismissible: false,
-                builder: (BuildContext context) => EntityDiceThrowDialog(
-                  entities: widget.entities,
-                  request: request,
-                  canChangeDifficulty: true,
-                )
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) => EntityDiceThrowDialog(
+                entities: entities,
+                request: request,
+                opposingRequest: opposingRequest,
+                canChangeDifficulty: true,
+              )
             );
             if(bundles == null || bundles.isEmpty) return;
             if(!context.mounted) return;
 
-            if(result.difficulty != null) {
-              var evaluation = evaluateDiceThrow(bundles.first);
+            if(result.isOpposition) {
+              var evaluation = evaluateDiceThrow(bundles[0], opposing: bundles[1]);
+              GameSession.instance!.diceThrowHistory.add(
+                DiceThrowHistoryEntry(
+                  actor: bundles[0].entity,
+                  opposing: bundles[1].entity,
+                  request: bundles[0].request,
+                  opposingRequest: bundles[0].request,
+                  evaluation: evaluation,
+                )
+              );
+            }
+            else if(result.difficulty != null) {
+              for(var bundle in bundles) {
+                var evaluation = evaluateDiceThrow(bundle);
+                GameSession.instance!.diceThrowHistory.add(
+                  DiceThrowHistoryEntry(
+                    actor: bundle.entity,
+                    request: bundle.request,
+                    evaluation: evaluation,
+                  )
+                );
+              }
             }
           },
           icon: Icon(CustomIcons.d10),
