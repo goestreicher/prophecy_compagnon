@@ -416,7 +416,6 @@ enum Advantage {
     cost: [3],
     type: AdvantageType.enfant
   ),
-  // TODO: manage the opposition throw variant
   empathieNaturelle(
     title: 'Empathie naturelle',
     description: "Cet Avantage permet au personnage de “sentir” son environnement comme s’il pouvait établir un contact empathique avec les éléments qui l’entourent. Cette faculté lui permet de ressentir des impressions, des émotions, des peurs. Cet Avantage s'utilise avec un jet de Mental + Empathie contre une Difficulté variable, en fonction de l’action entreprise. Pour ressentir des émotions sur des animaux et des créatures dénuées d'intelligence, la Difficulté est de 10. Sur des êtres intelligents, la Difficulté passe à 15. Le meneur de jeu se réserve le droit de faire effectuer à la cible un jet de Mental + Volonté contre une Difficulté de 15, s’il estime que cette dernière cherche à masquer ses émotions. Ce jet est alors un jet d'opposition.",
@@ -448,6 +447,19 @@ enum Advantage {
             ability: Ability.empathie,
           ),
         )
+      ),
+      EntityEffectNullConfiguration(
+          name: 'Empathie naturelle - Cible intelligente (opposition)',
+          trigger: EntityEffectTrigger.request,
+          activationDiceThrowRequest: DiceThrowRequest(
+            type: DiceThrowRequestType.oppositionDirect,
+            context: DiceThrowRequestContext.none,
+            difficulty: 15,
+            base: DiceThrowEntityBaseAbility(
+              attribute: Attribute.mental,
+              ability: Ability.empathie,
+            ),
+          )
       ),
     ],
   ),

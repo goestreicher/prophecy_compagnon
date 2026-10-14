@@ -16,7 +16,9 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_mj/ui/session/character/menus/prepare_opposition_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
@@ -84,22 +86,68 @@ class _EffectsMenuWidgetState extends State<EffectsMenuWidget> {
                 );
               }
               else {
+                bool isOpposition;
                 DiceThrowEvaluation? activationDiceThrowEvaluation;
 
                 if (selected!.activationDiceThrowRequest != null) {
+                  var request = selected!.activationDiceThrowRequest!;
+                  List<EntityBase> entities;
+                  DiceThrowRequest? opposingRequest;
+
+                  if(
+                      request.type == DiceThrowRequestType.oppositionDirect
+                      || request.type == DiceThrowRequestType.oppositionNR
+                  ) {
+                    isOpposition = true;
+                    var preparationResult = await showDialog<PrepareOppositionThrowResult>(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) => PrepareOppositionThrowDialog(
+                        actor: widget.entity,
+                      ),
+                    );
+                    if(preparationResult == null) return;
+                    if(!context.mounted) return;
+
+                    opposingRequest = DiceThrowRequest(
+                      type: request.type,
+                      context: DiceThrowRequestContext.none,
+                      difficulty: preparationResult.difficulty ?? request.difficulty,
+                      base: preparationResult.opposingBase ?? request.base,
+                      allowTendencies: request.allowTendencies,
+                    );
+
+                    entities = [widget.entity, preparationResult.opposing];
+                  }
+                  else {
+                    isOpposition = false;
+                    entities = [widget.entity];
+                  }
+
                   var bundles = await showDialog<List<EntityThrowBundle>>(
                     context: context,
                     barrierDismissible: false,
                     builder: (BuildContext context) =>
                       EntityDiceThrowDialog(
-                        entities: [widget.entity],
-                        request: selected!.activationDiceThrowRequest!,
+                        entities: entities,
+                        request: request,
+                        opposingRequest: opposingRequest,
                       )
                   );
                   if(bundles == null || bundles.isEmpty) return;
                   if(!context.mounted) return;
 
-                  activationDiceThrowEvaluation = evaluateDiceThrow(bundles.first);
+                  if(isOpposition) {
+                    activationDiceThrowEvaluation = evaluateDiceThrow(
+                      bundles[0],
+                      opposing: bundles[1],
+                    );
+                  }
+                  else {
+                    activationDiceThrowEvaluation = evaluateDiceThrow(
+                      bundles[0]
+                    );
+                  }
 
                   GameSession.instance!.diceThrowHistory.add(
                     DiceThrowHistoryEntry(
