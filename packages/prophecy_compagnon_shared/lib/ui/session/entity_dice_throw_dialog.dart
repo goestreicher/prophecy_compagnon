@@ -97,7 +97,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
 
   void rebuildBundles() {
     for(var e in widget.entities) {
-      if(!bundles.containsKey(e.id)) continue;
+      if(bundles[e.id] == null) continue;
 
       DiceThrowRequest bundleRequest;
       if([DiceThrowRequestType.oppositionNR, DiceThrowRequestType.oppositionDirect].contains(localRequest.type)) {

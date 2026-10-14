@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:prophecy_compagnon_mj/ui/session/character/dice_throw_menu_item.dart';
+import 'package:prophecy_compagnon_mj/ui/session/character/menus/dice_throw_menu.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/luck.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';

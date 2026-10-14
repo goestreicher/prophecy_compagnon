@@ -16,18 +16,11 @@
  */
 
 import 'package:material_ui/material_ui.dart';
-import 'package:prophecy_compagnon_mj/ui/session/character/dice_throw_menu_item.dart';
 import 'package:prophecy_compagnon_mj/ui/session/character/info.dart';
-import 'package:prophecy_compagnon_mj/ui/session/character/shared_dice_throw_items.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
-import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
-import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
+import 'package:prophecy_compagnon_mj/ui/session/character/menus/dice_throw_menu.dart';
+import 'package:prophecy_compagnon_mj/ui/session/character/menus/shared_dice_throw_items.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
-import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 import 'package:provider/provider.dart';
 
 class PlayCharactersPage extends StatefulWidget {
