@@ -34,6 +34,7 @@ class EntityDiceThrowDialog extends StatefulWidget {
     super.key,
     required this.entities,
     required this.request,
+    this.opposingRequest,
     this.canChangeDifficulty = false,
     this.difficultyHints,
     this.contextModifierHints,
@@ -44,6 +45,7 @@ class EntityDiceThrowDialog extends StatefulWidget {
 
   final List<EntityBase> entities;
   final DiceThrowRequest request;
+  final DiceThrowRequest? opposingRequest;
   final bool canChangeDifficulty;
   final Map<String, int>? difficultyHints;
   final List<String>? contextModifierHints;
@@ -59,6 +61,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
   Map<String, EntityThrowBundle?> bundles = <String, EntityThrowBundle?>{};
   int? difficulty;
   late DiceThrowRequest localRequest;
+  DiceThrowRequest? localOpposingRequest;
 
   @override
   void initState() {
@@ -69,10 +72,10 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
     }
 
     difficulty = widget.request.difficulty;
-    buildLocalRequest();
+    buildLocalRequests();
   }
 
-  void buildLocalRequest() {
+  void buildLocalRequests() {
     localRequest = DiceThrowRequest(
       type: widget.request.type,
       context: widget.request.context,
@@ -80,17 +83,40 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
       base: widget.request.base,
       allowTendencies: widget.request.allowTendencies,
     );
+
+    if(widget.opposingRequest != null) {
+      localOpposingRequest = DiceThrowRequest(
+        type: widget.opposingRequest!.type,
+        context: widget.opposingRequest!.context,
+        difficulty: difficulty,
+        base: widget.opposingRequest!.base,
+        allowTendencies: widget.opposingRequest!.allowTendencies,
+      );
+    }
   }
 
   void rebuildBundles() {
-    for(var id in bundles.keys) {
-      if(bundles[id] != null) {
-        bundles[id] = EntityThrowBundle(
-          entity: bundles[id]!.entity,
-          request: localRequest,
-          result: bundles[id]!.result,
-        );
+    for(var e in widget.entities) {
+      if(!bundles.containsKey(e.id)) continue;
+
+      DiceThrowRequest bundleRequest;
+      if([DiceThrowRequestType.oppositionNR, DiceThrowRequestType.oppositionDirect].contains(localRequest.type)) {
+        if(e.id == widget.entities[1].id) {
+          bundleRequest = localOpposingRequest ?? localRequest;
+        }
+        else {
+          bundleRequest = localRequest;
+        }
       }
+      else {
+        bundleRequest = localRequest;
+      }
+
+      bundles[e.id] = EntityThrowBundle(
+        entity: e,
+        request: bundleRequest,
+        result: bundles[e.id]!.result,
+      );
     }
   }
 
@@ -134,7 +160,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
                   onChanged: (int v) {
                     setState(() {
                       difficulty = v;
-                      buildLocalRequest();
+                      buildLocalRequests();
                       rebuildBundles();
                     });
                   },
@@ -163,7 +189,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
 
                       setState(() {
                         difficulty = v;
-                        buildLocalRequest();
+                        buildLocalRequests();
                         rebuildBundles();
                       });
                     },
@@ -313,7 +339,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
                 ),
                 EntityDiceThrowSimpleWidget(
                   entity: widget.entities[1],
-                  request: localRequest,
+                  request: localOpposingRequest ?? localRequest,
                   canChangeDifficulty: widget.canChangeDifficulty,
                   difficultyHints: widget.difficultyHints,
                   contextModifierHints: widget.contextModifierHints,
