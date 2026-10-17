@@ -450,6 +450,7 @@ class _MapActionWidgetState extends State<_MapActionWidget> {
       if(i == null) return;
       i.x = m.x;
       i.y = m.y;
+      widget.map.distances.updateFrom(i);
     }
   }
 
