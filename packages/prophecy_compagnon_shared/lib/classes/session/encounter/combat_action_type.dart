@@ -23,7 +23,6 @@ enum CombatActionType {
   movement(title: 'Mouvement', icon: Symbols.arrows_output),
   // attack(title: 'Attaque', icon: Icons.cancel_outlined),
   // defense(title: 'Défense', icon: Icons.cancel_outlined),
-  // effect(title: 'Effet', icon: Icons.cancel_outlined),
   ;
 
   final String title;

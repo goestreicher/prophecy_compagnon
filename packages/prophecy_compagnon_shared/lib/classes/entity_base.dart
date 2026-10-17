@@ -207,7 +207,11 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
             combatStatus.has(EntityCombatStatusFlag.onGround)
             && !combatStatus.has(EntityCombatStatusFlag.grappled)
         ) {
-          // TODO: create action for the entity to get back up
+          ret.add(
+            CombatActionMovementDescription(
+              movementType: CombatActionMovementType.getUp,
+            )
+          );
         }
     }
 
