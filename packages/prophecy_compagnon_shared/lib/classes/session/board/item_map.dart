@@ -39,7 +39,10 @@ class SessionBoardItemMap extends SessionBoardItem {
       items = items ?? SessionBoardItemMapItems(),
       freeMovementEnabled = true
   {
-    distances = MapDistances(this.items);
+    distances = MapDistances(
+      items: this.items,
+      pixelsPerMeter: background.pixelsPerMeter
+    );
   }
 
   @override
@@ -110,11 +113,18 @@ List<double> _matrix4ToJson(vm.Matrix4? m) {
 }
 
 class MapDistances {
-  MapDistances(SessionBoardItemMapItems items)
+  MapDistances(
+    {
+      required SessionBoardItemMapItems items,
+      required this.pixelsPerMeter,
+    }
+  )
     : _distances = <StringPairMapKey, double>{}, _items = items
   {
     rebuild();
   }
+
+  final double pixelsPerMeter;
 
   double? between(SessionMapItem first, SessionMapItem second) {
     var search = StringPairMapKey(first.id, second.id);
@@ -145,8 +155,8 @@ class MapDistances {
 
       // This assumes that all objects are circles
       // TODO: manage different shapes some day
-      distance -= max(item.size.width, item.size.height);
-      distance -= max(other.size.width, other.size.height);
+      distance -= (max(item.size.width, item.size.height) / 2) * pixelsPerMeter;
+      distance -= (max(other.size.width, other.size.height) / 2) * pixelsPerMeter;
 
       _distances[key] = distance;
     }
