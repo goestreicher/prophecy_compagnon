@@ -16,7 +16,6 @@
  */
 
 import 'package:material_ui/material_ui.dart';
-import 'package:prophecy_compagnon_shared/classes/combat.dart';
 import 'package:prophecy_compagnon_shared/classes/creature.dart';
 
 class NaturalWeaponDisplayWidget extends StatelessWidget {
@@ -49,29 +48,10 @@ class NaturalWeaponDisplayWidget extends StatelessWidget {
     }
     var damage = buffer.toString();
 
-    var rangeWidgets = <Widget>[];
-    for(var r in weapon.ranges.keys) {
-      String spec = '${r.title} - Init. ${weapon.ranges[r]!.initiative}';
-
-      spec += '${r != WeaponRange.ranged ? " - Distance" : " - Distance efficace"} ${weapon.ranges[r]!.effectiveDistance.toStringAsFixed(2)} m';
-      if(r == WeaponRange.ranged) {
-        spec += ' - Distance maximum ${weapon.ranges[r]!.maximumDistance!.toStringAsFixed(2)} m';
-      }
-
-      rangeWidgets.add(
-        DefaultTextStyle(
-          style: theme.textTheme.bodySmall!,
-          child: Row(
-            spacing: 8.0,
-            children: [
-              Expanded(
-                child: Text(
-                  spec,
-                ),
-              ),
-            ],
-          ),
-        )
+    var initiativeDescriptions = <String>[];
+    for(var r in weapon.initiative.keys) {
+      initiativeDescriptions.add(
+        '${r.title} : ${weapon.initiative[r]!}',
       );
     }
 
@@ -104,7 +84,20 @@ class NaturalWeaponDisplayWidget extends StatelessWidget {
             ],
           ),
         ),
-        ...rangeWidgets,
+        DefaultTextStyle(
+          style: theme.textTheme.bodySmall!,
+          child: Row(
+            spacing: 8.0,
+            children: [
+              Text(
+                'Initiative :',
+              ),
+              Text(
+                initiativeDescriptions.join(', '),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

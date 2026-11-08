@@ -154,167 +154,173 @@ class _CreatureDisplayWidgetState extends State<CreatureDisplayWidget> {
                 ),
               ],
             ),
-            ExpansionTile(
-              title: const Text('Général'),
-              controlAffinity: ListTileControlAffinity.leading,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 16.0,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 12.0,
-                        children: [
-                          CreatureDisplayGeneralWidget(
-                            creature: creature,
-                          ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 16.0,
-                            children: [
-                              Expanded(
-                                child: CreatureDisplaySecondaryAttributes(
-                                  creature: creature
-                                ),
-                              ),
-                              EntityDisplayInjuriesWidget(
-                                injuries: creature.injuries.manager,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 200,
-                      child: EntityDisplayAbilitiesWidget(
-                        entity: creature
-                      ),
-                    ),
-                    SizedBox(
-                      width: 100,
-                      child: EntityDisplayAttributesWidget(
-                        entity: creature
-                      ),
-                    ),
-                  ],
-                ),
-                if(creature.naturalWeapons.isNotEmpty || creature.specialCapabilities.isNotEmpty)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 16.0,
-                    children: [
-                      if(creature.naturalWeapons.isNotEmpty)
-                        Expanded(
-                          child: CreatureDisplayNaturalWeaponsWidget(
-                            creature: creature,
-                          ),
-                        ),
-                      if(creature.specialCapabilities.isNotEmpty)
-                        Expanded(
-                          child: CreatureDisplaySpecialCapabilities(
-                            creature: creature,
-                          ),
-                        ),
-                    ],
-                  ),
-                if(creature.favors.isNotEmpty)
-                  EntityDisplayDraconicFavorsWidget(
-                    entity: creature,
-                  ),
-                if(hasWeapon || hasArmor)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 16.0,
-                    children: [
-                      if(hasWeapon)
-                        Expanded(child: DisplayWeaponsWidget(entity: creature)),
-                      if(hasArmor)
-                        Expanded(child: DisplayArmorWidget(entity: creature)),
-                    ],
-                  ),
-              ],
-            ),
-            ExpansionTile(
-              title: const Text('Compétences'),
-              controlAffinity: ListTileControlAffinity.leading,
-              children: [
-                Wrap(
-                  spacing: 12.0,
-                  children: [
-                    if(hasPhysicalSkills)
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: skillGroupWidth,
-                        ),
-                        child: EntityDisplaySkillGroupWidget(
-                          entity: creature,
-                          attribute: Attribute.physique,
-                        ),
-                      ),
-                    if(hasManualSkills)
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: skillGroupWidth,
-                        ),
-                        child: EntityDisplaySkillGroupWidget(
-                          entity: creature,
-                          attribute: Attribute.manuel,
-                        ),
-                      ),
-                    if(hasMentalSkills)
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: skillGroupWidth,
-                        ),
-                        child: EntityDisplaySkillGroupWidget(
-                          entity: creature,
-                          attribute: Attribute.mental,
-                        ),
-                      ),
-                    if(hasSocialSkills)
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: skillGroupWidth,
-                        ),
-                        child: EntityDisplaySkillGroupWidget(
-                          entity: creature,
-                          attribute: Attribute.social,
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-            if(isMagicUser)
-              ExpansionTile(
-                title: const Text('Magie'),
+            Material(
+              child: ExpansionTile(
+                title: const Text('Général'),
                 controlAffinity: ListTileControlAffinity.leading,
                 children: [
-                  Column(
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 16.0,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 12.0,
+                          children: [
+                            CreatureDisplayGeneralWidget(
+                              creature: creature,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 16.0,
+                              children: [
+                                Expanded(
+                                  child: CreatureDisplaySecondaryAttributes(
+                                    creature: creature
+                                  ),
+                                ),
+                                EntityDisplayInjuriesWidget(
+                                  injuries: creature.injuries.manager,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 200,
+                        child: EntityDisplayAbilitiesWidget(
+                          entity: creature
+                        ),
+                      ),
+                      SizedBox(
+                        width: 100,
+                        child: EntityDisplayAttributesWidget(
+                          entity: creature
+                        ),
+                      ),
+                    ],
+                  ),
+                  if(creature.naturalWeapons.isNotEmpty || creature.specialCapabilities.isNotEmpty)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 16.0,
+                      children: [
+                        if(creature.naturalWeapons.isNotEmpty)
+                          Expanded(
+                            child: CreatureDisplayNaturalWeaponsWidget(
+                              creature: creature,
+                            ),
+                          ),
+                        if(creature.specialCapabilities.isNotEmpty)
+                          Expanded(
+                            child: CreatureDisplaySpecialCapabilities(
+                              creature: creature,
+                            ),
+                          ),
+                      ],
+                    ),
+                  if(creature.favors.isNotEmpty)
+                    EntityDisplayDraconicFavorsWidget(
+                      entity: creature,
+                    ),
+                  if(hasWeapon || hasArmor)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 16.0,
+                      children: [
+                        if(hasWeapon)
+                          Expanded(child: DisplayWeaponsWidget(entity: creature)),
+                        if(hasArmor)
+                          Expanded(child: DisplayArmorWidget(entity: creature)),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+            Material(
+              child: ExpansionTile(
+                title: const Text('Compétences'),
+                controlAffinity: ListTileControlAffinity.leading,
+                children: [
+                  Wrap(
                     spacing: 12.0,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 16.0,
-                        children: [
-                          ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: 160,
-                              ),
-                              child: EntityDisplayMagicSkillsWidget(entity: creature)
+                      if(hasPhysicalSkills)
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: skillGroupWidth,
                           ),
-                          Expanded(
-                              child: EntityDisplayMagicSpheresWidget(entity: creature)
+                          child: EntityDisplaySkillGroupWidget(
+                            entity: creature,
+                            attribute: Attribute.physique,
                           ),
-                        ],
-                      ),
-                      EntityDisplayMagicSpellsWidget(entity: creature)
+                        ),
+                      if(hasManualSkills)
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: skillGroupWidth,
+                          ),
+                          child: EntityDisplaySkillGroupWidget(
+                            entity: creature,
+                            attribute: Attribute.manuel,
+                          ),
+                        ),
+                      if(hasMentalSkills)
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: skillGroupWidth,
+                          ),
+                          child: EntityDisplaySkillGroupWidget(
+                            entity: creature,
+                            attribute: Attribute.mental,
+                          ),
+                        ),
+                      if(hasSocialSkills)
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: skillGroupWidth,
+                          ),
+                          child: EntityDisplaySkillGroupWidget(
+                            entity: creature,
+                            attribute: Attribute.social,
+                          ),
+                        ),
                     ],
                   ),
                 ],
+              ),
+            ),
+            if(isMagicUser)
+              Material(
+                child: ExpansionTile(
+                  title: const Text('Magie'),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  children: [
+                    Column(
+                      spacing: 12.0,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 16.0,
+                          children: [
+                            ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: 160,
+                                ),
+                                child: EntityDisplayMagicSkillsWidget(entity: creature)
+                            ),
+                            Expanded(
+                                child: EntityDisplayMagicSpheresWidget(entity: creature)
+                            ),
+                          ],
+                        ),
+                        EntityDisplayMagicSpellsWidget(entity: creature)
+                      ],
+                    ),
+                  ],
+                ),
               ),
           ],
         );

@@ -171,7 +171,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 17.0,
     "skills": {
       "families": {
         "combat": {
@@ -276,17 +276,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 5.5,
-            "maximum_distance": 5.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 5.5,
-            "maximum_distance": 5.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -3.0,
+          "maximum_distance": -3.0
         }
       },
       {
@@ -300,17 +297,14 @@
           "add": 0,
           "dice": 1
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 6,
-            "maximum_distance": 6
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 6,
-            "maximum_distance": 6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -1.5,
+          "maximum_distance": -1.5
         }
       },
       {
@@ -324,17 +318,14 @@
           "add": 50,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 8.5,
-            "maximum_distance": 8.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 8.5,
-            "maximum_distance": 8.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],

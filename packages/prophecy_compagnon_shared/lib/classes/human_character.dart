@@ -284,9 +284,10 @@ class HumanCharacter extends EntityBase with MagicUser {
         slot: EquipableItemSlot.hands,
         handiness: 0,
         requirements: {},
+        type: WeaponRange.contact,
         initiative: {
           WeaponRange.contact: 2,
-          WeaponRange.melee: 0,
+          // WeaponRange.melee: 0,
         },
         damage: AttributeBasedCalculator(
           static: 0.0,
@@ -315,9 +316,10 @@ class HumanCharacter extends EntityBase with MagicUser {
         slot: EquipableItemSlot.feet,
         handiness: 0,
         requirements: {},
+        type: WeaponRange.contact,
         initiative: {
           WeaponRange.contact: 2,
-          WeaponRange.melee: 0,
+          // WeaponRange.melee: 0,
         },
         damage: AttributeBasedCalculator(
             static: 0.0,

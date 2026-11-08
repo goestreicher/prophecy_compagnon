@@ -27,8 +27,9 @@ import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/descriptions/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/action/dice_throw_request.dart';
@@ -36,10 +37,9 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/tur
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
 
-class ActionConfigurationMovementGetUp extends ActionConfiguration {
-  ActionConfigurationMovementGetUp();
+class ActionInitializerMovementGetUp extends ActionInitializer {
+  ActionInitializerMovementGetUp();
 
   @override
   String get name => CombatActionMovementType.sprint.title;
@@ -48,11 +48,11 @@ class ActionConfigurationMovementGetUp extends ActionConfiguration {
   IconData get icon => CombatActionMovementType.sprint.icon;
 
   @override
-  Future<void> plan(SessionEncounterEntityAction action) async {
-    await guardPlan(action, _doPlan);
+  Future<void> plan(BuildContext context, SessionEncounterEntityAction action) async {
+    await guardPlan(context, action, _doPlan);
   }
 
-  Future<void> _doPlan(SessionEncounterEntityAction action) async {
+  Future<void> _doPlan(BuildContext context, SessionEncounterEntityAction action) async {
     var messageBus = SessionMessageBusClient.instance;
     if(messageBus == null) {
       // TODO: display a message

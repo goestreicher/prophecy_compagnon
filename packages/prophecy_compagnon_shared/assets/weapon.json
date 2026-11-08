@@ -18,6 +18,7 @@
     "requirements": {
       "force": 3
     },
+    "type": "melee",
     "initiative": {
       "melee": 0,
       "contact": 0
@@ -28,10 +29,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.8
+      "static": 0.6
     },
     "range_max": {
-      "static": 0.8
+      "static": 0.6
     },
     "uuid": "e37feb85-529b-4cd5-bece-f3d9a77bae40",
     "source": {
@@ -59,6 +60,7 @@
     "requirements": {
       "force": 4
     },
+    "type": "melee",
     "initiative": {
       "melee": 1,
       "contact": 0
@@ -69,10 +71,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "uuid": "20ee308f-420b-4a4c-99ac-5e70347523f8",
     "source": {
@@ -100,6 +102,7 @@
     "requirements": {
       "force": 5
     },
+    "type": "melee",
     "initiative": {
       "melee": 2,
       "contact": -2
@@ -110,10 +113,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "uuid": "b1f26761-d126-41a4-a4c2-f1a3ac6f3b82",
     "source": {
@@ -139,6 +142,7 @@
     "requirements": {
       "force": 5
     },
+    "type": "melee",
     "initiative": {
       "melee": 0,
       "contact": -2
@@ -149,10 +153,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "uuid": "f59afe1b-895c-4233-897e-8af90a2524c7",
     "source": {
@@ -180,6 +184,7 @@
     "requirements": {
       "force": 4
     },
+    "type": "melee",
     "initiative": {
       "melee": 2,
       "contact": 0
@@ -190,10 +195,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "special": [
       {
@@ -232,6 +237,7 @@
       "force": 3,
       "coordination": 4
     },
+    "type": "melee",
     "initiative": {
       "melee": 1,
       "contact": 0
@@ -242,10 +248,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "uuid": "9523aba6-3c0b-460f-8fc8-f6beaa447757",
     "source": {
@@ -274,6 +280,7 @@
       "force": 4,
       "coordination": 4
     },
+    "type": "melee",
     "initiative": {
       "melee": 1,
       "contact": 0
@@ -284,10 +291,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "uuid": "f054bc01-60a5-4c4b-accb-66bbd31760b6",
     "source": {
@@ -317,6 +324,7 @@
       "force": 5,
       "coordination": 4
     },
+    "type": "melee",
     "initiative": {
       "melee": 1,
       "contact": -1
@@ -327,10 +335,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "uuid": "1ca0e6f3-6d6c-4279-aefe-275b518752f2",
     "source": {
@@ -358,6 +366,7 @@
     "requirements": {
       "force": 5
     },
+    "type": "melee",
     "initiative": {
       "melee": 2
     },
@@ -368,10 +377,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "uuid": "bddb8599-83f2-44d0-b0a1-d30cb6914983",
     "source": {
@@ -399,6 +408,7 @@
     "requirements": {
       "force": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": 1
     },
@@ -409,10 +419,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "uuid": "b9a0318b-95bf-49cd-9e7d-ab0bbb68ebb9",
     "source": {
@@ -474,6 +484,7 @@
       "force": 7,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": 1
     },
@@ -485,18 +496,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 2,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.8
     },
     "range_max": {
-      "static": 2,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.8
     }
   },
   {
@@ -516,6 +519,7 @@
     "requirements": {
       "force": 5
     },
+    "type": "melee",
     "initiative": {
       "melee": 1
     },
@@ -526,10 +530,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "uuid": "248cc872-1739-43de-ad50-2e5dc17845e0",
     "source": {
@@ -559,6 +563,7 @@
       "force": 7,
       "coordination": 5
     },
+    "type": "melee",
     "initiative": {
       "melee": 1
     },
@@ -569,10 +574,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "uuid": "92cdf534-725f-46fc-8511-1bed17410625",
     "source": {
@@ -601,6 +606,7 @@
       "force": 4,
       "coordination": 4
     },
+    "type": "melee",
     "initiative": {
       "melee": -1,
       "contact": 1
@@ -611,10 +617,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.5
+      "static": 0.4
     },
     "range_max": {
-      "static": 0.5
+      "static": 0.4
     },
     "uuid": "8b2877a5-8dc1-464d-82f5-e1ee7bf5e85a",
     "source": {
@@ -643,6 +649,7 @@
       "force": 5,
       "coordination": 5
     },
+    "type": "melee",
     "initiative": {
       "melee": -1
     },
@@ -652,10 +659,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.8
+      "static": 0.6
     },
     "range_max": {
-      "static": 0.8
+      "static": 0.6
     },
     "uuid": "6d17ac5c-8d6e-4bb6-bf5d-f68700ab1ec2",
     "source": {
@@ -684,6 +691,7 @@
       "force": 5,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": 0
     },
@@ -693,10 +701,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "uuid": "f5e9bb82-ddd5-4cc1-9f29-ea05c7a864c6",
     "source": {
@@ -725,6 +733,7 @@
       "force": 3,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": -1,
       "contact": 1
@@ -735,10 +744,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.8
+      "static": 0.6
     },
     "range_max": {
-      "static": 0.8
+      "static": 0.6
     },
     "special": [
       {
@@ -777,6 +786,7 @@
       "force": 5,
       "coordination": 7
     },
+    "type": "melee",
     "initiative": {
       "melee": -1
     },
@@ -786,10 +796,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "special": [
       {
@@ -828,6 +838,7 @@
       "force": 6,
       "coordination": 4
     },
+    "type": "melee",
     "initiative": {
       "melee": -2
     },
@@ -838,10 +849,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.2
+      "static": 0.8
     },
     "uuid": "d655c59c-4fa7-4cf4-8ff5-8189587668bf",
     "source": {
@@ -870,6 +881,7 @@
       "force": 6,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": -2
     },
@@ -880,10 +892,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "uuid": "7c99e929-fa99-4004-a335-92c686e97467",
     "source": {
@@ -913,6 +925,7 @@
       "force": 7,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": -1
     },
@@ -923,10 +936,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "uuid": "dd35f6aa-f042-4674-b280-48d3cf6c4659",
     "source": {
@@ -955,6 +968,7 @@
       "force": 6,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": -1
     },
@@ -965,10 +979,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "special": [
       {
@@ -1006,6 +1020,7 @@
     "requirements": {
       "force": 3
     },
+    "type": "melee",
     "initiative": {
       "melee": 0,
       "contact": 0
@@ -1016,10 +1031,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.6
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.6
     },
     "special": [
       {
@@ -1056,6 +1071,7 @@
     "requirements": {
       "force": 4
     },
+    "type": "melee",
     "initiative": {
       "melee": -1,
       "contact": 0
@@ -1067,10 +1083,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.6
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.6
     },
     "special": [
       {
@@ -1108,6 +1124,7 @@
     "requirements": {
       "force": 4
     },
+    "type": "melee",
     "initiative": {
       "melee": 0,
       "contact": -1
@@ -1119,10 +1136,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.6
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.6
     },
     "uuid": "421613ea-9b84-488e-91e7-f21faadb6997",
     "source": {
@@ -1151,6 +1168,7 @@
       "force": 5,
       "coordination": 5
     },
+    "type": "melee",
     "initiative": {
       "melee": 0,
       "contact": -1
@@ -1162,10 +1180,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.6
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.6
     },
     "uuid": "cc93025a-5a7d-48d0-8ae0-e283aae40e75",
     "source": {
@@ -1195,6 +1213,7 @@
       "force": 6,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": -1
     },
@@ -1205,10 +1224,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.6
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.6
     },
     "uuid": "ef54a226-a09d-4384-bda6-05a0de55d28e",
     "source": {
@@ -1237,6 +1256,7 @@
     "requirements": {
       "force": 5
     },
+    "type": "melee",
     "initiative": {
       "melee": 0
     },
@@ -1247,10 +1267,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.2
+      "static": 0.8
     },
     "uuid": "520bba17-6d11-4865-8dea-5bbea8408437",
     "source": {
@@ -1279,6 +1299,7 @@
       "force": 6,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": -1
     },
@@ -1289,10 +1310,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "uuid": "d4c4fd38-7cc4-429f-a301-d94cb31dad28",
     "source": {
@@ -1320,6 +1341,7 @@
     "requirements": {
       "force": 7
     },
+    "type": "melee",
     "initiative": {
       "melee": -3
     },
@@ -1330,10 +1352,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "special": [
       {
@@ -1367,6 +1389,7 @@
     "requirements": {
       "coordination": 7
     },
+    "type": "melee",
     "initiative": {
       "melee": 3
     },
@@ -1374,10 +1397,10 @@
       "ability": "force"
     },
     "range_effective": {
-      "static": 2.0
+      "static": 1.6
     },
     "range_max": {
-      "static": 2.0
+      "static": 1.6
     },
     "special": [
       {
@@ -1413,6 +1436,7 @@
       "force": 4,
       "coordination": 7
     },
+    "type": "melee",
     "initiative": {
       "melee": 1
     },
@@ -1421,10 +1445,10 @@
       "dice": 2
     },
     "range_effective": {
-      "static": 2.0
+      "static": 1.6
     },
     "range_max": {
-      "static": 2.0
+      "static": 1.6
     },
     "special": [
       {
@@ -1462,6 +1486,7 @@
       "force": 4,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": 1
     },
@@ -1472,10 +1497,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "special": [
       {
@@ -1513,6 +1538,7 @@
       "force": 6,
       "coordination": 7
     },
+    "type": "melee",
     "initiative": {
       "melee": 1
     },
@@ -1523,10 +1549,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "special": [
       {
@@ -1564,6 +1590,7 @@
       "force": 6,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": 0
     },
@@ -1574,10 +1601,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "special": [
       {
@@ -1615,6 +1642,7 @@
       "force": 5,
       "coordination": 5
     },
+    "type": "melee",
     "initiative": {
       "melee": 0
     },
@@ -1625,10 +1653,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "special": [
       {
@@ -1673,6 +1701,7 @@
       "force": 6,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": -1
     },
@@ -1683,10 +1712,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "special": [
       {
@@ -1724,6 +1753,7 @@
       "force": 7,
       "coordination": 7
     },
+    "type": "melee",
     "initiative": {
       "melee": -2
     },
@@ -1733,10 +1763,10 @@
       "dice": 2
     },
     "range_effective": {
-      "static": 1.2
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2
+      "static": 1.0
     },
     "special": [
       {
@@ -1778,6 +1808,7 @@
       "force": 6,
       "coordination": 7
     },
+    "type": "melee",
     "initiative": {
       "melee": 2,
       "contact": -2
@@ -1788,10 +1819,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1.0
+      "static": 0.8
     },
     "special": [
       {
@@ -1826,6 +1857,7 @@
       "force": 5,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": 2
     },
@@ -1835,10 +1867,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.5
+      "static": 1.2
     },
     "range_max": {
-      "static": 1.5
+      "static": 1.2
     },
     "uuid": "3a684543-fd1f-4b45-ad25-923ceb281f46",
     "source": {
@@ -1867,6 +1899,7 @@
     "requirements": {
       "coordination": 3
     },
+    "type": "melee",
     "initiative": {
       "melee": 1,
       "contact": 0
@@ -1877,10 +1910,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.5
+      "static": 1.1
     },
     "range_max": {
-      "static": 1.5
+      "static": 1.1
     },
     "special": [
       {
@@ -1919,6 +1952,7 @@
       "force": 5,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": 2,
       "contact": 0
@@ -1930,10 +1964,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.5
+      "static": 1.1
     },
     "range_max": {
-      "static": 1.5
+      "static": 1.1
     },
     "special": [
       {
@@ -1981,6 +2015,7 @@
       "force": 5,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": 0
     },
@@ -1991,10 +2026,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.5
+      "static": 1.1
     },
     "range_max": {
-      "static": 1.5
+      "static": 1.1
     },
     "special": [
       {
@@ -2029,6 +2064,7 @@
       "force": 5,
       "coordination": 7
     },
+    "type": "melee",
     "initiative": {
       "melee": 1,
       "contact": 0
@@ -2039,10 +2075,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 2.0
+      "static": 1.6
     },
     "range_max": {
-      "static": 2.0
+      "static": 1.6
     },
     "special": [
       {
@@ -2084,6 +2120,7 @@
       "force": 5,
       "coordination": 8
     },
+    "type": "melee",
     "initiative": {
       "melee": 2
     },
@@ -2093,10 +2130,10 @@
       "dice": 2
     },
     "range_effective": {
-      "static": 2.0
+      "static": 1.6
     },
     "range_max": {
-      "static": 2.0
+      "static": 1.6
     },
     "special": [
       {
@@ -2142,6 +2179,7 @@
       "force": 6,
       "coordination": 7
     },
+    "type": "melee",
     "initiative": {
       "melee": 2
     },
@@ -2152,10 +2190,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.5
+      "static": 1.1
     },
     "range_max": {
-      "static": 1.5
+      "static": 1.1
     },
     "special": [
       {
@@ -2191,6 +2229,7 @@
       "price": 0
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": 0,
       "contact": 2
@@ -2200,10 +2239,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.2
+      "static": 0.0
     },
     "range_max": {
-      "static": 0.2
+      "static": 0.0
     },
     "special": [
       {
@@ -2238,6 +2277,7 @@
       "price": 0
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": 0,
       "contact": 1
@@ -2248,10 +2288,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.2
+      "static": 0.0
     },
     "range_max": {
-      "static": 0.2
+      "static": 0.0
     },
     "special": [
       {
@@ -2286,6 +2326,7 @@
       "price": 65
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": 0,
       "contact": 1
@@ -2296,10 +2337,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.2
+      "static": 0.0
     },
     "range_max": {
-      "static": 0.2
+      "static": 0.0
     },
     "special": [
       {
@@ -2334,6 +2375,7 @@
       "price": 135
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": 0,
       "contact": 1
@@ -2344,10 +2386,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.2
+      "static": 0.0
     },
     "range_max": {
-      "static": 0.2
+      "static": 0.0
     },
     "special": [
       {
@@ -2383,6 +2425,7 @@
       "price": 50
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": 0,
       "contact": 2
@@ -2393,10 +2436,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.2
+      "static": 0.0
     },
     "range_max": {
-      "static": 0.2
+      "static": 0.0
     },
     "uuid": "f03db636-6c98-406a-a4f3-faf8136d9a42",
     "source": {
@@ -2423,6 +2466,7 @@
       "price": 95
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": -1,
       "contact": -1
@@ -2433,10 +2477,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 0.2
+      "static": 0.3
     },
     "range_max": {
-      "static": 0.2
+      "static": 0.3
     },
     "uuid": "d256b905-c099-47c3-bc92-430498f0b54e",
     "source": {
@@ -2462,6 +2506,7 @@
       "price": 20
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": 0,
       "contact": 1
@@ -2501,6 +2546,7 @@
       "price": 40
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": 0,
       "contact": 1
@@ -2540,6 +2586,7 @@
       "price": 220
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": 0,
       "contact": 0
@@ -2591,6 +2638,7 @@
       "price": 330
     },
     "requirements": {},
+    "type": "contact",
     "initiative": {
       "melee": -1,
       "contact": 2
@@ -2644,6 +2692,7 @@
       "force": 3,
       "coordination": 3
     },
+    "type": "distance",
     "initiative": {
       "melee": 0,
       "distance": 3
@@ -2654,10 +2703,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.8
+      "static": 1.4
     },
     "range_max": {
-      "static": 1.8
+      "static": 1.4
     },
     "special": [
       {
@@ -2696,6 +2745,7 @@
       "force": 4,
       "coordination": 5
     },
+    "type": "distance",
     "initiative": {
       "melee": 0,
       "distance": 5
@@ -2706,10 +2756,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 2.2
+      "static": 1.8
     },
     "range_max": {
-      "static": 2.2
+      "static": 1.8
     },
     "special": [
       {
@@ -2751,6 +2801,7 @@
       "force": 5,
       "coordination": 4
     },
+    "type": "distance",
     "initiative": {
       "melee": 0,
       "distance": 1
@@ -2761,10 +2812,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 2.2
+      "static": 1.8
     },
     "range_max": {
-      "static": 2.2
+      "static": 1.8
     },
     "special": [
       {
@@ -2806,6 +2857,7 @@
       "force": 5,
       "coordination": 4
     },
+    "type": "distance",
     "initiative": {
       "melee": 0,
       "distance": 3
@@ -2816,10 +2868,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 2.2
+      "static": 1.8
     },
     "range_max": {
-      "static": 2.2
+      "static": 1.8
     },
     "special": [
       {
@@ -2861,6 +2913,7 @@
       "force": 5,
       "coordination": 6
     },
+    "type": "distance",
     "initiative": {
       "melee": 0,
       "distance": 3
@@ -2871,10 +2924,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 2.2
+      "static": 1.8
     },
     "range_max": {
-      "static": 2.2
+      "static": 1.8
     },
     "special": [
       {
@@ -2916,6 +2969,7 @@
       "force": 5,
       "coordination": 4
     },
+    "type": "distance",
     "initiative": {
       "melee": 0,
       "distance": 1
@@ -2926,10 +2980,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 2.2
+      "static": 1.8
     },
     "range_max": {
-      "static": 2.2
+      "static": 1.8
     },
     "special": [
       {
@@ -2968,6 +3022,7 @@
       "force": 6,
       "coordination": 5
     },
+    "type": "distance",
     "initiative": {
       "melee": 0,
       "distance": 10
@@ -2978,10 +3033,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 2.5
+      "static": 2.1
     },
     "range_max": {
-      "static": 2.5
+      "static": 2.1
     },
     "special": [
       {
@@ -3023,6 +3078,7 @@
       "perception": 3,
       "coordination": 6
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 0
     },
@@ -3070,6 +3126,7 @@
       "price": 0
     },
     "requirements": {},
+    "type": "ranged",
     "initiative": {
       "ranged": 3
     },
@@ -3116,6 +3173,7 @@
       "perception": 3,
       "coordination": 4
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 4
     },
@@ -3169,6 +3227,7 @@
       "perception": 4,
       "coordination": 4
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 3
     },
@@ -3222,6 +3281,7 @@
       "perception": 4,
       "coordination": 6
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 2
     },
@@ -3273,6 +3333,7 @@
       "perception": 5,
       "coordination": 4
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 1
     },
@@ -3322,6 +3383,7 @@
       "perception": 6,
       "coordination": 4
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 0
     },
@@ -3372,6 +3434,7 @@
       "force": 3,
       "perception": 4
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 0
     },
@@ -3429,6 +3492,7 @@
       "force": 6,
       "perception": 4
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 0
     },
@@ -3486,6 +3550,7 @@
       "force": 5,
       "perception": 4
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 0
     },
@@ -3543,6 +3608,7 @@
       "perception": 4,
       "coordination": 6
     },
+    "type": "ranged",
     "initiative": {
       "ranged": -1
     },
@@ -3602,6 +3668,7 @@
       "price": 40
     },
     "requirements": {},
+    "type": "ranged",
     "initiative": {
       "ranged": 3
     },
@@ -3654,6 +3721,7 @@
       "perception": 5,
       "coordination": 5
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 0
     },
@@ -3713,6 +3781,7 @@
     "requirements": {
       "force": 4
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 3
     },
@@ -3776,6 +3845,7 @@
     "requirements": {
       "force": 5
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 3
     },
@@ -3839,6 +3909,7 @@
     "requirements": {
       "force": 6
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 3
     },
@@ -3902,6 +3973,7 @@
     "requirements": {
       "force": 6
     },
+    "type": "ranged",
     "initiative": {
       "ranged": 4
     },
@@ -3987,6 +4059,7 @@
     "requirements": {
       "force": 5
     },
+    "type": "melee",
     "initiative": {
       "contact": -2,
       "melee": 3
@@ -3999,18 +4072,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.0
     }
   },
   {
@@ -4048,6 +4113,7 @@
     "layer": "normal",
     "skill": "armesTranchantes",
     "requirements": {},
+    "type": "melee",
     "initiative": {
       "contact": -2,
       "melee": 2
@@ -4060,18 +4126,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.2,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.0
     }
   },
   {
@@ -4108,6 +4166,7 @@
     "requirements": {
       "coordination": 3
     },
+    "type": "melee",
     "initiative": {
       "contact": 0,
       "melee": 1
@@ -4120,18 +4179,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1.5,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.1
     },
     "range_max": {
-      "static": 1.5,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.1
     }
   },
   {
@@ -4170,6 +4221,7 @@
       "force": 7,
       "coordination": 6
     },
+    "type": "melee",
     "initiative": {
       "melee": -1
     },
@@ -4181,18 +4233,10 @@
       "dice": 0
     },
     "range_effective": {
-      "static": 1.2,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.0
     },
     "range_max": {
-      "static": 1.2,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 1.0
     }
   },
   {
@@ -4230,6 +4274,7 @@
     "requirements": {
       "force": 9
     },
+    "type": "distance",
     "initiative": {
       "distance": 0
     },
@@ -4241,18 +4286,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 2.5,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 2.1
     },
     "range_max": {
-      "static": 2.5,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 2.1
     }
   },
   {
@@ -4297,6 +4334,7 @@
     "requirements": {
       "force": 4
     },
+    "type": "melee",
     "initiative": {
       "contact": 0,
       "melee": 2
@@ -4309,18 +4347,10 @@
       "dice": 1
     },
     "range_effective": {
-      "static": 1,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 0.8
     },
     "range_max": {
-      "static": 1,
-      "ability": null,
-      "multiply": 1,
-      "add": 0,
-      "dice": 0
+      "static": 0.8
     }
   }
 ]

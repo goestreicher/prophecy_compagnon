@@ -15,12 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
+import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/weapon.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 
-abstract class CombatActionDescription {
-  CombatActionDescription({
-    required this.type,
+abstract class ActionInitializerAttack extends ActionInitializer {
+  ActionInitializerAttack({
+    required this.weapon,
+    required this.target,
   });
 
-  CombatActionType type;
+  final Weapon weapon;
+  final EntityBase target;
 }

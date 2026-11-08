@@ -112,6 +112,7 @@ class WeaponModel extends EquipableItemModel {
     EquipableItemLayer layer = EquipableItemLayer.normal,
     required SpecializedSkill skill,
     required Map<Ability, int> requirements,
+    required WeaponRange type,
     required Map<WeaponRange, int> initiative,
     required AttributeBasedCalculator damage,
     required AttributeBasedCalculator rangeEffective,
@@ -139,6 +140,7 @@ class WeaponModel extends EquipableItemModel {
             layer: layer,
             skill: skill,
             requirements: requirements,
+            type: type,
             initiative: initiative,
             damage: damage,
             rangeEffective: rangeEffective,
@@ -168,6 +170,7 @@ class WeaponModel extends EquipableItemModel {
     super.layer,
     required this.skill,
     required this.requirements,
+    required this.type,
     required this.initiative,
     required this.damage,
     required this.rangeEffective,
@@ -180,14 +183,11 @@ class WeaponModel extends EquipableItemModel {
   @JsonKey(readValue: _getSkillFromJson, toJson: _setSkillToJson)
   SpecializedSkill skill;
   Map<Ability,int> requirements;
+  WeaponRange type;
   Map<WeaponRange, int> initiative;
   AttributeBasedCalculator damage;
   AttributeBasedCalculator rangeEffective;
   AttributeBasedCalculator rangeMax;
-
-  WeaponRange get range {
-    return initiative.keys.reduce((value, element) => element.index > value.index ? element : value);
-  }
 
   @JsonKey(includeToJson: true)
   @override
@@ -322,7 +322,7 @@ class WeaponModel extends EquipableItemModel {
       _$WeaponModelToJson(this);
 }
 
-class Weapon extends EquipableItem implements DamageProvider, InitiativeProvider {
+class Weapon extends EquipableItem implements DamageProvider, InitiativeProvider, RangeProvider {
   Weapon(this._uuid, {
     required super.model,
     super.alias,
@@ -337,6 +337,12 @@ class Weapon extends EquipableItem implements DamageProvider, InitiativeProvider
     super.metal,
   })
     : _uuid = const Uuid().v4().toString();
+
+  factory Weapon.fromJson(Map<String, dynamic> json) {
+    var ret = (EquipmentFactory.instance.forgeEquipment(json['type'], json: json) as Weapon);
+    ret.restoreFromJson(json);
+    return ret;
+  }
 
   final String _uuid;
 
@@ -387,4 +393,23 @@ class Weapon extends EquipableItem implements DamageProvider, InitiativeProvider
     }
     return ret;
   }
+
+  @override
+  WeaponRange get range => (model as WeaponModel).type;
+
+  @override
+  double distanceEffective(EntityBase owner) =>
+      (model as WeaponModel).rangeEffective.calculate(
+          (model as WeaponModel).rangeEffective.ability != null
+              ? owner.abilities.ability((model as WeaponModel).rangeEffective.ability!)
+              : 0
+      );
+
+  @override
+  double distanceMax(EntityBase owner) =>
+      (model as WeaponModel).rangeMax.calculate(
+          (model as WeaponModel).rangeMax.ability != null
+              ? owner.abilities.ability((model as WeaponModel).rangeMax.ability!)
+              : 0
+      );
 }

@@ -155,12 +155,10 @@ class CreatureCategory {
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class NaturalWeaponModelRangeSpecification {
   NaturalWeaponModelRangeSpecification({
-    required this.initiative,
     required this.effectiveDistance,
     this.maximumDistance,
   });
 
-  int initiative;
   double effectiveDistance;
   double? maximumDistance;
 
@@ -176,7 +174,9 @@ class NaturalWeaponModel {
     this.special,
     required this.skill,
     required this.damage,
-    required this.ranges,
+    required this.type,
+    required this.initiative,
+    required this.distance,
   }) : id = sentenceToCamelCase(transliterateFrenchToAscii(name));
 
   @JsonKey(includeToJson: false, includeFromJson: false)
@@ -185,7 +185,9 @@ class NaturalWeaponModel {
   String? special;
   int skill;
   AttributeBasedCalculator damage;
-  final Map<WeaponRange, NaturalWeaponModelRangeSpecification> ranges;
+  final WeaponRange type;
+  Map<WeaponRange, int> initiative;
+  final NaturalWeaponModelRangeSpecification distance;
 
   Map<String, dynamic> toJson() => _$NaturalWeaponModelToJson(this);
   factory NaturalWeaponModel.fromJson(Map<String, dynamic> json)
@@ -693,12 +695,6 @@ class Creature extends EntityBase with EncounterEntityModel, MagicUser {
 
       instance.addProtectionProvider(NaturalArmor(value: naturalArmor));
 
-      var contactRange = AttributeBasedCalculator(
-          static: 0.5,
-          multiply: 0,
-          add: 0,
-          dice: 0);
-
       for(var weapon in naturalWeapons) {
         var spSkill = SpecializedSkill.create(
           parent: Skill.creatureNaturalWeapon,
@@ -716,43 +712,32 @@ class Creature extends EntityBase with EncounterEntityModel, MagicUser {
         AttributeBasedCalculator? effective;
         AttributeBasedCalculator? max;
 
-        if(weapon.ranges.containsKey(WeaponRange.contact)) {
-          effective = AttributeBasedCalculator(
-              static: weapon.ranges[WeaponRange.contact]!.effectiveDistance,
-              multiply: 0,
-              add: 0,
-              dice: 0);
-          max = effective;
-        }
-        else if(weapon.ranges.containsKey(WeaponRange.melee)) {
-          effective = AttributeBasedCalculator(
-              static: weapon.ranges[WeaponRange.melee]!.effectiveDistance,
-              multiply: 0,
-              add: 0,
-              dice: 0);
-          max = effective;
-        }
-        else if(weapon.ranges.containsKey(WeaponRange.distance)) {
-          effective = AttributeBasedCalculator(
-              static: weapon.ranges[WeaponRange.distance]!.effectiveDistance,
-              multiply: 0,
-              add: 0,
-              dice: 0);
-          max = effective;
-        }
-        else if(weapon.ranges.containsKey(WeaponRange.ranged)) {
-          effective = AttributeBasedCalculator(
-              static: weapon.ranges[WeaponRange.ranged]!.effectiveDistance,
-              multiply: 0,
-              add: 0,
-              dice: 0);
-          max = AttributeBasedCalculator(
-              static: weapon.ranges[WeaponRange.ranged]!.maximumDistance == null
-                  ? weapon.ranges[WeaponRange.ranged]!.effectiveDistance * 2
-                  : weapon.ranges[WeaponRange.ranged]!.maximumDistance!,
-              multiply: 0,
-              add: 0,
-              dice: 0);
+        switch(weapon.type) {
+          case WeaponRange.contact:
+          case WeaponRange.melee:
+          case WeaponRange.distance:
+            effective = AttributeBasedCalculator(
+                static: weapon.distance.effectiveDistance,
+                multiply: 0,
+                add: 0,
+                dice: 0
+            );
+            max = effective;
+          case WeaponRange.ranged:
+            effective = AttributeBasedCalculator(
+                static: weapon.distance.effectiveDistance,
+                multiply: 0,
+                add: 0,
+                dice: 0
+            );
+            max = AttributeBasedCalculator(
+                static: weapon.distance.maximumDistance == null
+                    ? weapon.distance.effectiveDistance * 2
+                    : weapon.distance.maximumDistance!,
+                multiply: 0,
+                add: 0,
+                dice: 0
+            );
         }
 
         var wm = WeaponModel(
@@ -768,17 +753,15 @@ class Creature extends EntityBase with EncounterEntityModel, MagicUser {
             slot: EquipableItemSlot.hands,
             handiness: 0,
             requirements: {},
-            initiative: Map<WeaponRange, int>.fromEntries(
-              weapon.ranges.keys.map( (WeaponRange r) => MapEntry(r, 0) )
-            ),
+            type: weapon.type,
+            initiative: weapon.initiative,
             damage: weapon.damage,
-            rangeEffective: effective ?? contactRange,
-            rangeMax: max ?? contactRange);
+            rangeEffective: effective,
+            rangeMax: max,
+        );
 
         var weaponInstance = wm.instantiate();
-        for(var range in weapon.ranges.keys) {
-          instance.addNaturalWeapon(range, weaponInstance);
-        }
+        instance.addNaturalWeapon(weapon.type, weaponInstance);
       }
 
       ret.add(instance);

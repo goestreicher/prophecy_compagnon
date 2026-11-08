@@ -16,18 +16,20 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
 
 class ActionConfigurationMenuRenderer extends StatelessWidget {
   const ActionConfigurationMenuRenderer({
     super.key,
     required this.action,
-    required this.actionConfiguration,
+    required this.initializer,
+    required this.actionBuildContext,
   });
 
   final SessionEncounterEntityAction action;
-  final ActionConfiguration actionConfiguration;
+  final ActionInitializer initializer;
+  final BuildContext actionBuildContext;
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +37,14 @@ class ActionConfigurationMenuRenderer extends StatelessWidget {
 
     return MenuItemButton(
       leadingIcon: Icon(
-        actionConfiguration.icon,
+        initializer.icon,
         size: 18.0,
       ),
       onPressed: () {
-        actionConfiguration.plan(action);
+        initializer.plan(actionBuildContext, action);
       },
       child: Text(
-        actionConfiguration.name,
+        initializer.name,
         style: theme.textTheme.bodySmall,
       ),
     );

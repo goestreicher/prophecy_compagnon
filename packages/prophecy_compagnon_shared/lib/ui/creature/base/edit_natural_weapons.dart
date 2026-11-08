@@ -163,10 +163,12 @@ class _NaturalWeaponEditDialogState extends State<_NaturalWeaponEditDialog> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController capabilityController = TextEditingController();
 
+  WeaponRange? type;
   int skill = 0;
   AttributeBasedCalculator damage = AttributeBasedCalculator(static: 0);
-  final Map<WeaponRange, NaturalWeaponModelRangeSpecification> ranges =
-      <WeaponRange, NaturalWeaponModelRangeSpecification>{};
+  final Map<WeaponRange, int> initiative = <WeaponRange, int>{};
+  double distanceEffective = 0.0;
+  double distanceMax = 0.0;
 
   @override
   void initState() {
@@ -174,17 +176,18 @@ class _NaturalWeaponEditDialogState extends State<_NaturalWeaponEditDialog> {
 
     if(widget.source != null) {
       nameController.text = widget.source!.name;
+      type = widget.source!.type;
       if(widget.source!.special != null) {
         capabilityController.text = widget.source!.special!;
       }
       skill = widget.source!.skill;
       damage = widget.source!.damage;
-      for(var r in widget.source!.ranges.keys) {
-        ranges[r] = NaturalWeaponModelRangeSpecification(
-          initiative: widget.source!.ranges[r]!.initiative,
-          effectiveDistance: widget.source!.ranges[r]!.effectiveDistance,
-          maximumDistance: widget.source!.ranges[r]!.maximumDistance,
-        );
+      for(var r in widget.source!.initiative.keys) {
+        initiative[r] = widget.source!.initiative[r]!;
+      }
+      distanceEffective = widget.source!.distance.effectiveDistance;
+      if(widget.source!.distance.maximumDistance != null) {
+        distanceMax = widget.source!.distance.maximumDistance!;
       }
     }
   }
@@ -197,34 +200,22 @@ class _NaturalWeaponEditDialogState extends State<_NaturalWeaponEditDialog> {
     for(var r in WeaponRange.values) {
       rangeWidgets.add(
         _NaturalWeaponRangeEditWidget(
-          enabled: ranges.containsKey(r),
+          enabled: initiative.containsKey(r),
           range: r,
-          specification: ranges[r],
+          initiative: initiative[r],
           onEnableChanged: (bool enabled) {
             setState(() {
               if(enabled) {
-                ranges[r] = NaturalWeaponModelRangeSpecification(
-                  initiative: 0,
-                  effectiveDistance: 0.0,
-                  maximumDistance: 0.0,
-                );
+                initiative[r] = 0;
               }
               else {
-                ranges.remove(r);
+                initiative.remove(r);
               }
             });
           },
-          onInitiativeChanged: (int initiative) {
-            if(!ranges.containsKey(r)) return;
-            ranges[r]!.initiative = initiative;
-          },
-          onEffectiveDistanceChanged: (double distance) {
-            if(!ranges.containsKey(r)) return;
-            ranges[r]!.effectiveDistance = distance;
-          },
-          onMaximumDistanceChanged: (double distance) {
-            if(!ranges.containsKey(r)) return;
-            ranges[r]!.maximumDistance = distance;
+          onChanged: (int i) {
+            if(!initiative.containsKey(r)) return;
+            initiative[r] = i;
           },
         )
       );
@@ -263,6 +254,36 @@ class _NaturalWeaponEditDialogState extends State<_NaturalWeaponEditDialog> {
                     },
                   ),
                 ),
+              ],
+            ),
+            Row(
+              spacing: 12.0,
+              children: [
+                Expanded(
+                  child: DropdownMenuFormField<WeaponRange>(
+                    initialSelection: type,
+                    requestFocusOnTap: true,
+                    label: const Text('Type'),
+                    textStyle: theme.textTheme.bodySmall,
+                    inputDecorationTheme: InputDecorationTheme(
+                      border: OutlineInputBorder(),
+                      isCollapsed: true,
+                      constraints: BoxConstraints(maxHeight: 36.0),
+                      contentPadding: EdgeInsets.all(12.0),
+                    ),
+                    expandedInsets: EdgeInsets.zero,
+                    dropdownMenuEntries: WeaponRange.values
+                        .map((WeaponRange r) => DropdownMenuEntry(value: r, label: r.title))
+                        .toList(),
+                    validator: (WeaponRange? r) {
+                      if(r == null) return 'Valeur manquante';
+                      return null;
+                    },
+                    onSelected: (WeaponRange? r) {
+                      type = r;
+                    },
+                  ),
+                ),
                 SizedBox(
                   width: 90,
                   child: NumIntInputWidget(
@@ -273,6 +294,43 @@ class _NaturalWeaponEditDialogState extends State<_NaturalWeaponEditDialog> {
                     onChanged: (int value) => skill = value,
                   ),
                 ),
+                SizedBox(
+                  width: 90,
+                  child: NumDoubleInputWidget(
+                    label: type == WeaponRange.ranged
+                        ? 'Distance Eff.'
+                        : 'Distance',
+                    initialValue: distanceEffective,
+                    minValue: 0.0,
+                    maxValue: 9999.0,
+                    onChanged: (double value) {
+                      distanceEffective = value;
+                      if(distanceEffective > distanceMax) {
+                        setState(() {
+                          distanceMax = distanceEffective;
+                        });
+                      }
+                    },
+                  ),
+                ),
+                if(type == WeaponRange.ranged)
+                  SizedBox(
+                    width: 90,
+                    child: NumDoubleInputWidget(
+                      label: 'Distance Max.',
+                      initialValue: distanceMax,
+                      minValue: 0.0,
+                      maxValue: 99999.0,
+                      onChanged: (double value) {
+                        distanceMax = value;
+                        if(distanceMax < distanceEffective) {
+                          setState(() {
+                            distanceEffective = distanceMax;
+                          });
+                        }
+                      },
+                    ),
+                  ),
               ],
             ),
             _NaturalWeaponDamageEditWidget(
@@ -307,16 +365,21 @@ class _NaturalWeaponEditDialogState extends State<_NaturalWeaponEditDialog> {
           child: const Text('Annuler'),
         ),
         TextButton(
-          onPressed: ranges.isEmpty ? null : () {
+          onPressed: initiative.isEmpty ? null : () {
             if(!formKey.currentState!.validate()) return;
             var model = NaturalWeaponModel(
               name: nameController.text,
+              type: type!,
               special: capabilityController.text.isEmpty
                 ? null
                 : capabilityController.text,
               skill: skill,
+              initiative: initiative,
               damage: damage,
-              ranges: ranges,
+              distance: NaturalWeaponModelRangeSpecification(
+                effectiveDistance: distanceEffective,
+                maximumDistance: distanceMax,
+              ),
             );
             Navigator.of(context).pop(model);
           },
@@ -577,20 +640,16 @@ class _NaturalWeaponRangeEditWidget extends StatefulWidget {
   const _NaturalWeaponRangeEditWidget({
     required this.enabled,
     required this.range,
-    this.specification,
+    this.initiative,
     required this.onEnableChanged,
-    required this.onInitiativeChanged,
-    required this.onEffectiveDistanceChanged,
-    required this.onMaximumDistanceChanged,
+    required this.onChanged,
   });
 
   final bool enabled;
   final WeaponRange range;
-  final NaturalWeaponModelRangeSpecification? specification;
+  final int? initiative;
   final void Function(bool) onEnableChanged;
-  final void Function(int) onInitiativeChanged;
-  final void Function(double) onEffectiveDistanceChanged;
-  final void Function(double) onMaximumDistanceChanged;
+  final void Function(int) onChanged;
 
   @override
   State<_NaturalWeaponRangeEditWidget> createState() => _NaturalWeaponRangeEditWidgetState();
@@ -634,42 +693,12 @@ class _NaturalWeaponRangeEditWidgetState extends State<_NaturalWeaponRangeEditWi
           child: NumIntInputWidget(
             enabled: enabled,
             label: 'Initiative',
-            initialValue: widget.specification?.initiative ?? 0,
+            initialValue: widget.initiative ?? 0,
             minValue: -20,
             maxValue: 20,
-            onChanged: (int value) => widget.onInitiativeChanged(value),
+            onChanged: (int value) => widget.onChanged(value),
           ),
         ),
-        SizedBox(
-          width: 90,
-          child: NumDoubleInputWidget(
-            enabled: enabled,
-            label: widget.range == WeaponRange.ranged
-              ? 'Distance Eff.'
-              : 'Distance',
-            initialValue: widget.specification?.effectiveDistance ?? 0.0,
-            minValue: 0.0,
-            maxValue: 9999.0,
-            onChanged: (double value) {
-              widget.onEffectiveDistanceChanged(value);
-              if(widget.range != WeaponRange.ranged) {
-                widget.onMaximumDistanceChanged(value);
-              }
-            },
-          ),
-        ),
-        if(widget.range == WeaponRange.ranged)
-          SizedBox(
-            width: 90,
-            child: NumDoubleInputWidget(
-              enabled: enabled,
-              label: 'Distance Max.',
-              initialValue: widget.specification?.maximumDistance ?? 0.0,
-              minValue: 0.0,
-              maxValue: 99999.0,
-              onChanged: (double value) => widget.onMaximumDistanceChanged(value),
-            ),
-          ),
       ],
     );
   }

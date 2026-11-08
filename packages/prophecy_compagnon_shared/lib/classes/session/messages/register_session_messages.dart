@@ -11,6 +11,7 @@ import "package:prophecy_compagnon_shared/classes/session/messages/encounter/tur
 import "package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/set_combat_action.dart";
 import "package:prophecy_compagnon_shared/classes/session/messages/management/request_master.dart";
 import "package:prophecy_compagnon_shared/classes/session/messages/map/get_movement_path.dart";
+import "package:prophecy_compagnon_shared/classes/session/messages/map/select_target.dart";
 import "package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart";
 import "package:prophecy_compagnon_shared/classes/session/messages/set_state/board.dart";
 import "package:prophecy_compagnon_shared/classes/session/messages/set_state/ticker.dart";
@@ -82,6 +83,16 @@ void registerSessionMessages() {
   SessionMessage.registerSessionMessageJsonFactory(
     "SessionMapCancelGetMovementPath",
     (Map<String, dynamic> json) => SessionMapCancelGetMovementPath.fromJson(json),
+  );
+
+  SessionMessage.registerSessionMessageJsonFactory(
+    "SessionMapSelectTarget",
+    (Map<String, dynamic> json) => SessionMapSelectTarget.fromJson(json),
+  );
+
+  SessionMessage.registerSessionMessageJsonFactory(
+    "SessionMapCancelSelectTarget",
+    (Map<String, dynamic> json) => SessionMapCancelSelectTarget.fromJson(json),
   );
 
   SessionMessage.registerSessionMessageJsonFactory(

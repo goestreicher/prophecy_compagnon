@@ -103,30 +103,28 @@
     "natural_weapons": [
       {
         "name": "Bec",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 7,
         "damage": { "static": 12 }
       },
       {
         "name": "Serres",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 6,
         "damage": { "static": 9 }
@@ -254,30 +252,28 @@
     "natural_weapons": [
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 2,
         "damage": { "static": 4 }
       },
       {
         "name": "Ruade",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         },
         "skill": 3,
         "damage": { "static": 7 }
@@ -440,17 +436,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -464,17 +457,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         }
       }
     ],
@@ -640,17 +630,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -664,17 +651,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         }
       }
     ],
@@ -840,17 +824,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -864,17 +845,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         }
       }
     ],
@@ -986,15 +964,14 @@
     "natural_weapons": [
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 5,
         "damage": { "static": 9 }
@@ -1122,30 +1099,28 @@
     "natural_weapons": [
       {
         "name": "Griffes",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 2,
         "damage": { "static": 18 }
       },
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 3,
         "damage": { "static": 19 }
@@ -1263,15 +1238,14 @@
     "natural_weapons": [
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 7,
         "damage": { "static": 14 }
@@ -1391,30 +1365,28 @@
     "natural_weapons": [
       {
         "name": "Griffes",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 6,
         "damage": { "static": 15 }
       },
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 6,
         "damage": { "static": 23 }
@@ -1540,30 +1512,28 @@
     "natural_weapons": [
       {
         "name": "Griffes",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.25
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 6,
         "damage": { "static": 15 }
       },
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.0
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 6,
         "damage": { "static": 23 }
@@ -1689,30 +1659,28 @@
     "natural_weapons": [
       {
         "name": "Griffes",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 6,
         "damage": { "static": 15 }
       },
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.0
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 6,
         "damage": { "static": 23 }
@@ -1815,30 +1783,28 @@
     "natural_weapons": [
       {
         "name": "Défenses",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.1
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.2,
+          "maximum_distance": -0.2
         },
         "skill": 6,
         "damage": { "static": 18 }
       },
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.0
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.2,
+          "maximum_distance": -0.2
         },
         "skill": 7,
         "damage": { "static": 23 }
@@ -2417,30 +2383,28 @@
     "natural_weapons": [
       {
         "name": "Corne",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.35
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.7
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 7,
         "damage": { "static": 28 }
       },
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.35
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.7
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 6,
         "damage": { "static": 24 }
@@ -2559,30 +2523,28 @@
     "natural_weapons": [
       {
         "name": "Griffes",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.25
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 8,
         "damage": { "static": 16 }
       },
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.25
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         },
         "skill": 8,
         "damage": { "static": 18 }
@@ -2696,30 +2658,28 @@
     "natural_weapons": [
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.1
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 7,
         "damage": { "static": 11 }
       },
       {
         "name": "Queue",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.1,
+          "maximum_distance": 0.1
         },
         "skill": 6,
         "damage": { "static": 10 }
@@ -2838,15 +2798,14 @@
     "natural_weapons": [
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.35
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.7
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 8,
         "damage": { "static": 23 }
@@ -2961,30 +2920,28 @@
     "natural_weapons": [
       {
         "name": "Griffes",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.25
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 8,
         "damage": { "static": 18 }
       },
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.0
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 7,
         "damage": { "static": 22 }

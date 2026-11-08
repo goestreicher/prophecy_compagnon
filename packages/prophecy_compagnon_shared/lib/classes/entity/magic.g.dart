@@ -19,7 +19,9 @@ EntityMagic _$EntityMagicFromJson(Map<String, dynamic> json) => EntityMagic(
     (k, e) =>
         MapEntry($enumDecode(_$MagicSphereEnumMap, k), (e as num).toInt()),
   ),
-  spells: EntityMagicSpells.fromJson(json['spells'] as List),
+  spells: json['spells'] == null
+      ? null
+      : EntityMagicSpells.fromJson(json['spells'] as List),
 );
 
 Map<String, dynamic> _$EntityMagicToJson(

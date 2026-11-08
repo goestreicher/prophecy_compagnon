@@ -21,9 +21,10 @@ import 'package:json_annotation/json_annotation.dart';
 part 'combat_status.g.dart';
 
 enum EntityCombatStatusFlag {
-  none(value: 0, label: 'OK'),
-  onGround(value: 1 << 1, label: 'Au sol'),
-  grappled(value: 1 << 2, label: 'Saisi(e)'),
+  none(value:           0, label: 'OK'),
+  onGround(value:  1 << 1, label: 'Au sol'),
+  grappled(value:  1 << 2, label: 'Saisi(e)'),
+  grappling(value: 1 << 3, label: 'A saisi'),
   ;
 
   final int value;

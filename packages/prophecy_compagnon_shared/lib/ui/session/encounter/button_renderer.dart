@@ -16,30 +16,30 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
 
 class ActionConfigurationButtonRenderer extends StatelessWidget {
   const ActionConfigurationButtonRenderer({
     super.key,
     required this.action,
-    required this.actionConfiguration,
+    required this.initializer,
   });
 
   final SessionEncounterEntityAction action;
-  final ActionConfiguration actionConfiguration;
+  final ActionInitializer initializer;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
-        actionConfiguration.plan(action);
+        initializer.plan(context, action);
       },
-      icon: Icon(actionConfiguration.icon),
+      icon: Icon(initializer.icon),
       iconSize: 18.0,
       padding: const EdgeInsets.all(4.0),
       constraints: const BoxConstraints(),
-      tooltip: actionConfiguration.name,
+      tooltip: initializer.name,
     );
   }
 }

@@ -268,18 +268,19 @@ class Shield extends EquipableItem implements ProtectionProvider, DamageProvider
     );
   }
 
-  factory Shield.create({
-    required EquipmentModel model,
-    String? alias,
-    EquipmentQuality quality = EquipmentQuality.normal,
-    EquipmentMetal metal = EquipmentMetal.none,
-  }) => Shield(
-          const Uuid().v4().toString(),
-          model: model,
-          alias: alias,
-          quality: quality,
-          metal: metal,
-        );
+  Shield.create({
+    required super.model,
+    super.alias,
+    super.quality,
+    super.metal,
+  })
+    : _uuid = const Uuid().v4().toString();
+
+  factory Shield.fromJson(Map<String, dynamic> json) {
+    var ret = (EquipmentFactory.instance.forgeEquipment(json['type'], json: json) as Shield);
+    ret.restoreFromJson(json);
+    return ret;
+  }
 
   final String _uuid;
 

@@ -35,6 +35,7 @@ WeaponModel _$WeaponModelFromJson(Map<String, dynamic> json) => WeaponModel(
   requirements: (json['requirements'] as Map<String, dynamic>).map(
     (k, e) => MapEntry($enumDecode(_$AbilityEnumMap, k), (e as num).toInt()),
   ),
+  type: $enumDecode(_$WeaponRangeEnumMap, json['type']),
   initiative: (json['initiative'] as Map<String, dynamic>).map(
     (k, e) =>
         MapEntry($enumDecode(_$WeaponRangeEnumMap, k), (e as num).toInt()),
@@ -83,6 +84,7 @@ Map<String, dynamic> _$WeaponModelToJson(WeaponModel instance) =>
       'requirements': instance.requirements.map(
         (k, e) => MapEntry(_$AbilityEnumMap[k]!, e),
       ),
+      'type': _$WeaponRangeEnumMap[instance.type]!,
       'initiative': instance.initiative.map(
         (k, e) => MapEntry(_$WeaponRangeEnumMap[k]!, e),
       ),

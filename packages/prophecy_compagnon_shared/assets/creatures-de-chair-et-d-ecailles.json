@@ -45,7 +45,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 1.6,
     "skills": {
       "families": {
         "combat": {
@@ -150,17 +150,14 @@
           "add": 8,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -174,17 +171,14 @@
           "add": 10,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -249,7 +243,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 1.4,
     "skills": {
       "families": {
         "combat": {
@@ -354,17 +348,14 @@
           "add": 4,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.5,
+          "maximum_distance": -0.5
         }
       },
       {
@@ -378,17 +369,14 @@
           "add": 2,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.5,
+          "maximum_distance": -0.5
         }
       }
     ],
@@ -981,17 +969,14 @@
           "add": 3,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.15,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.3,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.1,
+          "maximum_distance": -0.1
         }
       },
       {
@@ -1005,17 +990,14 @@
           "add": 6,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         }
       }
     ],
@@ -1190,17 +1172,14 @@
           "add": 6,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 2,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 2,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         }
       },
       {
@@ -1214,17 +1193,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -1238,17 +1214,14 @@
           "add": 12,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.5,
-            "maximum_distance": 0.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 1,
-            "maximum_distance": 1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.4,
+          "maximum_distance": 0.4
         }
       }
     ],
@@ -1484,7 +1457,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 0.4,
     "skills": {
       "families": {
         "combat": {
@@ -1601,12 +1574,13 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 2,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 2
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -1667,7 +1641,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 0.4,
     "skills": {
       "families": {
         "combat": {
@@ -1956,17 +1930,14 @@
           "add": 1,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2,
-            "maximum_distance": 0.2
-          },
-          "melee": {
-            "initiative": 2,
-            "effective_distance": 0.2,
-            "maximum_distance": 0.2
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -2406,17 +2377,14 @@
           "add": 12,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 2,
-            "effective_distance": 1,
-            "maximum_distance": 1
-          },
-          "melee": {
-            "initiative": 2,
-            "effective_distance": 1,
-            "maximum_distance": 1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 2,
+          "melee": 2
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         }
       },
       {
@@ -2430,12 +2398,14 @@
           "add": 14,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.5,
-            "maximum_distance": 0.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.3,
+          "maximum_distance": -0.3
         }
       }
     ],
@@ -2605,17 +2575,14 @@
           "add": 8,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -2629,17 +2596,14 @@
           "add": 5,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3,
-            "maximum_distance": 0.3
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.3,
-            "maximum_distance": 0.3
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -2812,17 +2776,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -2836,17 +2797,14 @@
           "add": 2,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -2907,7 +2865,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 0.4,
     "skills": {
       "families": {
         "combat": {
@@ -3022,17 +2980,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -3046,17 +3001,14 @@
           "add": 1,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.1,
-            "maximum_distance": 0.1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -3123,7 +3075,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 1.4,
     "skills": {
       "families": {
         "combat": {
@@ -3249,12 +3201,13 @@
           "add": 9,
           "dice": 0
         },
-        "ranges": {
-          "melee": {
-            "initiative": 4,
-            "effective_distance": 20,
-            "maximum_distance": 20
-          }
+        "type": "melee",
+        "initiative": {
+          "melee": 4
+        },
+        "distance": {
+          "effective_distance": 20.0,
+          "maximum_distance": 20.0
         }
       },
       {
@@ -3268,17 +3221,14 @@
           "add": 9,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 3,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 1,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 3,
+          "melee": 1
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -3434,17 +3384,14 @@
           "add": 6,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -3610,17 +3557,14 @@
           "add": 12,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 3,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 1,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 3,
+          "melee": 1
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -3634,17 +3578,14 @@
           "add": 14,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 2,
-            "effective_distance": 0.3,
-            "maximum_distance": 0.3
-          },
-          "melee": {
-            "initiative": -1,
-            "effective_distance": 0.6,
-            "maximum_distance": 0.6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 2,
+          "melee": -1
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         }
       }
     ],
@@ -3701,7 +3642,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 0.6,
     "skills": {
       "families": {
         "combat": {
@@ -4063,7 +4004,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 1.2,
     "skills": {
       "families": {
         "combat": {
@@ -4166,17 +4107,14 @@
           "add": 10,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -4352,17 +4290,14 @@
           "add": 8,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.5,
-            "maximum_distance": 0.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 1,
-            "maximum_distance": 1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -4376,17 +4311,14 @@
           "add": 6,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.5,
-            "maximum_distance": 0.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 1,
-            "maximum_distance": 1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -4400,17 +4332,14 @@
           "add": 12,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.6,
-            "maximum_distance": 0.6
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6,
-            "maximum_distance": 0.6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -4573,17 +4502,14 @@
           "add": 3,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 1,
-            "effective_distance": 2,
-            "maximum_distance": 2
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 1
+        },
+        "distance": {
+          "effective_distance": 1.6,
+          "maximum_distance": 1.6
         }
       },
       {
@@ -4597,12 +4523,13 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "ranged": {
-            "initiative": 3,
-            "effective_distance": 8,
-            "maximum_distance": 16
-          }
+        "type": "ranged",
+        "initiative": {
+          "ranged": 3
+        },
+        "distance": {
+          "effective_distance": 8.0,
+          "maximum_distance": 16.0
         }
       }
     ],
@@ -4775,17 +4702,14 @@
           "add": 8,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -4799,17 +4723,14 @@
           "add": 20,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -4980,17 +4901,14 @@
           "add": 0,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.5,
-            "maximum_distance": 0.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 1,
-            "maximum_distance": 1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -5183,17 +5101,14 @@
           "add": 6,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.5,
-            "maximum_distance": 0.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.5,
-            "maximum_distance": 0.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -5207,17 +5122,14 @@
           "add": 12,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -5274,7 +5186,7 @@
         "injuries": {}
       }
     },
-    "size": 1.2,
+    "size": 1.6,
     "skills": {
       "families": {
         "combat": {
@@ -5389,17 +5301,14 @@
           "add": 8,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -5413,17 +5322,14 @@
           "add": 2,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.8,
-            "maximum_distance": 0.8
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -5437,17 +5343,14 @@
           "add": 4,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.5,
-            "maximum_distance": 0.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 1,
-            "maximum_distance": 1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         }
       }
     ],
@@ -5618,12 +5521,14 @@
           "add": 8,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -5637,12 +5542,13 @@
           "add": 10,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": -2,
-            "effective_distance": 0.4,
-            "maximum_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": -2
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],

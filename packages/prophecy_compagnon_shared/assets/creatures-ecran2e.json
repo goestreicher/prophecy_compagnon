@@ -96,15 +96,14 @@
     "natural_weapons": [
       {
         "name": "Morsure",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.4,
+          "maximum_distance": -0.4
         },
         "skill": 3,
         "damage": { "static": 3 }
@@ -134,7 +133,7 @@
     "biome": "Chaînes de montagne de moyenne altitude, régions volcaniques",
     "real_size": "1m20 d'envergure",
     "weight": "10 kg",
-    "size": 0.7,
+    "size": 0.6,
     "abilities": {
       "force":        5,
       "intelligence": 5,
@@ -226,15 +225,14 @@
     "natural_weapons": [
       {
         "name": "Bec",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.15
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.3
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 5,
         "damage": { "static": 13 },
@@ -242,15 +240,14 @@
       },
       {
         "name": "Serres",
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.15
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.3
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         },
         "skill": 7,
         "damage": { "static": 11 },

@@ -17,12 +17,18 @@
 
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_position_status.dart';
 
 void executeRankAction(CombatAction action) {
   switch(action.type) {
+    case CombatActionType.attack:
+      // TODO: implement
+      throw(UnimplementedError());
+    case CombatActionType.defense:
+      // Nothing to do for actions used for defense, they've already been resolved
+      break;
     case CombatActionType.effect:
       // Nothing to do here, effects are managed below
       break;

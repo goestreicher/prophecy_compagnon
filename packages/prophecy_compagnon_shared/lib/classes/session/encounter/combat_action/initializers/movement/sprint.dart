@@ -16,11 +16,26 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
+import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/descriptions/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/action/dice_throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/assign_combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/get_usable_actions.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/set_combat_action.dart';
@@ -28,23 +43,23 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/map/get_movem
 import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/movement_path_result.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
 
-class ActionConfigurationMovementRun extends ActionConfiguration {
-  ActionConfigurationMovementRun();
-
-  @override
-  String get name => CombatActionMovementType.run.title;
+class ActionInitializerMovementSprint extends ActionInitializer {
+  ActionInitializerMovementSprint();
 
   @override
-  IconData get icon => CombatActionMovementType.run.icon;
+  String get name => CombatActionMovementType.sprint.title;
 
   @override
-  Future<void> plan(SessionEncounterEntityAction action) async {
-    await guardPlan(action, _doPlan);
+  IconData get icon => CombatActionMovementType.sprint.icon;
+
+  @override
+  Future<void> plan(BuildContext context, SessionEncounterEntityAction action) async {
+    await guardPlan(context, action, _doPlan);
   }
 
-  Future<void> _doPlan(SessionEncounterEntityAction action) async {
+  Future<void> _doPlan(BuildContext context, SessionEncounterEntityAction action) async {
     var messageBus = SessionMessageBusClient.instance;
     if(messageBus == null) {
       // TODO: display a message
@@ -52,8 +67,92 @@ class ActionConfigurationMovementRun extends ActionConfiguration {
     }
 
     var assignedActions = <SessionEncounterEntityAction>[];
+    double distanceMultiplier;
 
     if(action.stage == SessionEncounterEntityActionStage.none) {
+      var controllingClient = messageBus.clientControlling(action.entity.id);
+
+      // TODO: request the difficulty from master
+      var difficulty = 15;
+      var request = DiceThrowRequest(
+        type: DiceThrowRequestType.simple,
+        context: DiceThrowRequestContext.none,
+        difficulty: difficulty,
+        base: DiceThrowEntityBaseSkill(
+          attribute: Attribute.physique,
+          ability: Ability.force,
+          skill: Skill.athletisme,
+        )
+      );
+
+      var diceThrowResponse = await messageBus.publishAndWaitForResponse(
+        SessionActionDiceThrowRequestMessage(
+          destination: controllingClient,
+          entityId: action.entity.id,
+          request: request,
+        )
+      );
+
+      if(diceThrowResponse.status != SessionMessageResponseStatus.accepted) {
+        // TODO: display a nice message ?
+        return;
+      }
+
+      if(diceThrowResponse.data is! EntityThrowBundle) {
+        // TODO: display a nice message ?
+        return;
+      }
+
+      var bundle = diceThrowResponse.data as EntityThrowBundle;
+
+      // TODO: manage duration
+      var evaluation = evaluateDiceThrow(bundle);
+
+      GameSession.instance!.diceThrowHistory.add(
+        DiceThrowHistoryEntry(
+          actor: bundle.entity,
+          request: bundle.request,
+          evaluation: evaluation,
+        )
+      );
+
+      if(evaluation.criticalType == DiceThrowResultType.criticalFail) {
+        var setResponse = await messageBus.publishAndWaitForResponse(
+          SessionEncounterTurnSetCombatActionMessage(
+            destination: SessionMessage.masterIdentifier,
+            actionUuid: action.uuid,
+            combatAction: CombatActionEffect(
+              entityId: action.entity.id,
+              rank: action.rank,
+              effects: [
+                SessionEntityAddEffectMessage(
+                  broadcastIncludesSelf: true,
+                  entityId: action.entity.id,
+                  effect: EntityEffectCombatStatus(
+                    name: 'Au sol',
+                    trigger: EntityEffectTrigger.once,
+                    status: EntityCombatStatusFlag.onGround,
+                  ),
+                ),
+              ]
+            )
+          )
+        );
+
+        if(setResponse.status != SessionMessageResponseStatus.accepted) {
+          // TODO: display a message
+          return;
+        }
+
+        return;
+      }
+      else if(evaluation.resultType == DiceThrowResultType.fail) {
+        distanceMultiplier = 3.0;
+      }
+      else {
+        distanceMultiplier = 5.0;
+      }
+
       var usableActionsResponse = await messageBus.publishAndWaitForResponse(
         SessionEncounterTurnGetUsableActions(
           destination: SessionMessage.masterIdentifier,
@@ -80,7 +179,7 @@ class ActionConfigurationMovementRun extends ActionConfiguration {
                 entityId: a.entity.id,
                 rank: a.rank,
                 movementType: CombatActionMovementType.run,
-                distanceMultiplier: 2.0,
+                distanceMultiplier: distanceMultiplier,
               ),
             )
           );
@@ -94,6 +193,9 @@ class ActionConfigurationMovementRun extends ActionConfiguration {
         }
       }
     }
+    else {
+      distanceMultiplier = (action.combatAction! as CombatActionMovement).distanceMultiplier;
+    }
 
     var controllingClient = messageBus.clientControlling(action.entity.id);
 
@@ -101,7 +203,7 @@ class ActionConfigurationMovementRun extends ActionConfiguration {
       SessionMapGetMovementPath(
         destination: controllingClient,
         entityId: action.entity.id,
-        distanceMultiplier: 2.0,
+        distanceMultiplier: distanceMultiplier,
         waitResponseTimeout: 60,
       ),
     );
@@ -150,7 +252,7 @@ class ActionConfigurationMovementRun extends ActionConfiguration {
         actionUuid: action.uuid,
         combatAction: CombatActionMovement(
           movementType: CombatActionMovementType.run,
-          distanceMultiplier: 2.0,
+          distanceMultiplier: distanceMultiplier,
           rank: action.rank,
           mapId: r.mapId,
           entityId: action.entity.id,

@@ -16,6 +16,7 @@
  */
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/session_encounter_turn.dart';
 
 part 'select_actions.g.dart';
@@ -33,6 +34,7 @@ class SessionEncounterTurnSelectActions extends SessionEncounterTurnMessage {
     this.allowEmptySelection = false,
     this.usableOnly = true,
     this.showWeakHandAction = true,
+    this.usage,
   })
     : super(hasResponse: true, waitResponseTimeout: 60);
 
@@ -44,6 +46,7 @@ class SessionEncounterTurnSelectActions extends SessionEncounterTurnMessage {
   final bool allowEmptySelection;
   final bool usableOnly;
   final bool showWeakHandAction;
+  final CombatActionType? usage;
 
   @override
   Map<String, dynamic> sessionMessageToJson() =>

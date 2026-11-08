@@ -17,59 +17,29 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/turn.dart';
 
 class SessionEncounterTurnSelectActionDialog extends StatefulWidget {
   const SessionEncounterTurnSelectActionDialog({
     super.key,
     required this.description,
-    required this.turn,
-    required this.entityId,
-    this.excludedActionUuids = const <String>[],
+    required this.availableActions,
     this.multiselect = false,
     this.selectRange = false,
     this.allowEmptySelection = false,
-    this.usableOnly = true,
-    this.showWeakHandAction = true,
   });
 
   final String description;
-  final SessionEncounterTurn turn;
-  final String entityId;
-  final List<String> excludedActionUuids;
+  final List<SessionEncounterEntityAction> availableActions;
   final bool multiselect;
   final bool selectRange;
   final bool allowEmptySelection;
-  final bool usableOnly;
-  final bool showWeakHandAction;
 
   @override
   State<SessionEncounterTurnSelectActionDialog> createState() => _SessionEncounterTurnSelectActionDialogState();
 }
 
 class _SessionEncounterTurnSelectActionDialogState extends State<SessionEncounterTurnSelectActionDialog> {
-  late final List<SessionEncounterEntityAction> sorted;
   final List<SessionEncounterEntityAction> selected = <SessionEncounterEntityAction>[];
-
-  @override
-  void initState() {
-    super.initState();
-
-    Iterable<SessionEncounterEntityAction> actionsIterable;
-    if(widget.usableOnly) {
-      actionsIterable = widget.turn.filteredActions((SessionEncounterEntityAction a) => a.stage == SessionEncounterEntityActionStage.none);
-    }
-    else {
-      actionsIterable = widget.turn.actions;
-    }
-
-    sorted = actionsIterable
-      .where((SessionEncounterEntityAction a) => a.entity.id == widget.entityId)
-      .where((SessionEncounterEntityAction a) => !widget.excludedActionUuids.contains(a.uuid))
-      .where((SessionEncounterEntityAction a) => widget.showWeakHandAction || !a.weakHand)
-      .toList()
-      ..sort((SessionEncounterEntityAction a, SessionEncounterEntityAction b) => b.rank - a.rank);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +57,7 @@ class _SessionEncounterTurnSelectActionDialogState extends State<SessionEncounte
             Row(
               spacing: 12.0,
               children: [
-                for(var (i, a) in sorted.indexed)
+                for(var (i, a) in widget.availableActions.indexed)
                   _ActionPill(
                     rank: a.rank,
                     selected: selected.contains(a),
@@ -101,7 +71,7 @@ class _SessionEncounterTurnSelectActionDialogState extends State<SessionEncounte
                           }
                           else {
                             selected.clear();
-                            selected.addAll(sorted.getRange(0, i + 1));
+                            selected.addAll(widget.availableActions.getRange(0, i + 1));
                           }
                         });
                       }
@@ -138,7 +108,7 @@ class _SessionEncounterTurnSelectActionDialogState extends State<SessionEncounte
           child: const Text('Annuler'),
         ),
         ElevatedButton(
-          onPressed: selected.isEmpty ? null : () {
+          onPressed: (selected.isEmpty && !widget.allowEmptySelection) ? null : () {
             Navigator.of(context, rootNavigator: true).pop(selected);
           },
           style: ElevatedButton.styleFrom(

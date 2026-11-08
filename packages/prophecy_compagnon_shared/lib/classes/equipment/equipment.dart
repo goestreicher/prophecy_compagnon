@@ -393,9 +393,9 @@ abstract mixin class SupportsEquipableItem {
   }
 
   bool isEquiped(EquipableItem item) {
-    for(var bp in equiped.keys) {
-      for(var layer in equiped[bp]!.keys) {
-        if(equiped[bp]![layer]!.contains(item)) {
+    for(var bp in _equiped.keys) {
+      for(var layer in _equiped[bp]!.keys) {
+        if(_equiped[bp]![layer]!.contains(item)) {
           return true;
         }
       }
@@ -410,37 +410,37 @@ abstract mixin class SupportsEquipableItem {
       for(var realBp in EquipableItemSlot.slotsFor(eit.slot)) {
         if(realBp == EquipableItemSlot.hands) {
           if(eit.handiness == 2) {
-            if(equiped[realBp] == null) {
-              equiped[realBp] = <EquipableItemLayer, List<EquipableItem>>{};
+            if(_equiped[realBp] == null) {
+              _equiped[realBp] = <EquipableItemLayer, List<EquipableItem>>{};
             }
-            if(equiped[realBp]![eit.layer] == null) {
-              equiped[realBp]![eit.layer] = <EquipableItem>[];
+            if(_equiped[realBp]![eit.layer] == null) {
+              _equiped[realBp]![eit.layer] = <EquipableItem>[];
             }
-            if(!equiped[realBp]![eit.layer]!.contains(item)) {
-              equiped[realBp]![eit.layer]!.add(item);
+            if(!_equiped[realBp]![eit.layer]!.contains(item)) {
+              _equiped[realBp]![eit.layer]!.add(item);
             }
           }
           else if(eit.handiness == 1) {
-            if(equiped[target] == null) {
-              equiped[target] = <EquipableItemLayer, List<EquipableItem>>{};
+            if(_equiped[target] == null) {
+              _equiped[target] = <EquipableItemLayer, List<EquipableItem>>{};
             }
-            if(equiped[target]![eit.layer] == null) {
-              equiped[target]![eit.layer] = <EquipableItem>[];
+            if(_equiped[target]![eit.layer] == null) {
+              _equiped[target]![eit.layer] = <EquipableItem>[];
             }
-            if(!equiped[target]![eit.layer]!.contains(item)) {
-              equiped[target]![eit.layer]!.add(item);
+            if(!_equiped[target]![eit.layer]!.contains(item)) {
+              _equiped[target]![eit.layer]!.add(item);
             }
           }
         }
         else {
-          if (equiped[realBp] == null) {
-            equiped[realBp] = <EquipableItemLayer, List<EquipableItem>>{};
+          if (_equiped[realBp] == null) {
+            _equiped[realBp] = <EquipableItemLayer, List<EquipableItem>>{};
           }
-          if(equiped[realBp]![eit.layer] == null) {
-            equiped[realBp]![eit.layer] = <EquipableItem>[];
+          if(_equiped[realBp]![eit.layer] == null) {
+            _equiped[realBp]![eit.layer] = <EquipableItem>[];
           }
-          if(!equiped[realBp]![eit.layer]!.contains(item)) {
-            equiped[realBp]![eit.layer]!.add(item);
+          if(!_equiped[realBp]![eit.layer]!.contains(item)) {
+            _equiped[realBp]![eit.layer]!.add(item);
           }
         }
       }
@@ -454,25 +454,25 @@ abstract mixin class SupportsEquipableItem {
     var itemsToDesequip = <EquipableItem>[];
 
     if(target == EquipableItemSlot.dominantHand || target == EquipableItemSlot.weakHand) {
-      if(equiped.containsKey(target) && equiped[target]![eit.layer] != null) {
-        itemsToDesequip.addAll(equiped[target]![eit.layer]!);
+      if(_equiped.containsKey(target) && _equiped[target]![eit.layer] != null) {
+        itemsToDesequip.addAll(_equiped[target]![eit.layer]!);
       }
     }
 
     for(var realBp in EquipableItemSlot.slotsFor(eit.slot)) {
       if(target == EquipableItemSlot.hands) {
         for(var bp in [EquipableItemSlot.dominantHand, EquipableItemSlot.weakHand]) {
-          if(equiped.containsKey(bp) && equiped[bp]![eit.layer] != null) {
-            itemsToDesequip.addAll(equiped[bp]![eit.layer]!);
+          if(_equiped.containsKey(bp) && _equiped[bp]![eit.layer] != null) {
+            itemsToDesequip.addAll(_equiped[bp]![eit.layer]!);
           }
         }
       }
       else if(
-          equiped.containsKey(realBp)
-          && equiped[realBp]![eit.layer] != null
-          && equiped[realBp]![eit.layer]!.length >= realBp.slots
+          _equiped.containsKey(realBp)
+          && _equiped[realBp]![eit.layer] != null
+          && _equiped[realBp]![eit.layer]!.length >= realBp.slots
       ) {
-        itemsToDesequip.add(equiped[realBp]![eit.layer]![0]);
+        itemsToDesequip.add(_equiped[realBp]![eit.layer]![0]);
       }
     }
 
@@ -488,11 +488,11 @@ abstract mixin class SupportsEquipableItem {
 
   void unequip(EquipableItem item) {
     if(isEquiped(item)) {
-      for(var bp in equiped.keys) {
-        for(var layer in equiped[bp]!.values) {
+      for(var bp in _equiped.keys) {
+        for(var layer in _equiped[bp]!.values) {
           layer.removeWhere((e) => e == item);
         }
-        equiped[bp]!.removeWhere((k, v) => v.isEmpty);
+        _equiped[bp]!.removeWhere((k, v) => v.isEmpty);
       }
 
       item.unequiped(this);
@@ -500,26 +500,36 @@ abstract mixin class SupportsEquipableItem {
     }
   }
 
+  List<EquipableItem> equiped() {
+    var ret = <EquipableItem>[];
+    for(var slot in _equiped.keys) {
+      for(var layer in _equiped[slot]!.keys) {
+        ret.addAll(_equiped[slot]![layer]!);
+      }
+    }
+    return ret;
+  }
+
   List<EquipableItem> equipedForSlot(EquipableItemSlot slot) {
     var ret = <EquipableItem>[];
-    for(var layer in equiped[slot]?.keys ?? <EquipableItemLayer>[]) {
-      ret.addAll(equiped[slot]![layer]!);
+    for(var layer in _equiped[slot]?.keys ?? <EquipableItemLayer>[]) {
+      ret.addAll(_equiped[slot]![layer]!);
     }
     return ret;
   }
 
   List<EquipableItem> equipedForSlotAndLayer(EquipableItemSlot slot, EquipableItemLayer layer) =>
-    equiped[slot]?[layer] ?? <EquipableItem>[];
+    _equiped[slot]?[layer] ?? <EquipableItem>[];
 
   bool isSlotFree(EquipableItemSlot slot, EquipableItemLayer layer) {
-    if(!equiped.containsKey(slot)) return true;
-    if(!equiped[slot]!.containsKey(layer)) return true;
-    if(equiped[slot]![layer]!.length < slot.slots) return true;
+    if(!_equiped.containsKey(slot)) return true;
+    if(!_equiped[slot]!.containsKey(layer)) return true;
+    if(_equiped[slot]![layer]!.length < slot.slots) return true;
     return false;
   }
 
   @JsonKey(includeToJson: false, includeFromJson: false)
-  Map<EquipableItemSlot, Map<EquipableItemLayer, List<EquipableItem>>> equiped =
+  final Map<EquipableItemSlot, Map<EquipableItemLayer, List<EquipableItem>>> _equiped =
     <EquipableItemSlot, Map<EquipableItemLayer, List<EquipableItem>>>{};
 
   Map<String, dynamic> toJson() => _$SupportsEquipableItemToJson(this);

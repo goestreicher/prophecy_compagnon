@@ -16,18 +16,24 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/weapon.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_description.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/attack/weapon.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/movement/get_up.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/movement/run.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/movement/simple.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/movement/sprint.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/finder.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/delay_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/button_renderer.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/instantiate.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/menu_renderer.dart';
+import 'package:prophecy_compagnon_shared/ui/session/encounter/button_renderer.dart';
+import 'package:prophecy_compagnon_shared/ui/session/encounter/menu_renderer.dart';
 
 class TurnActionWidget extends StatelessWidget {
   const TurnActionWidget({
@@ -122,14 +128,68 @@ class TurnActionWidget extends StatelessWidget {
               )
             );
 
-            if(action.canBeUsedFor(CombatActionType.movement)) {
-              var descriptions = action.entity.availableActionsForType(CombatActionType.movement);
-              if(descriptions.isNotEmpty) {
+            if(action.entity.canAct()) {
+              var initializers = <ActionInitializer>[];
+
+              /*
+                  Movement actions
+               */
+              if(action.entity.canMove()) {
+                initializers.addAll([
+                  ActionInitializerMovementSimple(),
+                  ActionInitializerMovementRun(),
+                  ActionInitializerMovementSprint(),
+                ]);
+              }
+              else if(
+                  action.entity.combatStatus.has(EntityCombatStatusFlag.onGround)
+                  && !action.entity.combatStatus.has(EntityCombatStatusFlag.grappled)
+              ) {
+                initializers.add(
+                  ActionInitializerMovementGetUp(),
+                );
+              }
+
+              if(initializers.isNotEmpty) {
                 bottomRow.add(
                   _ActionTypeMenu(
                     type: CombatActionType.movement,
                     action: action,
-                    items: descriptions,
+                    items: initializers,
+                    actionBuildContext: context,
+                  )
+                );
+              }
+
+              /*
+                  Attack actions
+               */
+              initializers.clear();
+              EquipableItemSlot hand;
+              if(action.weakHand) {
+                hand = EquipableItemSlot.weakHand;
+              }
+              else {
+                hand = EquipableItemSlot.dominantHand;
+              }
+
+              for(var dp in action.entity.damageProviderForHand(hand)) {
+                if(dp is! Weapon) {
+                  continue;
+                }
+
+                initializers.add(
+                  ActionInitializerWeapon(weapon: dp)
+                );
+              }
+
+              if(initializers.isNotEmpty) {
+                bottomRow.add(
+                  _ActionTypeMenu(
+                    type: CombatActionType.attack,
+                    action: action,
+                    items: initializers,
+                    actionBuildContext: context,
                   )
                 );
               }
@@ -145,11 +205,9 @@ class TurnActionWidget extends StatelessWidget {
           }
         }
         else if (action.stage == SessionEncounterEntityActionStage.assigned) {
-          var actionDescription = action.combatAction == null
-              ? null
-              : actionDescriptionForCombatAction(action.combatAction!);
+          var initializer = action.combatAction?.initializer();
 
-          if(actionDescription == null) {
+          if(initializer == null) {
             // TODO: propose to un-assign the action
             // Though some actions (effect) are without CombatActionDescription,
             // but in this case we shouldn't be in this branch
@@ -165,7 +223,7 @@ class TurnActionWidget extends StatelessWidget {
                   ),
                   ActionConfigurationButtonRenderer(
                     action: action,
-                    actionConfiguration: instantiateActionConfiguration(actionDescription)!,
+                    initializer: initializer,
                   )
                 ],
               )
@@ -210,11 +268,13 @@ class _ActionTypeMenu extends StatelessWidget {
     required this.type,
     required this.action,
     required this.items,
+    required this.actionBuildContext,
   });
 
   final CombatActionType type;
   final SessionEncounterEntityAction action;
-  final List<CombatActionDescription> items;
+  final List<ActionInitializer> items;
+  final BuildContext actionBuildContext;
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +283,8 @@ class _ActionTypeMenu extends StatelessWidget {
         for(var i in items)
           ActionConfigurationMenuRenderer(
             action: action,
-            actionConfiguration: instantiateActionConfiguration(i)!,
+            initializer: i,
+            actionBuildContext: actionBuildContext,
           ),
       ],
       builder: (BuildContext context, MenuController controller, Widget? child) {

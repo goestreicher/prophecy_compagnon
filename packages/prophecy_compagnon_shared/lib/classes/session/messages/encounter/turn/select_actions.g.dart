@@ -24,6 +24,7 @@ SessionEncounterTurnSelectActions _$SessionEncounterTurnSelectActionsFromJson(
         allowEmptySelection: json['allow_empty_selection'] as bool? ?? false,
         usableOnly: json['usable_only'] as bool? ?? true,
         showWeakHandAction: json['show_weak_hand_action'] as bool? ?? true,
+        usage: $enumDecodeNullable(_$CombatActionTypeEnumMap, json['usage']),
       )
       ..hasResponse = json['has_response'] as bool
       ..waitResponseTimeout = (json['wait_response_timeout'] as num?)?.toInt()
@@ -45,4 +46,12 @@ Map<String, dynamic> _$SessionEncounterTurnSelectActionsToJson(
   'allow_empty_selection': instance.allowEmptySelection,
   'usable_only': instance.usableOnly,
   'show_weak_hand_action': instance.showWeakHandAction,
+  'usage': _$CombatActionTypeEnumMap[instance.usage],
+};
+
+const _$CombatActionTypeEnumMap = {
+  CombatActionType.attack: 'attack',
+  CombatActionType.defense: 'defense',
+  CombatActionType.effect: 'effect',
+  CombatActionType.movement: 'movement',
 };

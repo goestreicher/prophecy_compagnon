@@ -9,7 +9,6 @@ part of 'creature.dart';
 NaturalWeaponModelRangeSpecification
 _$NaturalWeaponModelRangeSpecificationFromJson(Map<String, dynamic> json) =>
     NaturalWeaponModelRangeSpecification(
-      initiative: (json['initiative'] as num).toInt(),
       effectiveDistance: (json['effective_distance'] as num).toDouble(),
       maximumDistance: (json['maximum_distance'] as num?)?.toDouble(),
     );
@@ -17,7 +16,6 @@ _$NaturalWeaponModelRangeSpecificationFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$NaturalWeaponModelRangeSpecificationToJson(
   NaturalWeaponModelRangeSpecification instance,
 ) => <String, dynamic>{
-  'initiative': instance.initiative,
   'effective_distance': instance.effectiveDistance,
   'maximum_distance': instance.maximumDistance,
 };
@@ -30,13 +28,13 @@ NaturalWeaponModel _$NaturalWeaponModelFromJson(Map<String, dynamic> json) =>
       damage: AttributeBasedCalculator.fromJson(
         json['damage'] as Map<String, dynamic>,
       ),
-      ranges: (json['ranges'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(
-          $enumDecode(_$WeaponRangeEnumMap, k),
-          NaturalWeaponModelRangeSpecification.fromJson(
-            e as Map<String, dynamic>,
-          ),
-        ),
+      type: $enumDecode(_$WeaponRangeEnumMap, json['type']),
+      initiative: (json['initiative'] as Map<String, dynamic>).map(
+        (k, e) =>
+            MapEntry($enumDecode(_$WeaponRangeEnumMap, k), (e as num).toInt()),
+      ),
+      distance: NaturalWeaponModelRangeSpecification.fromJson(
+        json['distance'] as Map<String, dynamic>,
       ),
     );
 
@@ -46,9 +44,11 @@ Map<String, dynamic> _$NaturalWeaponModelToJson(NaturalWeaponModel instance) =>
       'special': instance.special,
       'skill': instance.skill,
       'damage': instance.damage.toJson(),
-      'ranges': instance.ranges.map(
-        (k, e) => MapEntry(_$WeaponRangeEnumMap[k]!, e.toJson()),
+      'type': _$WeaponRangeEnumMap[instance.type]!,
+      'initiative': instance.initiative.map(
+        (k, e) => MapEntry(_$WeaponRangeEnumMap[k]!, e),
       ),
+      'distance': instance.distance.toJson(),
     };
 
 const _$WeaponRangeEnumMap = {
@@ -148,16 +148,20 @@ Creature _$CreatureFromJson(Map<String, dynamic> json) =>
             : EntityCombatStatus.fromJson(
                 json['combat_status'] as Map<String, dynamic>,
               ),
-        equipment: EntityEquipment.fromJson(json['equipment'] as List),
+        equipment: json['equipment'] == null
+            ? null
+            : EntityEquipment.fromJson(json['equipment'] as List),
         money: json['money'] == null
             ? null
             : MoneyWallet.fromJson(json['money'] as Map<String, dynamic>),
         magic: json['magic'] == null
             ? null
             : EntityMagic.fromJson(json['magic'] as Map<String, dynamic>),
-        favors: EntityDraconicFavors.fromJson(
-          EntityDraconicFavors.readFavorsFromJson(json, 'favors') as List,
-        ),
+        favors: EntityDraconicFavors.readFavorsFromJson(json, 'favors') == null
+            ? null
+            : EntityDraconicFavors.fromJson(
+                EntityDraconicFavors.readFavorsFromJson(json, 'favors') as List,
+              ),
         effects: EntityEffects.fromJson(json['effects'] as List?),
       )
       ..abilities = EntityAbilities.fromJson(

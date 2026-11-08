@@ -17,18 +17,18 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/descriptions/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/set_combat_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/map/get_movement_path.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/movement_path_result.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
-import 'package:prophecy_compagnon_shared/ui/session/encounter/action_configuration/action_configuration.dart';
 
-class ActionConfigurationMovementSimple extends ActionConfiguration {
-  ActionConfigurationMovementSimple();
+class ActionInitializerMovementSimple extends ActionInitializer {
+  ActionInitializerMovementSimple();
 
   @override
   String get name => CombatActionMovementType.simple.title;
@@ -37,11 +37,11 @@ class ActionConfigurationMovementSimple extends ActionConfiguration {
   IconData get icon => CombatActionMovementType.simple.icon;
 
   @override
-  Future<void> plan(SessionEncounterEntityAction action) async {
-    await guardPlan(action, _doPlan);
+  Future<void> plan(BuildContext context, SessionEncounterEntityAction action) async {
+    await guardPlan(context, action, _doPlan);
   }
 
-  Future<void> _doPlan(SessionEncounterEntityAction action) async {
+  Future<void> _doPlan(BuildContext context, SessionEncounterEntityAction action) async {
     var messageBus = SessionMessageBusClient.instance;
     if(messageBus == null) {
       // TODO: display a message

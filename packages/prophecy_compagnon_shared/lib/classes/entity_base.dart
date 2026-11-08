@@ -41,9 +41,6 @@ import 'package:prophecy_compagnon_shared/classes/money.dart';
 import 'package:prophecy_compagnon_shared/classes/object_location.dart';
 import 'package:prophecy_compagnon_shared/classes/object_source.dart';
 import 'package:prophecy_compagnon_shared/classes/resource_base_class.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_description.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
 import 'package:prophecy_compagnon_shared/utils/text_utils.dart';
 import 'package:uuid/uuid.dart';
 
@@ -61,6 +58,12 @@ abstract interface class DamageProvider {
 
 abstract interface class InitiativeProvider {
   int initiativeForRange(WeaponRange range);
+}
+
+abstract interface class RangeProvider {
+  WeaponRange get range;
+  double distanceEffective(EntityBase owner);
+  double distanceMax(EntityBase owner);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
@@ -167,7 +170,7 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
   }
 
   double get baseMovementDistance => attributes.physique.toDouble();
-  double get contactCombatRange => size / 2;
+  double get reach => size / 2;
 
   ExportableBinaryData? _image;
   ExportableBinaryData? _icon;
@@ -180,43 +183,6 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
       canAct()
       && !combatStatus.has(EntityCombatStatusFlag.onGround)
       && !combatStatus.has(EntityCombatStatusFlag.grappled);
-
-  List<CombatActionDescription> availableActionsForType(CombatActionType type) {
-    var ret = <CombatActionDescription>[];
-    if(!canAct()) return ret;
-
-    switch(type) {
-      case CombatActionType.effect:
-        // Nothing to do here
-        break;
-      case CombatActionType.movement:
-        if(canMove()) {
-          ret.addAll([
-            CombatActionMovementDescription(
-                movementType: CombatActionMovementType.simple,
-            ),
-            CombatActionMovementDescription(
-              movementType: CombatActionMovementType.run,
-            ),
-            CombatActionMovementDescription(
-              movementType: CombatActionMovementType.sprint,
-            ),
-          ]);
-        }
-        else if(
-            combatStatus.has(EntityCombatStatusFlag.onGround)
-            && !combatStatus.has(EntityCombatStatusFlag.grappled)
-        ) {
-          ret.add(
-            CombatActionMovementDescription(
-              movementType: CombatActionMovementType.getUp,
-            )
-          );
-        }
-    }
-
-    return ret;
-  }
 
   int takeDamage(int amount, { int armorDivider = 1 }) {
     var finalDamage = amount;
@@ -359,14 +325,17 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     if(!_damageProviders.containsKey(range)) _damageProviders[range] = <DamageProvider>[];
     if(!_damageProviders[range]!.contains(dp)) _damageProviders[range]!.add(dp);
   }
+
   void removeDamageProvider(DamageProvider dp) {
     for(var range in _damageProviders.keys) {
       _damageProviders[range]!.remove(dp);
     }
   }
+
   List<DamageProvider> damageProvidersForRange(WeaponRange range) {
     return _damageProviders[range] ?? <DamageProvider>[];
   }
+
   List<DamageProvider> damageProviderForHand(EquipableItemSlot hand) {
     var ret = <DamageProvider>[];
 

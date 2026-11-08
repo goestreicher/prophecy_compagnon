@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 
@@ -35,9 +36,11 @@ abstract class CombatAction {
   final bool interpolate;
   final List<SessionMessage> effects;
 
-  Map<String, dynamic> combatActionToJson();
+  ActionInitializer? initializer();
 
   CombatAction? lerp(int rank, double x) => null;
+
+  Map<String, dynamic> combatActionToJson();
 
   factory CombatAction.fromJson(Map<String, dynamic> json) {
     if(!json.containsKey('_type')) {

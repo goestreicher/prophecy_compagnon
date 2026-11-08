@@ -123,30 +123,28 @@
         "name": "Défenses",
         "skill": 5,
         "damage": { "ability": "force", "add": 6 },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.1,
+          "maximum_distance": -0.1
         }
       },
       {
         "name": "Morsure",
         "skill": 3,
         "damage": { "ability": "force", "add": 5 },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.2
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.4
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.1,
+          "maximum_distance": -0.1
         }
       }
     ],
@@ -191,7 +189,7 @@
     "status": {
       "bitfield": 0
     },
-    "size": 0.4,
+    "size": 0.2,
     "initiative": 4,
     "abilities": {
       "force": 1,
@@ -299,30 +297,28 @@
         "name": "Griffes",
         "skill": 3,
         "damage": { "ability": "force", "add": 2 },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.05
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
         "name": "Morsure",
         "skill": 3,
         "damage": { "ability": "force", "add": 1 },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.05
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.1
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -451,15 +447,14 @@
         "name": "Morsure",
         "skill": 6,
         "damage": { "ability": "force", "add": 4 },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.15
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.3
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],
@@ -639,17 +634,14 @@
           "add": 3,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.15,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.3,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -663,17 +655,14 @@
           "add": 6,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 0.3,
-            "maximum_distance": null
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 0.6,
-            "maximum_distance": null
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.2,
+          "maximum_distance": 0.2
         }
       }
     ],
@@ -874,7 +863,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 12,
     "skills": {
       "families": {
         "combat": {
@@ -979,17 +968,14 @@
           "add": 15,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 4.5,
-            "maximum_distance": 4.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 4.5,
-            "maximum_distance": 4.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -1.5,
+          "maximum_distance": -1.5
         }
       },
       {
@@ -1003,17 +989,14 @@
           "add": 0,
           "dice": 1
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 6,
-            "maximum_distance": 6
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 6,
-            "maximum_distance": 6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       },
       {
@@ -1027,17 +1010,14 @@
           "add": 26,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 6,
-            "maximum_distance": 6
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 6,
-            "maximum_distance": 6
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.0,
+          "maximum_distance": 0.0
         }
       }
     ],

@@ -87,4 +87,5 @@ const _$EntityCombatStatusFlagEnumMap = {
   EntityCombatStatusFlag.none: 'none',
   EntityCombatStatusFlag.onGround: 'onGround',
   EntityCombatStatusFlag.grappled: 'grappled',
+  EntityCombatStatusFlag.grappling: 'grappling',
 };

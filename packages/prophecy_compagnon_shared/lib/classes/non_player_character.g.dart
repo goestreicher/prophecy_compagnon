@@ -87,7 +87,9 @@ NonPlayerCharacter _$NonPlayerCharacterFromJson(Map<String, dynamic> json) =>
             : EntityCombatStatus.fromJson(
                 json['combat_status'] as Map<String, dynamic>,
               ),
-        equipment: EntityEquipment.fromJson(json['equipment'] as List),
+        equipment: json['equipment'] == null
+            ? null
+            : EntityEquipment.fromJson(json['equipment'] as List),
         money: json['money'] == null
             ? null
             : MoneyWallet.fromJson(json['money'] as Map<String, dynamic>),
@@ -123,9 +125,11 @@ NonPlayerCharacter _$NonPlayerCharacterFromJson(Map<String, dynamic> json) =>
                 json['tendencies'] as Map<String, dynamic>,
               ),
         description: json['description'] as String?,
-        favors: EntityDraconicFavors.fromJson(
-          EntityDraconicFavors.readFavorsFromJson(json, 'favors') as List,
-        ),
+        favors: EntityDraconicFavors.readFavorsFromJson(json, 'favors') == null
+            ? null
+            : EntityDraconicFavors.fromJson(
+                EntityDraconicFavors.readFavorsFromJson(json, 'favors') as List,
+              ),
         fervor: json['fervor'] == null
             ? null
             : EntityFervor.fromJson(json['fervor'] as Map<String, dynamic>),

@@ -117,193 +117,207 @@ class CharacterDisplayWidget extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16.0),
-        ExpansionTile(
-          title: const Text('Général'),
-          controlAffinity: ListTileControlAffinity.leading,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 16.0,
-              children: [
-                Expanded(
-                  child: Column(
-                    spacing: 12.0,
-                    children: [
-                      CharacterDisplayGeneralWidget(character: character),
-                      Row(
-                        spacing: 16.0,
-                        children: [
-                          EntityDisplayInjuriesWidget(injuries: character.injuries.manager),
-                          Expanded(
-                            child: Center(
-                              child: TendenciesEditWidget(
-                                tendencies: character.tendencies,
-                                editValues: false,
-                                showCircles: false,
-                                backgroundWidth: 180,
-                              ),
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  )
-                ),
-                SizedBox(
-                  width: 200.0,
-                  child: Column(
-                    spacing: 12.0,
-                    children: [
-                      EntityDisplayAbilitiesWidget(entity: character),
-                      Row(
-                        spacing: 8.0,
-                        children: [
-                          Expanded(
-                            child: EntityDisplayAttributesWidget(
-                              entity: character
-                            )
-                          ),
-                          Expanded(
-                            child: CharacterDisplaySecondaryAttributesWidget(
-                              character: character
-                            )
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
-                ),
-              ],
-            ),
-            if(character.disadvantages.isNotEmpty)
-              CharacterDisplayDisadvantagesWidget(character: character),
-            if(character.advantages.isNotEmpty)
-              CharacterDisplayAdvantagesWidget(character: character),
-            if(character.favors.isNotEmpty)
-              EntityDisplayDraconicFavorsWidget(
-                entity: character,
-              )
-          ],
-        ),
-        ExpansionTile(
-          title: const Text('Compétences'),
-          controlAffinity: ListTileControlAffinity.leading,
-          children: [
-            Wrap(
-              spacing: 12.0,
-              children: [
-                if(hasPhysicalSkills)
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: skillGroupWidth,
-                    ),
-                    child: EntityDisplaySkillGroupWidget(
-                      entity: character,
-                      attribute: Attribute.physique,
-                    ),
-                  ),
-                if(hasManualSkills)
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: skillGroupWidth,
-                    ),
-                    child: EntityDisplaySkillGroupWidget(
-                      entity: character,
-                      attribute: Attribute.manuel,
-                    ),
-                  ),
-                if(hasMentalSkills)
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: skillGroupWidth,
-                    ),
-                    child: EntityDisplaySkillGroupWidget(
-                      entity: character,
-                      attribute: Attribute.mental,
-                    ),
-                  ),
-                if(hasSocialSkills)
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: skillGroupWidth,
-                    ),
-                    child: EntityDisplaySkillGroupWidget(
-                      entity: character,
-                      attribute: Attribute.social,
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-        if(isMagicUser)
-          ExpansionTile(
-            title: const Text('Magie'),
+        Material(
+          child: ExpansionTile(
+            title: const Text('Général'),
             controlAffinity: ListTileControlAffinity.leading,
             children: [
-              Column(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 16.0,
+                children: [
+                  Expanded(
+                    child: Column(
+                      spacing: 12.0,
+                      children: [
+                        CharacterDisplayGeneralWidget(character: character),
+                        Row(
+                          spacing: 16.0,
+                          children: [
+                            EntityDisplayInjuriesWidget(injuries: character.injuries.manager),
+                            Expanded(
+                              child: Center(
+                                child: TendenciesEditWidget(
+                                  tendencies: character.tendencies,
+                                  editValues: false,
+                                  showCircles: false,
+                                  backgroundWidth: 180,
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      ],
+                    )
+                  ),
+                  SizedBox(
+                    width: 200.0,
+                    child: Column(
+                      spacing: 12.0,
+                      children: [
+                        EntityDisplayAbilitiesWidget(entity: character),
+                        Row(
+                          spacing: 8.0,
+                          children: [
+                            Expanded(
+                              child: EntityDisplayAttributesWidget(
+                                entity: character
+                              )
+                            ),
+                            Expanded(
+                              child: CharacterDisplaySecondaryAttributesWidget(
+                                character: character
+                              )
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                  ),
+                ],
+              ),
+              if(character.disadvantages.isNotEmpty)
+                CharacterDisplayDisadvantagesWidget(character: character),
+              if(character.advantages.isNotEmpty)
+                CharacterDisplayAdvantagesWidget(character: character),
+              if(character.favors.isNotEmpty)
+                EntityDisplayDraconicFavorsWidget(
+                  entity: character,
+                )
+            ],
+          ),
+        ),
+        Material(
+          child: ExpansionTile(
+            title: const Text('Compétences'),
+            controlAffinity: ListTileControlAffinity.leading,
+            children: [
+              Wrap(
                 spacing: 12.0,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 16.0,
-                    children: [
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: 160,
-                        ),
-                        child: EntityDisplayMagicSkillsWidget(entity: character)
+                  if(hasPhysicalSkills)
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: skillGroupWidth,
                       ),
-                      Expanded(
-                        child: EntityDisplayMagicSpheresWidget(entity: character)
+                      child: EntityDisplaySkillGroupWidget(
+                        entity: character,
+                        attribute: Attribute.physique,
                       ),
-                    ],
-                  ),
-                  EntityDisplayMagicSpellsWidget(entity: character)
+                    ),
+                  if(hasManualSkills)
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: skillGroupWidth,
+                      ),
+                      child: EntityDisplaySkillGroupWidget(
+                        entity: character,
+                        attribute: Attribute.manuel,
+                      ),
+                    ),
+                  if(hasMentalSkills)
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: skillGroupWidth,
+                      ),
+                      child: EntityDisplaySkillGroupWidget(
+                        entity: character,
+                        attribute: Attribute.mental,
+                      ),
+                    ),
+                  if(hasSocialSkills)
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: skillGroupWidth,
+                      ),
+                      child: EntityDisplaySkillGroupWidget(
+                        entity: character,
+                        attribute: Attribute.social,
+                      ),
+                    ),
                 ],
               ),
             ],
           ),
+        ),
+        if(isMagicUser)
+          Material(
+            child: ExpansionTile(
+              title: const Text('Magie'),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                Column(
+                  spacing: 12.0,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 16.0,
+                      children: [
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: 160,
+                          ),
+                          child: EntityDisplayMagicSkillsWidget(entity: character)
+                        ),
+                        Expanded(
+                          child: EntityDisplayMagicSpheresWidget(entity: character)
+                        ),
+                      ],
+                    ),
+                    EntityDisplayMagicSpellsWidget(entity: character)
+                  ],
+                ),
+              ],
+            ),
+          ),
         if(character.caste.caste != Caste.sansCaste)
-          ExpansionTile(
-            title: const Text('Caste'),
-            controlAffinity: ListTileControlAffinity.leading,
-            children: [
-              CharacterDisplayCasteDetailsWidget(
-                character: character,
-              ),
-            ],
+          Material(
+            child: ExpansionTile(
+              title: const Text('Caste'),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                CharacterDisplayCasteDetailsWidget(
+                  character: character,
+                ),
+              ],
+            ),
           ),
         if(character.draconicLink.progress != DraconicLinkProgress.aucunLien)
-          ExpansionTile(
-            title: const Text('Lien'),
-            controlAffinity: ListTileControlAffinity.leading,
-            children: [
-              CharacterDisplayDraconicLinkWidget(
-                character: character,
-              ),
-            ],
+          Material(
+            child: ExpansionTile(
+              title: const Text('Lien'),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                CharacterDisplayDraconicLinkWidget(
+                  character: character,
+                ),
+              ],
+            ),
           ),
         if(character.fervor.value > 0 || character.fervor.powers.isNotEmpty)
-          ExpansionTile(
-            title: const Text("Pouvoirs de l'esprit"),
-            controlAffinity: ListTileControlAffinity.leading,
-            children: [
-              CharacterDisplayFervorWidget(
-                character: character,
-              ),
-            ],
+          Material(
+            child: ExpansionTile(
+              title: const Text("Pouvoirs de l'esprit"),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                CharacterDisplayFervorWidget(
+                  character: character,
+                ),
+              ],
+            ),
           ),
         if(hasWeapon || hasArmor)
-          ExpansionTile(
-            title: const Text('Équipement'),
-            controlAffinity: ListTileControlAffinity.leading,
-            children: [
-              if(hasWeapon)
-                DisplayWeaponsWidget(entity: character),
-              if(hasArmor)
-                DisplayArmorWidget(entity: character),
-            ],
+          Material(
+            child: ExpansionTile(
+              title: const Text('Équipement'),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                if(hasWeapon)
+                  DisplayWeaponsWidget(entity: character),
+                if(hasArmor)
+                  DisplayArmorWidget(entity: character),
+              ],
+            ),
           )
       ],
     );

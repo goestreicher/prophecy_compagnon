@@ -30,8 +30,10 @@ import 'package:prophecy_compagnon_shared/classes/session/map/item.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/item_entity.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/movement_path.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/map/get_movement_path.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/map/select_target.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/map/session_action_map.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/movement_path_result.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/select_target_result.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_map_status.dart';
@@ -108,9 +110,13 @@ class _MapActionWidgetState extends State<_MapActionWidget> {
   GlobalKey interactiveViewerKey = GlobalKey();
   bool transformationControllerInitialized = false;
   TransformationController transformationController = TransformationController();
+
   SessionMapGetMovementPath? currentMovementRequestMessage;
   SessionMapItem? currentMovingItem;
   MovementPath? currentMovement;
+
+  SessionMapSelectTarget? currentSelectRequestMessage;
+  Set<String> selectableItems = <String>{};
 
   @override
   void initState() {
@@ -237,10 +243,39 @@ class _MapActionWidgetState extends State<_MapActionWidget> {
                                     item.movable
                                     && (widget.map.freeMovementEnabled || currentMovingItem == item);
 
+                                var selectable =
+                                    currentSelectRequestMessage != null
+                                    && selectableItems.contains(item.id)
+                                    && GameSession.instance!.entity(item.id) != null;
+
                                 return Positioned(
                                   left: item.x - (item.size.width * widget.map.background.pixelsPerMeter) / 2,
                                   top: item.y - (item.size.height * widget.map.background.pixelsPerMeter) / 2,
                                   child: GestureDetector(
+                                    onTap: !selectable? null : () {
+                                      var distance = widget.map.distances.between(
+                                        widget.map.items[currentSelectRequestMessage!.entityId]!,
+                                        item
+                                      );
+
+                                      if(distance == null) {
+                                        // TODO: display a message?
+                                        return;
+                                      }
+
+                                      SessionMessageBusClient.instance?.sendResponse(
+                                        currentSelectRequestMessage!,
+                                        SessionSelectTargetResult(
+                                          entityId: item.id,
+                                          distance: distance / widget.map.background.pixelsPerMeter,
+                                        ),
+                                      );
+
+                                      setState(() {
+                                        currentSelectRequestMessage = null;
+                                        selectableItems.clear();
+                                      });
+                                    },
                                     onPanStart: !canMove ? null : (DragStartDetails? details) {
                                       if(details == null) return;
                                       if(widget.map.freeMovementEnabled) {
@@ -451,6 +486,45 @@ class _MapActionWidgetState extends State<_MapActionWidget> {
       i.x = m.x;
       i.y = m.y;
       widget.map.distances.updateFrom(i);
+    }
+    else if(m is SessionMapSelectTarget) {
+      selectTarget(m);
+    }
+  }
+
+  void selectTarget(SessionMapSelectTarget m) {
+    // TODO
+    var source = widget.map.items[m.entityId];
+    if(source == null) {
+      SessionMessageBusClient.instance?.sendResponse(
+        m,
+        null,
+        status: SessionMessageResponseStatus.rejected,
+        statusMessage: "Source absente de la carte",
+      );
+      return;
+    }
+
+    Set<String> targets = <String>{};
+    for(var entry in widget.map.distances.from(source).entries) {
+      if(entry.value <= (m.distance + max(source.size.width, source.size.height)/2) * widget.map.background.pixelsPerMeter) {
+        targets.add(entry.key);
+      }
+    }
+
+    setState(() {
+      currentSelectRequestMessage = m;
+      selectableItems.clear();
+      selectableItems.addAll(targets);
+    });
+  }
+
+  void cancelSelectTarget(SessionMapCancelSelectTarget m) {
+    if(selectableItems.isNotEmpty) {
+      setState(() {
+        currentSelectRequestMessage = null;
+        selectableItems.clear();
+      });
     }
   }
 

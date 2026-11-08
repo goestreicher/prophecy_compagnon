@@ -52,6 +52,7 @@ class _WeaponEditDialogState extends State<WeaponEditDialog> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
   bool unique = false;
+  WeaponRange? type;
   int? hands;
   SpecializedSkill? specializedSkill;
   bool createSpecializedSkill = false;
@@ -79,6 +80,7 @@ class _WeaponEditDialogState extends State<WeaponEditDialog> {
     if(widget.weapon != null) {
       nameController.text = widget.weapon!.name;
       unique = widget.weapon!.unique;
+      type = widget.weapon!.type;
       hands = widget.weapon!.handiness;
       specializedSkill = widget.weapon!.skill;
       weightController.text = widget.weapon!.weight.toStringAsFixed(2);
@@ -166,6 +168,28 @@ class _WeaponEditDialogState extends State<WeaponEditDialog> {
                             return null;
                           },
                           autovalidateMode: AutovalidateMode.onUserInteraction,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 120,
+                        child: DropdownMenuFormField<WeaponRange>(
+                          initialSelection: type,
+                          requestFocusOnTap: true,
+                          label: const Text('Type'),
+                          inputDecorationTheme: const InputDecorationTheme(
+                            border: OutlineInputBorder(),
+                          ),
+                          expandedInsets: EdgeInsets.zero,
+                          dropdownMenuEntries: WeaponRange.values
+                            .map((WeaponRange r) => DropdownMenuEntry(value: r, label: r.title))
+                            .toList(),
+                          validator: (WeaponRange? r) {
+                            if(r == null) return 'Valeur manquante';
+                            return null;
+                          },
+                          onSelected: (WeaponRange? r) {
+                            type = r;
+                          },
                         ),
                       ),
                       SizedBox(
@@ -484,6 +508,7 @@ class _WeaponEditDialogState extends State<WeaponEditDialog> {
                 uuid: const Uuid().v4().toString(),
                 name: nameController.text,
                 unique: unique,
+                type: type!,
                 source: ObjectSource.local,
                 description: descriptionController.text,
                 weight: double.parse(weightController.text),

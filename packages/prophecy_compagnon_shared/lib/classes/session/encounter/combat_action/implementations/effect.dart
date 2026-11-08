@@ -15,24 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_description.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 
-CombatActionDescription? actionDescriptionForCombatAction(CombatAction action) {
-  CombatActionDescription? ret;
+part 'effect.g.dart';
 
-  switch(action.type) {
-    case CombatActionType.effect:
-      // No description for this action
-      break;
-    case CombatActionType.movement:
-      if(action is CombatActionAssignedMovement) {
-        ret = CombatActionMovementDescription(movementType: action.movementType);
-      }
-  }
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class CombatActionEffect extends CombatAction {
+  CombatActionEffect({
+    required super.entityId,
+    required super.rank,
+    required super.effects,
+  })
+    : super(type: CombatActionType.effect);
 
-  return ret;
+  @override
+  ActionInitializer? initializer() => null;
+
+  factory CombatActionEffect.fromJson(Map<String, dynamic> json) =>
+      _$CombatActionEffectFromJson(json);
+
+  @override
+  Map<String, dynamic> combatActionToJson() =>
+      _$CombatActionEffectToJson(this);
 }

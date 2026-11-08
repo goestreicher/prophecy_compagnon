@@ -51,6 +51,10 @@ class _SkillThrowMenuWidgetState extends State<SkillThrowMenuWidget> {
       var familyEntries = <DropdownMenuEntry<SkillThrowWrapper>>[];
 
       for(var skill in widget.entity.skills.forFamily(family)) {
+        if(!skill.skill.canInstantiate) {
+          continue;
+        }
+
         familyEntries.add(
           DropdownMenuEntry(
             value: StandardSkillThrowWrapper(

@@ -63,7 +63,7 @@
         "injuries": {}
       }
     },
-    "size": 0.8,
+    "size": 7,
     "skills": {
       "families": {
         "combat": {
@@ -160,49 +160,43 @@
       {
         "name": "Griffes",
         "special": null,
-        "skill": 8,
+        "skill": 7,
         "damage": {
           "static": null,
           "ability": "force",
           "multiply": 1,
-          "add": 12,
+          "add": 10,
           "dice": 0
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 2.5,
-            "maximum_distance": 2.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 2.5,
-            "maximum_distance": 2.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": -0.5,
+          "maximum_distance": -0.5
         }
       },
       {
         "name": "Morsure",
         "special": null,
-        "skill": 11,
+        "skill": 10,
         "damage": {
-          "static": 40,
+          "static": 35,
           "ability": null,
           "multiply": 1,
           "add": 0,
           "dice": 1
         },
-        "ranges": {
-          "contact": {
-            "initiative": 0,
-            "effective_distance": 3.5,
-            "maximum_distance": 3.5
-          },
-          "melee": {
-            "initiative": 0,
-            "effective_distance": 3.5,
-            "maximum_distance": 3.5
-          }
+        "type": "contact",
+        "initiative": {
+          "contact": 0,
+          "melee": 0
+        },
+        "distance": {
+          "effective_distance": 0.5,
+          "maximum_distance": 0.5
         }
       }
     ],

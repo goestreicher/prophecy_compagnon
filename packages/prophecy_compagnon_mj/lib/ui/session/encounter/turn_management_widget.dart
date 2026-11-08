@@ -21,7 +21,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_mj/ui/session/encounter/execute_rank_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/implementations/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/turn.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/session_encounter_turn.dart';
@@ -211,23 +211,43 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
       );
     }
     else if(m is SessionEncounterTurnSelectActions) {
-      var selected = await showDialog<List<SessionEncounterEntityAction>>(
-        context: context,
-        builder: (BuildContext context) =>
-          SessionEncounterTurnSelectActionDialog(
-            description: m.description,
-            turn: widget.turn,
-            entityId: m.entityId,
-            excludedActionUuids: m.excludedActionUuids,
-            multiselect: m.multiselect,
-            selectRange: m.selectRange,
-            allowEmptySelection: m.allowEmptySelection,
-            usableOnly: m.usableOnly,
-            showWeakHandAction: m.showWeakHandAction,
-          )
-      );
+      Iterable<SessionEncounterEntityAction> actionsIterable;
+      if(m.usableOnly) {
+        actionsIterable = widget.turn.filteredActions(
+            (SessionEncounterEntityAction a) =>
+                a.stage == SessionEncounterEntityActionStage.none
+        );
+      }
+      else {
+        actionsIterable = widget.turn.actions;
+      }
 
-      if((selected == null || selected.isEmpty) && !m.allowEmptySelection) {
+      var available = actionsIterable
+        .where((SessionEncounterEntityAction a) => a.entity.id == m.entityId)
+        .where((SessionEncounterEntityAction a) => !m.excludedActionUuids.contains(a.uuid))
+        .where((SessionEncounterEntityAction a) => m.usage == null || a.canBeUsedFor(m.usage!))
+        .where((SessionEncounterEntityAction a) => m.showWeakHandAction || !a.weakHand)
+        .toList()
+        ..sort((SessionEncounterEntityAction a, SessionEncounterEntityAction b) => b.rank - a.rank);
+
+      var selected = <SessionEncounterEntityAction>[];
+
+      if(available.isNotEmpty) {
+        selected = await showDialog<List<SessionEncounterEntityAction>>(
+          context: context,
+          builder: (BuildContext context) =>
+            SessionEncounterTurnSelectActionDialog(
+              description: m.description,
+              availableActions: available,
+              multiselect: m.multiselect,
+              selectRange: m.selectRange,
+              allowEmptySelection: m.allowEmptySelection,
+            )
+          )
+          ?? <SessionEncounterEntityAction>[];
+      }
+
+      if(selected.isEmpty && !m.allowEmptySelection) {
         messageBus.sendResponse(
           m,
           null,
@@ -237,7 +257,7 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
       else {
         messageBus.sendResponse(
           m,
-          selected ?? <SessionEncounterEntityAction>[],
+          selected,
         );
       }
     }

@@ -21,18 +21,19 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_actio
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/action_planning.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 
-abstract class ActionConfiguration {
-  ActionConfiguration();
+abstract class ActionInitializer {
+  ActionInitializer();
 
   String get name;
   IconData get icon;
 
-  Future<void> plan(SessionEncounterEntityAction action);
+  Future<void> plan(BuildContext context, SessionEncounterEntityAction action);
 
   @protected
   Future<void> guardPlan(
+      BuildContext context,
       SessionEncounterEntityAction action,
-      Future<void> Function(SessionEncounterEntityAction action) guarded
+      Future<void> Function(BuildContext, SessionEncounterEntityAction) guarded
   ) async {
     var planResponse = await SessionMessageBusClient.instance?.publishAndWaitForResponse(
       SessionEncounterTurnActionPlanningStart(
@@ -40,6 +41,10 @@ abstract class ActionConfiguration {
         actionUuid: action.uuid,
       )
     );
+
+    if(!context.mounted) {
+      return;
+    }
 
     if(planResponse == null) {
       // TODO: display a nice message?
@@ -51,7 +56,7 @@ abstract class ActionConfiguration {
       return;
     }
 
-    await guarded(action);
+    await guarded(context, action);
 
     SessionMessageBusClient.instance?.publish(
       SessionEncounterTurnActionPlanningEnd(

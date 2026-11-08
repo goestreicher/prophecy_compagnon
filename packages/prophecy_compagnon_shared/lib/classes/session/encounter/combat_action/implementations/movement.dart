@@ -19,8 +19,13 @@ import 'dart:ui';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/descriptions/movement.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/movement/get_up.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/movement/run.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/movement/simple.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/movement/sprint.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actions/descriptions/movement.dart';
 import 'package:prophecy_compagnon_shared/classes/session/map/movement_path.dart';
 
 part 'movement.g.dart';
@@ -38,6 +43,20 @@ class CombatActionAssignedMovement extends CombatAction {
 
   final CombatActionMovementType movementType;
   final double distanceMultiplier;
+
+  @override
+  ActionInitializer? initializer() {
+    switch(movementType) {
+      case CombatActionMovementType.simple:
+        return ActionInitializerMovementSimple();
+      case CombatActionMovementType.run:
+        return ActionInitializerMovementRun();
+      case CombatActionMovementType.sprint:
+        return ActionInitializerMovementSprint();
+      case CombatActionMovementType.getUp:
+        return ActionInitializerMovementGetUp();
+    }
+  }
 
   factory CombatActionAssignedMovement.fromJson(Map<String, dynamic> json) =>
       _$CombatActionAssignedMovementFromJson(json);
