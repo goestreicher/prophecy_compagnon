@@ -745,6 +745,7 @@ class Creature extends EntityBase with EncounterEntityModel, MagicUser {
             uuid: 'creature:$id:specialized:weapon:${weapon.id}',
             source: ObjectSource.local,
             skill: spSkill,
+            ability: Ability.force,
             weight: 0.0,
             creationDifficulty: 0,
             creationTime: 0,

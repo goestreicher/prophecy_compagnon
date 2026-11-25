@@ -55,6 +55,7 @@ class _WeaponEditDialogState extends State<WeaponEditDialog> {
   WeaponRange? type;
   int? hands;
   SpecializedSkill? specializedSkill;
+  Ability? ability;
   bool createSpecializedSkill = false;
   TextEditingController weightController = TextEditingController();
   TextEditingController dcController = TextEditingController();
@@ -83,6 +84,7 @@ class _WeaponEditDialogState extends State<WeaponEditDialog> {
       type = widget.weapon!.type;
       hands = widget.weapon!.handiness;
       specializedSkill = widget.weapon!.skill;
+      ability = widget.weapon!.ability;
       weightController.text = widget.weapon!.weight.toStringAsFixed(2);
       dcController.text = widget.weapon!.creationDifficulty.toString();
       tcController.text = widget.weapon!.creationTime.toString();
@@ -264,6 +266,30 @@ class _WeaponEditDialogState extends State<WeaponEditDialog> {
                           },
                           onSelected: (SpecializedSkill? s) {
                             specializedSkill = s;
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: DropdownMenuFormField<Ability>(
+                          initialSelection: ability,
+                          requestFocusOnTap: true,
+                          label: const Text('Caractéristique'),
+                          inputDecorationTheme: const InputDecorationTheme(
+                            border: OutlineInputBorder(),
+                          ),
+                          expandedInsets: EdgeInsets.zero,
+                          dropdownMenuEntries: Ability.values
+                            .map((Ability a) => DropdownMenuEntry(
+                                value: a,
+                                label: a.name
+                            ))
+                            .toList(),
+                          validator: (Ability? a) {
+                            if(a == null) return 'Valeur manquante';
+                            return null;
+                          },
+                          onSelected: (Ability? a) {
+                            ability = a;
                           },
                         ),
                       ),
@@ -523,6 +549,7 @@ class _WeaponEditDialogState extends State<WeaponEditDialog> {
                   price: cityPrice!,
                 ),
                 skill: specializedSkill!,
+                ability: ability!,
                 slot: EquipableItemSlot.hands,
                 handiness: hands!,
                 requirements: requirements,
@@ -541,6 +568,7 @@ class _WeaponEditDialogState extends State<WeaponEditDialog> {
               widget.weapon!.name = nameController.text;
               widget.weapon!.unique = unique;
               widget.weapon!.skill = specializedSkill!;
+              widget.weapon!.ability = ability!;
               widget.weapon!.description = descriptionController.text;
               widget.weapon!.weight = double.parse(weightController.text);
               widget.weapon!.creationDifficulty = int.parse(dcController.text);

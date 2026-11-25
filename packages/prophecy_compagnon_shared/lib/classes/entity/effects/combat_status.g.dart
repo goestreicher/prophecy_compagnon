@@ -8,41 +8,45 @@ part of 'combat_status.dart';
 
 EntityEffectCombatStatus _$EntityEffectCombatStatusFromJson(
   Map<String, dynamic> json,
-) => EntityEffectCombatStatus(
-  uuid: json['uuid'] as String?,
-  name: json['name'] as String,
-  trigger: $enumDecode(_$EntityEffectTriggerEnumMap, json['trigger']),
-  triggerTickerEvent: json['trigger_ticker_event'] == null
-      ? null
-      : TickerEvent.fromJson(
-          json['trigger_ticker_event'] as Map<String, dynamic>,
-        ),
-  duration: json['duration'] == null
-      ? null
-      : TickerEvent.fromJson(json['duration'] as Map<String, dynamic>),
-  activationDiceThrowRequest: json['activation_dice_throw_request'] == null
-      ? null
-      : DiceThrowRequest.fromJson(
-          json['activation_dice_throw_request'] as Map<String, dynamic>,
-        ),
-  activationDiceThrowValidResults:
-      (json['activation_dice_throw_valid_results'] as List<dynamic>?)
-          ?.map((e) => $enumDecode(_$DiceThrowResultTypeEnumMap, e))
-          .toList() ??
-      const [DiceThrowResultType.success],
-  activationDiceThrowValueTransformer:
-      json['activation_dice_throw_value_transformer'] == null
-      ? null
-      : EntityEffectActivationDiceThrowValueTransformer.fromJson(
-          json['activation_dice_throw_value_transformer']
-              as Map<String, dynamic>,
-        ),
-  postEffects: (json['post_effects'] as List<dynamic>?)
-      ?.map((e) => EntityEffect.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
-  status: $enumDecode(_$EntityCombatStatusFlagEnumMap, json['status']),
-)..active = json['active'] as bool;
+) =>
+    EntityEffectCombatStatus(
+        uuid: json['uuid'] as String?,
+        name: json['name'] as String,
+        trigger: $enumDecode(_$EntityEffectTriggerEnumMap, json['trigger']),
+        triggerTickerEvent: json['trigger_ticker_event'] == null
+            ? null
+            : TickerEvent.fromJson(
+                json['trigger_ticker_event'] as Map<String, dynamic>,
+              ),
+        duration: json['duration'] == null
+            ? null
+            : TickerEvent.fromJson(json['duration'] as Map<String, dynamic>),
+        activationDiceThrowRequest:
+            json['activation_dice_throw_request'] == null
+            ? null
+            : DiceThrowRequest.fromJson(
+                json['activation_dice_throw_request'] as Map<String, dynamic>,
+              ),
+        activationDiceThrowValidResults:
+            (json['activation_dice_throw_valid_results'] as List<dynamic>?)
+                ?.map((e) => $enumDecode(_$DiceThrowResultTypeEnumMap, e))
+                .toList() ??
+            const [DiceThrowResultType.success],
+        activationDiceThrowValueTransformer:
+            json['activation_dice_throw_value_transformer'] == null
+            ? null
+            : EntityEffectActivationDiceThrowValueTransformer.fromJson(
+                json['activation_dice_throw_value_transformer']
+                    as Map<String, dynamic>,
+              ),
+        postEffects: (json['post_effects'] as List<dynamic>?)
+            ?.map((e) => EntityEffect.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
+        status: $enumDecode(_$EntityCombatStatusFlagEnumMap, json['status']),
+      )
+      ..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt()
+      ..active = json['active'] as bool;
 
 Map<String, dynamic> _$EntityEffectCombatStatusToJson(
   EntityEffectCombatStatus instance,
@@ -62,6 +66,7 @@ Map<String, dynamic> _$EntityEffectCombatStatusToJson(
       .activationDiceThrowValueTransformer
       ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
+  'elapsed_trigger_units': instance.elapsedTriggerUnits,
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
   'status': _$EntityCombatStatusFlagEnumMap[instance.status]!,

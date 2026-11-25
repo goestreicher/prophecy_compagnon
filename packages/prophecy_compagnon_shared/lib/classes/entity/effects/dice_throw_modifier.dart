@@ -17,6 +17,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_modifier_enums.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
@@ -41,6 +42,8 @@ class EntityEffectGlobalDiceThrowModifierConfiguration extends EntityEffectConfi
     required this.type,
     required this.family,
     required this.modifier,
+    this.matcher,
+    this.singleUse = false,
     this.alwaysApply = true,
   })
     : super(target: EntityEffectTarget.diceThrowModifier);
@@ -48,6 +51,8 @@ class EntityEffectGlobalDiceThrowModifierConfiguration extends EntityEffectConfi
   final DiceThrowModifierType type;
   final DiceThrowModifierFamily family;
   final int modifier;
+  final DiceThrowMatcher? matcher;
+  final bool singleUse;
   final bool alwaysApply;
 
   @override
@@ -64,6 +69,7 @@ class EntityEffectGlobalDiceThrowModifierConfiguration extends EntityEffectConfi
       type: type,
       family: family,
       modifier: modifier,
+      matcher: matcher,
       alwaysApply: alwaysApply,
     );
 }
@@ -87,6 +93,8 @@ class EntityEffectGlobalDiceThrowModifier extends EntityEffect {
     required this.family,
     required this.modifier,
     this.modifierId,
+    this.matcher,
+    this.singleUse = false,
     this.alwaysApply = true,
   })
     : super(target: EntityEffectTarget.diceThrowModifier);
@@ -95,18 +103,21 @@ class EntityEffectGlobalDiceThrowModifier extends EntityEffect {
   final DiceThrowModifierFamily family;
   final int modifier;
   String? modifierId;
+  final DiceThrowMatcher? matcher;
+  final bool singleUse;
   final bool alwaysApply;
 
   @override
   void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
     super.apply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation);
 
-    var mod = OneOffDiceThrowModifier(
+    var mod = GenericDiceThrowModifier(
       type: type,
       family: family,
       label: name,
       value: modifier,
       name: uuid,
+      singleUse: singleUse,
       alwaysApply: alwaysApply,
     );
     modifierId = mod.id;

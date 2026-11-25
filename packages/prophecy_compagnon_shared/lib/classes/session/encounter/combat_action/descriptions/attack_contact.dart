@@ -20,8 +20,8 @@ import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 
 enum CombatActionAttackContactType {
   simple(title: "Attaque simple", icon: CustomIcons.punch),
-  // brutal(title: "Attaque brutale", icon: CustomIcons.punchBrutal),
-  // precise(title: "Attaque précise", icon: CustomIcons.punchPrecise),
+  brutal(title: "Attaque brutale", icon: CustomIcons.punchBrutal),
+  precise(title: "Attaque précise", icon: CustomIcons.punchPrecise),
   // stun(title: "Assomer", icon: CustomIcons.punch),
   // incapacitate(title: "Incapaciter", icon: CustomIcons.punch),
   // topple(title: "Renverser", icon: CustomIcons.punch),

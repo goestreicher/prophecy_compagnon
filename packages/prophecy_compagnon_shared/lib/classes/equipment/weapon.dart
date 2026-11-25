@@ -111,6 +111,7 @@ class WeaponModel extends EquipableItemModel {
     required int handiness,
     EquipableItemLayer layer = EquipableItemLayer.normal,
     required SpecializedSkill skill,
+    required Ability ability,
     required Map<Ability, int> requirements,
     required WeaponRange type,
     required Map<WeaponRange, int> initiative,
@@ -139,6 +140,7 @@ class WeaponModel extends EquipableItemModel {
             handiness: handiness,
             layer: layer,
             skill: skill,
+            ability: ability,
             requirements: requirements,
             type: type,
             initiative: initiative,
@@ -169,6 +171,7 @@ class WeaponModel extends EquipableItemModel {
     required super.handiness,
     super.layer,
     required this.skill,
+    required this.ability,
     required this.requirements,
     required this.type,
     required this.initiative,
@@ -182,6 +185,7 @@ class WeaponModel extends EquipableItemModel {
 
   @JsonKey(readValue: _getSkillFromJson, toJson: _setSkillToJson)
   SpecializedSkill skill;
+  Ability ability;
   Map<Ability,int> requirements;
   WeaponRange type;
   Map<WeaponRange, int> initiative;
@@ -338,12 +342,6 @@ class Weapon extends EquipableItem implements DamageProvider, InitiativeProvider
   })
     : _uuid = const Uuid().v4().toString();
 
-  factory Weapon.fromJson(Map<String, dynamic> json) {
-    var ret = (EquipmentFactory.instance.forgeEquipment(json['type'], json: json) as Weapon);
-    ret.restoreFromJson(json);
-    return ret;
-  }
-
   final String _uuid;
 
   @override
@@ -412,4 +410,10 @@ class Weapon extends EquipableItem implements DamageProvider, InitiativeProvider
               ? owner.abilities.ability((model as WeaponModel).rangeMax.ability!)
               : 0
       );
+
+  factory Weapon.fromJson(Map<String, dynamic> json) {
+    var ret = (EquipmentFactory.instance.forgeEquipment(json['type'], json: json) as Weapon);
+    ret.restoreFromJson(json);
+    return ret;
+  }
 }

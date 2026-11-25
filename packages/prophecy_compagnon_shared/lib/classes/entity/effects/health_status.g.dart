@@ -43,7 +43,7 @@ EntityEffectHealthStatus _$EntityEffectHealthStatusFromJson(
   elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
   active: json['active'] as bool? ?? false,
   status: $enumDecode(_$EntityHealthStatusFlagEnumMap, json['status']),
-);
+)..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt();
 
 Map<String, dynamic> _$EntityEffectHealthStatusToJson(
   EntityEffectHealthStatus instance,
@@ -63,6 +63,7 @@ Map<String, dynamic> _$EntityEffectHealthStatusToJson(
       .activationDiceThrowValueTransformer
       ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
+  'elapsed_trigger_units': instance.elapsedTriggerUnits,
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
   'status': _$EntityHealthStatusFlagEnumMap[instance.status]!,

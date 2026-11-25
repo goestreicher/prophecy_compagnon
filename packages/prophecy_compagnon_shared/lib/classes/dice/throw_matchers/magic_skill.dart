@@ -15,10 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/magic.dart';
 
+part 'magic_skill.g.dart';
+
+@JsonSerializable()
 class MagicSkillDiceThrowMatcher extends DiceThrowMatcher {
   const MagicSkillDiceThrowMatcher({ required this.skill });
 
@@ -27,4 +31,11 @@ class MagicSkillDiceThrowMatcher extends DiceThrowMatcher {
   @override
   // TODO: magic skills are not supported RN
   bool matches(DiceThrowRequest request) => false;
+
+  @override
+  Map<String, dynamic> diceThrowMatcherToJson() =>
+      _$MagicSkillDiceThrowMatcherToJson(this);
+
+  factory MagicSkillDiceThrowMatcher.fromJson(Map<String, dynamic> json) =>
+      _$MagicSkillDiceThrowMatcherFromJson(json);
 }

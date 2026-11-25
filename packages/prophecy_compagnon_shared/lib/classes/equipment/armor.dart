@@ -332,4 +332,10 @@ class Armor extends EquipableItem implements ProtectionProvider {
   int protection() => (model as ArmorModel).protection;
 
   late final EquipmentDiceThrowModifier _diceThrowModifier;
+
+  factory Armor.fromJson(Map<String, dynamic> json) {
+    var ret = (EquipmentFactory.instance.forgeEquipment(json['type'], json: json) as Armor);
+    ret.restoreFromJson(json);
+    return ret;
+  }
 }

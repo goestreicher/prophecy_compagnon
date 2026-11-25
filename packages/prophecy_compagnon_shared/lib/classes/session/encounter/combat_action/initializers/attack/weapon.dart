@@ -19,13 +19,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:prophecy_compagnon_shared/classes/combat.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/weapon.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/descriptions/attack_contact.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/descriptions/attack_distance.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/descriptions/attack_melee.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/descriptions/attack_ranged.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/attack/attack.dart';
-import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/attack/shared/simple.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/attack/utils.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
@@ -99,105 +95,8 @@ class ActionInitializerWeapon extends ActionInitializer {
       return;
     }
 
-    var options = <SimpleDialogOption>[];
-    // TODO: list all possible attacks, depending on the weapon type
-    switch(weapon.range) {
-      case WeaponRange.contact:
-        // TODO: manage grappling here
-        for(var t in CombatActionAttackContactType.values) {
-          options.add(
-            SimpleDialogOption(
-              onPressed: () {
-                ActionInitializerAttack initializer;
-                switch(t) {
-                  case CombatActionAttackContactType.simple:
-                    initializer = ActionInitializerAttackSimple(
-                      weapon: weapon,
-                      target: target,
-                      icon: t.icon,
-                    );
-                }
-
-                Navigator.of(context, rootNavigator: true).pop(initializer);
-              },
-              child: Text(
-                t.title,
-              )
-            )
-          );
-        }
-      case WeaponRange.melee:
-        for(var t in CombatActionAttackMeleeType.values) {
-          options.add(
-            SimpleDialogOption(
-              onPressed: () {
-                ActionInitializerAttack initializer;
-                switch(t) {
-                  case CombatActionAttackMeleeType.simple:
-                    initializer = ActionInitializerAttackSimple(
-                      weapon: weapon,
-                      target: target,
-                      icon: t.icon,
-                    );
-                }
-
-                Navigator.of(context, rootNavigator: true).pop(initializer);
-              },
-              child: Text(
-                t.title,
-              ),
-            )
-          );
-        }
-      case WeaponRange.distance:
-        for(var t in CombatActionAttackDistanceType.values) {
-          options.add(
-            SimpleDialogOption(
-              onPressed: () {
-                ActionInitializerAttack initializer;
-                switch(t) {
-                  case CombatActionAttackDistanceType.simple:
-                    initializer = ActionInitializerAttackSimple(
-                      weapon: weapon,
-                      target: target,
-                      icon: t.icon,
-                    );
-                }
-
-                Navigator.of(context, rootNavigator: true).pop(initializer);
-              },
-              child: Text(
-                t.title,
-              ),
-            )
-          );
-        }
-      case WeaponRange.ranged:
-        for(var t in CombatActionAttackRangedType.values) {
-          options.add(
-            SimpleDialogOption(
-              onPressed: () {
-                ActionInitializerAttack initializer;
-                switch(t) {
-                  case CombatActionAttackRangedType.simple:
-                    initializer = ActionInitializerAttackSimple(
-                      weapon: weapon,
-                      target: target,
-                      icon: t.icon,
-                    );
-                }
-
-                Navigator.of(context, rootNavigator: true).pop(initializer);
-              },
-              child: Text(
-                t.title,
-              ),
-            )
-          );
-        }
-    }
-
-    if(options.isEmpty) {
+    var initializers = getAttackInitializersForWeapon(weapon: weapon, target: target);
+    if(initializers.isEmpty) {
       // TODO: display a message
       return;
     }
@@ -206,7 +105,18 @@ class ActionInitializerWeapon extends ActionInitializer {
       context: context,
       builder: (BuildContext context) => SimpleDialog(
         title: const Text("Sélectionner le type d'attaque"),
-        children: options,
+        children: initializers
+          .map(
+            (ActionInitializerAttack i) => SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop(i);
+              },
+              child: Text(
+                i.name,
+              ),
+            )
+          )
+          .toList(),
       ),
     );
     if(!context.mounted) return;

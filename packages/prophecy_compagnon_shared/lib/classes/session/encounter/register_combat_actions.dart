@@ -1,11 +1,17 @@
 // GENERATED CODE - DO NOT EDIT
 
 import "package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart";
+import "package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/attack.dart";
 import "package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/defense.dart";
 import "package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/effect.dart";
 import "package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/movement.dart";
 
 void registerCombatActions() {
+  CombatAction.registerCombatActionJsonFactory(
+    "CombatActionAttack",
+    (Map<String, dynamic> json) => CombatActionAttack.fromJson(json),
+  );
+
   CombatAction.registerCombatActionJsonFactory(
     "CombatActionDefenseDodge",
     (Map<String, dynamic> json) => CombatActionDefenseDodge.fromJson(json),

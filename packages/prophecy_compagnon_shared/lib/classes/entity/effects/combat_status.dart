@@ -73,7 +73,7 @@ class EntityEffectCombatStatus extends EntityEffect {
   })
     : super(
         target: EntityEffectTarget.combatStatus,
-        active: true,
+        active: false,
         removeOnUnapply: true,
       );
 

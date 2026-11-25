@@ -15,12 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/ability.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 
+part 'ability.g.dart';
+
+@JsonSerializable()
 class AbilityDiceThrowMatcher extends DiceThrowMatcher {
   const AbilityDiceThrowMatcher({ required this.ability });
 
@@ -37,4 +41,11 @@ class AbilityDiceThrowMatcher extends DiceThrowMatcher {
         request.base is DiceThrowEntityBaseSkill
         && (request.base as DiceThrowEntityBaseSkill).ability == ability
       );
+
+  @override
+  Map<String, dynamic> diceThrowMatcherToJson() =>
+      _$AbilityDiceThrowMatcherToJson(this);
+
+  factory AbilityDiceThrowMatcher.fromJson(Map<String, dynamic> json) =>
+      _$AbilityDiceThrowMatcherFromJson(json);
 }

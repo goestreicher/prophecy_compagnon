@@ -94,8 +94,6 @@ class EntityEffectHealthStatus extends EntityEffect {
 
   @override
   void unapply({ required EntityBase target }) {
-    if(!canApply(target: target)) return;
-
     target.healthStatus.clear(status);
     super.unapply(target: target);
   }

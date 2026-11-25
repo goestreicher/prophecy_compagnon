@@ -141,7 +141,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
 
     if(contextModifier != 0) {
       modifiers.add(
-        OneOffDiceThrowModifier(
+        GenericDiceThrowModifier(
           type: contextModifier < 0
             ? DiceThrowModifierType.malus
             : DiceThrowModifierType.bonus,
@@ -156,7 +156,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
     if(widget.request.base.difficultyModifier(widget.entity) != 0) {
       if(widget.request.difficulty != null) {
         modifiers.add(
-          OneOffDiceThrowModifier(
+          GenericDiceThrowModifier(
             type: DiceThrowModifierType.difficulty,
             family: DiceThrowModifierFamily.context,
             label: widget.request.base.difficultyModifierLabel(widget.entity),
@@ -167,7 +167,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
       }
       else {
         modifiers.add(
-          OneOffDiceThrowModifier(
+          GenericDiceThrowModifier(
             type: DiceThrowModifierType.malus,
             family: DiceThrowModifierFamily.context,
             label: widget.request.base.difficultyModifierLabel(widget.entity),
@@ -180,7 +180,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
 
     if(isCriticalSuccess) {
       modifiers.add(
-        OneOffDiceThrowModifier(
+        GenericDiceThrowModifier(
           type: DiceThrowModifierType.bonus,
           family: DiceThrowModifierFamily.criticalDiceThrow,
           label: 'Réussite critique',

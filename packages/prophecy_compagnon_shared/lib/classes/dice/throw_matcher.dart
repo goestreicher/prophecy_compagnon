@@ -17,8 +17,31 @@
 
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 
+typedef DiceThrowMatcherJsonFactory = DiceThrowMatcher Function(Map<String, dynamic>);
+
 abstract class DiceThrowMatcher {
   const DiceThrowMatcher();
 
   bool matches(DiceThrowRequest request);
+
+  Map<String, dynamic> diceThrowMatcherToJson();
+
+  factory DiceThrowMatcher.fromJson(Map<String, dynamic> json) {
+    if(!json.containsKey('_type')) {
+      throw(ArgumentError('Missing "_type" key in JSON'));
+    }
+    return _matcherFactories[json['_type']]!(json);
+  }
+
+  Map<String, dynamic> toJson() {
+    var ret = diceThrowMatcherToJson();
+    ret['_type'] = runtimeType.toString();
+    return ret;
+  }
+
+  static void registerDiceThrowMatcherJsonFactory(String name, DiceThrowMatcherJsonFactory factory) =>
+      _matcherFactories[name] = factory;
+
+  static final Map<String, DiceThrowMatcherJsonFactory> _matcherFactories =
+      <String, DiceThrowMatcherJsonFactory>{};
 }

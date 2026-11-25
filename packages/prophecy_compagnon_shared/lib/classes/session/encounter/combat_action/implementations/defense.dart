@@ -16,6 +16,11 @@
  */
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/shield.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/weapon.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
@@ -30,13 +35,18 @@ abstract class CombatActionDefense extends CombatAction {
     required super.entityId,
     required super.rank,
     required this.defenseType,
+    super.effects,
   })
     : super(type: CombatActionType.defense);
 
   final CombatActionDefenseType defenseType;
 
+  String get label => defenseType.title;
+
   @override
   ActionInitializer? initializer() => null;
+
+  DiceThrowEntityBase diceThrowBase();
 }
 
 @JsonSerializable()
@@ -46,6 +56,13 @@ class CombatActionDefenseDodge extends CombatActionDefense {
     required super.rank,
   })
     : super(defenseType: CombatActionDefenseType.dodge);
+
+  @override
+  DiceThrowEntityBase diceThrowBase() => DiceThrowEntityBaseSkill(
+    attribute: Attribute.physique,
+    skill: Skill.esquive,
+    ability: Ability.coordination,
+  );
 
   factory CombatActionDefenseDodge.fromJson(Map<String, dynamic> json) =>
       _$CombatActionDefenseDodgeFromJson(json);
@@ -66,6 +83,13 @@ class CombatActionDefenseParryShield extends CombatActionDefense {
 
   final Shield shield;
 
+  @override
+  DiceThrowEntityBase diceThrowBase() => DiceThrowEntityBaseSkill(
+    attribute: Attribute.physique,
+    skill: Skill.bouclier,
+    ability: Ability.force,
+  );
+
   factory CombatActionDefenseParryShield.fromJson(Map<String, dynamic> json) =>
       _$CombatActionDefenseParryShieldFromJson(json);
 
@@ -84,6 +108,16 @@ class CombatActionDefenseParryWeapon extends CombatActionDefense {
     : super(defenseType: CombatActionDefenseType.parryWeapon);
 
   final Weapon weapon;
+
+  @override
+  String get label => '${defenseType.title} (${weapon.name})';
+
+  @override
+  DiceThrowEntityBase diceThrowBase() => DiceThrowEntityBaseSkill(
+    attribute: Attribute.physique,
+    specialization: (weapon.model as WeaponModel).skill,
+    ability: (weapon.model as WeaponModel).ability,
+  );
 
   factory CombatActionDefenseParryWeapon.fromJson(Map<String, dynamic> json) =>
       _$CombatActionDefenseParryWeaponFromJson(json);

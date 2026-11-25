@@ -15,9 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 
+part 'boolean.g.dart';
+
+@JsonSerializable()
 class BooleanOrDiceThrowMatcher extends DiceThrowMatcher {
   const BooleanOrDiceThrowMatcher({ required this.children });
 
@@ -26,8 +30,16 @@ class BooleanOrDiceThrowMatcher extends DiceThrowMatcher {
   @override
   bool matches(DiceThrowRequest request) =>
       children.any((DiceThrowMatcher m) => m.matches(request));
+
+  @override
+  Map<String, dynamic> diceThrowMatcherToJson() =>
+      _$BooleanOrDiceThrowMatcherToJson(this);
+
+  factory BooleanOrDiceThrowMatcher.fromJson(Map<String, dynamic> json) =>
+      _$BooleanOrDiceThrowMatcherFromJson(json);
 }
 
+@JsonSerializable()
 class BooleanAndDiceThrowMatcher extends DiceThrowMatcher {
   const BooleanAndDiceThrowMatcher({ required this.children });
 
@@ -36,4 +48,11 @@ class BooleanAndDiceThrowMatcher extends DiceThrowMatcher {
   @override
   bool matches(DiceThrowRequest request) =>
       children.every((DiceThrowMatcher m) => m.matches(request));
+
+  @override
+  Map<String, dynamic> diceThrowMatcherToJson() =>
+      _$BooleanAndDiceThrowMatcherToJson(this);
+
+  factory BooleanAndDiceThrowMatcher.fromJson(Map<String, dynamic> json) =>
+      _$BooleanAndDiceThrowMatcherFromJson(json);
 }

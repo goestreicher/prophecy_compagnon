@@ -227,18 +227,20 @@ class GameSession extends ChangeNotifier {
       var toRemove = <EntityEffect>[];
 
       for(var effect in entity.effects) {
-        if(!effect.active) {
-          if(effect.triggerTickerEvent == event) {
-            effect.apply(target: entity);
+        effect.tick(event);
+
+        if(effect.becameActive) {
+          effect.apply(target: entity);
+          if(effect.trigger == EntityEffectTrigger.once) {
+            toRemove.add(effect);
           }
-        }
-        else {
-          effect.tick(event);
         }
 
         if(effect.expired) {
           effect.unapply(target: entity);
-          if(effect.removeOnUnapply) toRemove.add(effect);
+          if(effect.removeOnUnapply) {
+            toRemove.add(effect);
+          }
         }
       }
 

@@ -30,6 +30,7 @@ abstract class DiceThrowModifier {
     required this.label,
     required this.value,
     this.matcher,
+    this.singleUse = false,
     this.alwaysApply = true,
     this.valueOverrideDiceThrowRequest,
     this.valueOverrideValidResults = const [DiceThrowResultType.success],
@@ -42,6 +43,7 @@ abstract class DiceThrowModifier {
   final String label;
   final int value;
   final DiceThrowMatcher? matcher;
+  final bool singleUse;
   final bool alwaysApply;
   final DiceThrowRequest? valueOverrideDiceThrowRequest;
   final List<DiceThrowResultType> valueOverrideValidResults;
@@ -57,7 +59,7 @@ abstract class DiceThrowModifier {
     if(valueOverride == null) return ret;
 
     if(valueOverrideValidResults.contains(evaluation.resultType)) {
-      ret = OneOffDiceThrowModifier(
+      ret = GenericDiceThrowModifier(
         type: type,
         family: family,
         label: label,
@@ -71,13 +73,14 @@ abstract class DiceThrowModifier {
   }
 }
 
-class OneOffDiceThrowModifier extends DiceThrowModifier {
-  const OneOffDiceThrowModifier({
+class GenericDiceThrowModifier extends DiceThrowModifier {
+  const GenericDiceThrowModifier({
     super.target,
     required super.type,
     required super.family,
     required super.label,
     required super.value,
+    super.singleUse,
     super.alwaysApply,
     super.valueOverrideDiceThrowRequest,
     super.valueOverrideValidResults,

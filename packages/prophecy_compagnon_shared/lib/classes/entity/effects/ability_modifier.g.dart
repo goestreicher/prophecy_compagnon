@@ -45,7 +45,7 @@ EntityEffectAbilityModifier _$EntityEffectAbilityModifierFromJson(
   active: json['active'] as bool? ?? false,
   ability: $enumDecode(_$AbilityEnumMap, json['ability']),
   modifier: (json['modifier'] as num).toInt(),
-);
+)..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt();
 
 Map<String, dynamic> _$EntityEffectAbilityModifierToJson(
   EntityEffectAbilityModifier instance,
@@ -66,6 +66,7 @@ Map<String, dynamic> _$EntityEffectAbilityModifierToJson(
       ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
   'remove_on_unapply': instance.removeOnUnapply,
+  'elapsed_trigger_units': instance.elapsedTriggerUnits,
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
   'ability': _$AbilityEnumMap[instance.ability]!,

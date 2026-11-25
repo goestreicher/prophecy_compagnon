@@ -47,8 +47,12 @@ _$EntityEffectGlobalDiceThrowModifierFromJson(Map<String, dynamic> json) =>
       family: $enumDecode(_$DiceThrowModifierFamilyEnumMap, json['family']),
       modifier: (json['modifier'] as num).toInt(),
       modifierId: json['modifier_id'] as String?,
+      matcher: json['matcher'] == null
+          ? null
+          : DiceThrowMatcher.fromJson(json['matcher'] as Map<String, dynamic>),
+      singleUse: json['single_use'] as bool? ?? false,
       alwaysApply: json['always_apply'] as bool? ?? true,
-    );
+    )..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt();
 
 Map<String, dynamic> _$EntityEffectGlobalDiceThrowModifierToJson(
   EntityEffectGlobalDiceThrowModifier instance,
@@ -69,12 +73,15 @@ Map<String, dynamic> _$EntityEffectGlobalDiceThrowModifierToJson(
       ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
   'remove_on_unapply': instance.removeOnUnapply,
+  'elapsed_trigger_units': instance.elapsedTriggerUnits,
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
   'type': _$DiceThrowModifierTypeEnumMap[instance.type]!,
   'family': _$DiceThrowModifierFamilyEnumMap[instance.family]!,
   'modifier': instance.modifier,
   'modifier_id': instance.modifierId,
+  'matcher': instance.matcher?.toJson(),
+  'single_use': instance.singleUse,
   'always_apply': instance.alwaysApply,
 };
 
@@ -102,6 +109,7 @@ const _$DiceThrowModifierTypeEnumMap = {
 
 const _$DiceThrowModifierFamilyEnumMap = {
   DiceThrowModifierFamily.advantage: 'advantage',
+  DiceThrowModifierFamily.attackEffect: 'attackEffect',
   DiceThrowModifierFamily.context: 'context',
   DiceThrowModifierFamily.criticalDiceThrow: 'criticalDiceThrow',
   DiceThrowModifierFamily.damage: 'damage',

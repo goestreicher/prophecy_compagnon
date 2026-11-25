@@ -1,18 +1,28 @@
 // GENERATED CODE - DO NOT EDIT
 
 import "package:prophecy_compagnon_shared/classes/entity/effect.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/ability_change.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/ability_modifier.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/attribute_modifier.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/damage.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/damage_malus_modifier.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/dice_throw_modifier.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/gain_luck.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/gain_proficiency.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/health_status.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart";
+import "package:prophecy_compagnon_shared/classes/entity/effects/injury.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/injury_capacity.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/luck_modifier.dart";
 import "package:prophecy_compagnon_shared/classes/entity/effects/null.dart";
 
 void registerEntityEffects() {
+  EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectAbilityChange",
+    (Map<String, dynamic> json) => EntityEffectAbilityChange.fromJson(json),
+  );
+
   EntityEffect.registerEntityEffectJsonFactory(
     "EntityEffectAbilityModifier",
     (Map<String, dynamic> json) => EntityEffectAbilityModifier.fromJson(json),
@@ -29,6 +39,11 @@ void registerEntityEffects() {
   );
 
   EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectDamage",
+    (Map<String, dynamic> json) => EntityEffectDamage.fromJson(json),
+  );
+
+  EntityEffect.registerEntityEffectJsonFactory(
     "EntityEffectDamageMalusModifier",
     (Map<String, dynamic> json) => EntityEffectDamageMalusModifier.fromJson(json),
   );
@@ -39,6 +54,16 @@ void registerEntityEffects() {
   );
 
   EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectGainLuck",
+    (Map<String, dynamic> json) => EntityEffectGainLuck.fromJson(json),
+  );
+
+  EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectGainProficiency",
+    (Map<String, dynamic> json) => EntityEffectGainProficiency.fromJson(json),
+  );
+
+  EntityEffect.registerEntityEffectJsonFactory(
     "EntityEffectHealthStatus",
     (Map<String, dynamic> json) => EntityEffectHealthStatus.fromJson(json),
   );
@@ -46,6 +71,11 @@ void registerEntityEffects() {
   EntityEffect.registerEntityEffectJsonFactory(
     "EntityEffectInitiativeExtraDice",
     (Map<String, dynamic> json) => EntityEffectInitiativeExtraDice.fromJson(json),
+  );
+
+  EntityEffect.registerEntityEffectJsonFactory(
+    "EntityEffectInjury",
+    (Map<String, dynamic> json) => EntityEffectInjury.fromJson(json),
   );
 
   EntityEffect.registerEntityEffectJsonFactory(

@@ -32,6 +32,7 @@ WeaponModel _$WeaponModelFromJson(Map<String, dynamic> json) => WeaponModel(
   skill: SpecializedSkill.fromJson(
     WeaponModel._getSkillFromJson(json, 'skill') as Map<String, dynamic>,
   ),
+  ability: $enumDecode(_$AbilityEnumMap, json['ability']),
   requirements: (json['requirements'] as Map<String, dynamic>).map(
     (k, e) => MapEntry($enumDecode(_$AbilityEnumMap, k), (e as num).toInt()),
   ),
@@ -81,6 +82,7 @@ Map<String, dynamic> _$WeaponModelToJson(WeaponModel instance) =>
       'handiness': instance.handiness,
       'layer': _$EquipableItemLayerEnumMap[instance.layer]!,
       'skill': WeaponModel._setSkillToJson(instance.skill),
+      'ability': _$AbilityEnumMap[instance.ability]!,
       'requirements': instance.requirements.map(
         (k, e) => MapEntry(_$AbilityEnumMap[k]!, e),
       ),

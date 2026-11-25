@@ -21,6 +21,7 @@ import 'package:go_router/go_router.dart';
 import 'package:prophecy_compagnon_mj/ui/app_routes.dart';
 import 'package:prophecy_compagnon_mj/ui/main_page.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/register_dice_throw_entity_bases.dart';
+import 'package:prophecy_compagnon_shared/classes/dice/register_dice_throw_matchers.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/register_entity_effects.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/register_board_items.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/register_combat_actions.dart';
@@ -45,6 +46,7 @@ void main() async {
   await DataStorage.instance.init();
   registerCombatActions();
   registerDiceThrowEntityBases();
+  registerDiceThrowMatchers();
   registerEntityEffects();
   registerSessionBoardItems();
   registerSessionMapItems();

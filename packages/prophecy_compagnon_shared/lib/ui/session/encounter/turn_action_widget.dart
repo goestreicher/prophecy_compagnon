@@ -97,114 +97,112 @@ class TurnActionWidget extends StatelessWidget {
         );
       }
       else {
-        if(action.stage == SessionEncounterEntityActionStage.none) {
-          if(controlling) {
-            bottomRow.add(
-              IconButton(
-                icon: Icon(Icons.pause),
-                iconSize: 18.0,
-                padding: const EdgeInsets.all(4.0),
-                constraints: const BoxConstraints(),
-                tooltip: "Retarder l'action",
-                onPressed: () async {
-                  var messageBus = SessionMessageBusClient.instance;
-                  if(messageBus == null) {
-                    // TODO: display a message
-                    return;
-                  }
-
-                  var response = await messageBus.publishAndWaitForResponse(
-                    SessionEncounterTurnDelayActionMessage(
-                      destination: SessionMessage.masterIdentifier,
-                      actionUuid: action.uuid,
-                    )
-                  );
-
-                  if(response.status != SessionMessageResponseStatus.accepted) {
-                    // TODO: display a message
-                    return;
-                  }
-                },
-              )
-            );
-
-            if(action.entity.canAct()) {
-              var initializers = <ActionInitializer>[];
-
-              /*
-                  Movement actions
-               */
-              if(action.entity.canMove()) {
-                initializers.addAll([
-                  ActionInitializerMovementSimple(),
-                  ActionInitializerMovementRun(),
-                  ActionInitializerMovementSprint(),
-                ]);
-              }
-              else if(
-                  action.entity.combatStatus.has(EntityCombatStatusFlag.onGround)
-                  && !action.entity.combatStatus.has(EntityCombatStatusFlag.grappled)
-              ) {
-                initializers.add(
-                  ActionInitializerMovementGetUp(),
-                );
-              }
-
-              if(initializers.isNotEmpty) {
-                bottomRow.add(
-                  _ActionTypeMenu(
-                    type: CombatActionType.movement,
-                    action: action,
-                    items: initializers,
-                    actionBuildContext: context,
-                  )
-                );
-              }
-
-              /*
-                  Attack actions
-               */
-              initializers.clear();
-              EquipableItemSlot hand;
-              if(action.weakHand) {
-                hand = EquipableItemSlot.weakHand;
-              }
-              else {
-                hand = EquipableItemSlot.dominantHand;
-              }
-
-              for(var dp in action.entity.damageProviderForHand(hand)) {
-                if(dp is! Weapon) {
-                  continue;
+        if(!controlling) {
+          bottomRow.add(
+            Text(
+              'Action contrôlée par un autre client',
+              style: theme.textTheme.bodySmall,
+            )
+          );
+        }
+        else if(action.stage == SessionEncounterEntityActionStage.none) {
+          bottomRow.add(
+            IconButton(
+              icon: Icon(Icons.pause),
+              iconSize: 18.0,
+              padding: const EdgeInsets.all(4.0),
+              constraints: const BoxConstraints(),
+              tooltip: "Retarder l'action",
+              onPressed: () async {
+                var messageBus = SessionMessageBusClient.instance;
+                if(messageBus == null) {
+                  // TODO: display a message
+                  return;
                 }
 
-                initializers.add(
-                  ActionInitializerWeapon(weapon: dp)
-                );
-              }
-
-              if(initializers.isNotEmpty) {
-                bottomRow.add(
-                  _ActionTypeMenu(
-                    type: CombatActionType.attack,
-                    action: action,
-                    items: initializers,
-                    actionBuildContext: context,
+                var response = await messageBus.publishAndWaitForResponse(
+                  SessionEncounterTurnDelayActionMessage(
+                    destination: SessionMessage.masterIdentifier,
+                    actionUuid: action.uuid,
                   )
                 );
+
+                if(response.status != SessionMessageResponseStatus.accepted) {
+                  // TODO: display a message
+                  return;
+                }
+              },
+            )
+          );
+
+          if(action.entity.canAct()) {
+            var initializers = <ActionInitializer>[];
+
+            /*
+                Movement actions
+             */
+            if(action.entity.canMove()) {
+              initializers.addAll([
+                ActionInitializerMovementSimple(),
+                ActionInitializerMovementRun(),
+                ActionInitializerMovementSprint(),
+              ]);
+            }
+            else if(
+                action.entity.combatStatus.has(EntityCombatStatusFlag.onGround)
+                && !action.entity.combatStatus.has(EntityCombatStatusFlag.grappled)
+            ) {
+              initializers.add(
+                ActionInitializerMovementGetUp(),
+              );
+            }
+
+            if(initializers.isNotEmpty) {
+              bottomRow.add(
+                _ActionTypeMenu(
+                  type: CombatActionType.movement,
+                  action: action,
+                  items: initializers,
+                  actionBuildContext: context,
+                )
+              );
+            }
+
+            /*
+                Attack actions
+             */
+            initializers.clear();
+            EquipableItemSlot hand;
+            if(action.weakHand) {
+              hand = EquipableItemSlot.weakHand;
+            }
+            else {
+              hand = EquipableItemSlot.dominantHand;
+            }
+
+            for(var dp in action.entity.damageProviderForHand(hand)) {
+              if(dp is! Weapon) {
+                continue;
               }
+
+              initializers.add(
+                ActionInitializerWeapon(weapon: dp)
+              );
+            }
+
+            if(initializers.isNotEmpty) {
+              bottomRow.add(
+                _ActionTypeMenu(
+                  type: CombatActionType.attack,
+                  action: action,
+                  items: initializers,
+                  actionBuildContext: context,
+                )
+              );
             }
           }
-          else {
-            bottomRow.add(
-              Text(
-                'Action contrôlée par un autre client',
-                style: theme.textTheme.bodySmall,
-              )
-            );
-          }
         }
-        else if (action.stage == SessionEncounterEntityActionStage.assigned) {
+        else if(action.stage == SessionEncounterEntityActionStage.assigned) {
           var initializer = action.combatAction?.initializer();
 
           if(initializer == null) {

@@ -117,8 +117,8 @@ class _SessionCharacterInfoWidgetState extends State<SessionCharacterInfoWidget>
 
 enum _SessionCharacterInfoSelectedView {
   actions(title: 'Actions'),
-  injuries(title: 'Blessures'),
   attributes(title: 'Attributs'),
+  injuries(title: 'Blessures'),
   ;
 
   final String title;

@@ -55,5 +55,5 @@ abstract class DiceThrowEntityBase {
       _baseFactories[name] = factory;
 
   static final Map<String, DiceThrowEntityBaseJsonFactory> _baseFactories =
-  <String, DiceThrowEntityBaseJsonFactory>{};
+      <String, DiceThrowEntityBaseJsonFactory>{};
 }

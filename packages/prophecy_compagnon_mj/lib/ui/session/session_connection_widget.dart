@@ -197,7 +197,7 @@ class _SessionConnectionWidgetState extends State<SessionConnectionWidget> {
 
     if(m is SessionEntityAddEffectMessage) {
       entity.effects.add(m.effect);
-      if(m.effect.canApply(target: entity)) {
+      if(m.effect.canApply(target: entity, activationDiceThrowEvaluation: m.activationDiceThrowEvaluation)) {
         m.effect.apply(
           target: entity,
           activationDiceThrowEvaluation: m.activationDiceThrowEvaluation

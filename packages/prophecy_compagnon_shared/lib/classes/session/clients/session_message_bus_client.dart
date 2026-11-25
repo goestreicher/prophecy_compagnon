@@ -24,6 +24,12 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/session_set_s
 import 'package:prophecy_compagnon_shared/classes/session/session_message_bus.dart';
 import 'package:uuid/uuid.dart';
 
+class SessionMessageBusClientException implements Exception {
+  SessionMessageBusClientException(this.message);
+
+  final String message;
+}
+
 abstract class SessionMessageBusClient {
   SessionMessageBusClient()
     : uuid = Uuid().v4().toString(),

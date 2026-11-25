@@ -386,6 +386,7 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
         TextButton(
           onPressed: () {
             disableDiceThrowEffects();
+
             Navigator.of(context, rootNavigator: true).pop();
           },
           child: const Text('Annuler'),
@@ -395,6 +396,15 @@ class _EntityDiceThrowDialogState extends State<EntityDiceThrowDialog> {
             ? null
             : () {
                 disableDiceThrowEffects();
+
+                for(var b in bundles.values) {
+                  for(var m in b!.result.modifiers) {
+                    if(m.singleUse) {
+                      b.entity.removeThrowModifier(m.id);
+                    }
+                  }
+                }
+
                 Navigator.of(context, rootNavigator: true).pop(
                   bundles.values
                     .map((EntityThrowBundle? b) => b!)

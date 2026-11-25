@@ -42,7 +42,7 @@ EntityEffectNull _$EntityEffectNullFromJson(Map<String, dynamic> json) =>
       removeOnUnapply: json['remove_on_unapply'] as bool? ?? false,
       elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
       active: json['active'] as bool? ?? false,
-    );
+    )..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt();
 
 Map<String, dynamic> _$EntityEffectNullToJson(EntityEffectNull instance) =>
     <String, dynamic>{
@@ -62,6 +62,7 @@ Map<String, dynamic> _$EntityEffectNullToJson(EntityEffectNull instance) =>
           ?.toJson(),
       'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
       'remove_on_unapply': instance.removeOnUnapply,
+      'elapsed_trigger_units': instance.elapsedTriggerUnits,
       'elapsed_duration_units': instance.elapsedDurationUnits,
       'active': instance.active,
     };

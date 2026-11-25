@@ -36,16 +36,21 @@ enum EntityEffectTrigger {
 }
 
 enum EntityEffectTarget {
+  ability,
   abilityModifier,
   attributeModifier,
   combatStatus,
+  damage,
   damageMalusModifier,
   diceThrowModifier,
   healthStatus,
   initiativeExtraDice,
+  injury,
   injuryCapacity,
+  luck,
   luckModifier,
   none,
+  proficiency,
   ;
 }
 
@@ -127,6 +132,7 @@ abstract class EntityEffect {
     this.activationDiceThrowValueTransformer,
     List<EntityEffect>? postEffects,
     this.removeOnUnapply = false,
+    this.elapsedTriggerUnits = 0,
     this.elapsedDurationUnits,
     bool active = false,
   })
@@ -145,17 +151,29 @@ abstract class EntityEffect {
   final EntityEffectActivationDiceThrowValueTransformer? activationDiceThrowValueTransformer;
   final List<EntityEffect> postEffects;
   final bool removeOnUnapply;
+  int elapsedTriggerUnits;
   int? elapsedDurationUnits;
   bool _active;
 
   Map<String, dynamic> effectToJson();
 
-  bool canApply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) =>
-    activationDiceThrowRequest == null
-    || (
-        activationDiceThrowEvaluation != null
-        && activationDiceThrowValidResults.contains(activationDiceThrowEvaluation.resultType)
-    );
+  bool canApply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
+    if(_active) {
+      return false;
+    }
+
+    if(activationDiceThrowRequest != null) {
+      return
+          activationDiceThrowEvaluation != null
+          && activationDiceThrowValidResults.contains(activationDiceThrowEvaluation.resultType);
+    }
+
+    if(triggerTickerEvent != null) {
+      return false;
+    }
+
+    return true;
+  }
 
   void setActivationDiceThrowValue(int v) {}
 
@@ -202,6 +220,19 @@ abstract class EntityEffect {
 
   @mustCallSuper
   void tick(TickerEvent event) {
+    _tickTrigger(event);
+    _tickDuration(event);
+  }
+
+  void _tickTrigger(TickerEvent event) {
+    if(triggerTickerEvent == null) return;
+    if(triggerTickerEvent!.type != TickerEventType.end) return;
+    if(active) return;
+
+    elapsedTriggerUnits = elapsedTriggerUnits + 1;
+  }
+
+  void _tickDuration(TickerEvent event) {
     if(duration == null) return;
     if(duration!.type != TickerEventType.end) return;
     if(!active) return;
@@ -210,10 +241,25 @@ abstract class EntityEffect {
     elapsedDurationUnits = elapsedDurationUnits! + 1;
   }
 
-  bool get expired =>
-      duration != null
-      && elapsedDurationUnits != null
-      && elapsedDurationUnits! >= duration!.count;
+  bool get becameActive =>
+      triggerTickerEvent != null
+      && elapsedTriggerUnits >= triggerTickerEvent!.count;
+
+  bool get expired {
+    if(duration == null) {
+      if(triggerTickerEvent == null) {
+        return true;
+      }
+      else {
+        return becameActive;
+      }
+    }
+    else {
+      return
+        elapsedDurationUnits != null
+        && elapsedDurationUnits! >= duration!.count;
+    }
+  }
 
   factory EntityEffect.fromJson(Map<String, dynamic> json) {
     if(!json.containsKey('_type')) {
@@ -245,6 +291,15 @@ class EntityEffects with Iterable<EntityEffect>, ChangeNotifier {
   Iterator<EntityEffect> get iterator => _all.iterator;
 
   void add(EntityEffect effect) {
+    // Effects that trigger only once when added are not saved for long-term use
+    if(
+        effect.trigger == EntityEffectTrigger.once
+        && effect.triggerTickerEvent == null
+        && effect.activationDiceThrowRequest == null
+    ) {
+      return;
+    }
+
     if(_all.any((EntityEffect e) => e.id == effect.id)) {
       return;
     }

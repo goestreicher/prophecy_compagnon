@@ -20,7 +20,7 @@ import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 
 enum CombatActionAttackRangedType {
   simple(title: "Attaque simple", icon: CustomIcons.bow),
-  // precise(title: "Attaque précise"),
+  precise(title: "Attaque précise", icon: CustomIcons.bowPrecise),
   ;
 
   final String title;

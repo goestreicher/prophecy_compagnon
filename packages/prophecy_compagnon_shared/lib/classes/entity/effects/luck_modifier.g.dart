@@ -44,7 +44,7 @@ EntityEffectLuckModifier _$EntityEffectLuckModifierFromJson(
   elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
   active: json['active'] as bool? ?? false,
   value: (json['value'] as num).toInt(),
-);
+)..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt();
 
 Map<String, dynamic> _$EntityEffectLuckModifierToJson(
   EntityEffectLuckModifier instance,
@@ -65,6 +65,7 @@ Map<String, dynamic> _$EntityEffectLuckModifierToJson(
       ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
   'remove_on_unapply': instance.removeOnUnapply,
+  'elapsed_trigger_units': instance.elapsedTriggerUnits,
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
   'value': instance.value,

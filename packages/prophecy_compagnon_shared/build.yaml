@@ -22,6 +22,12 @@ builders:
     build_extensions: {"lib/$lib$": ["lib/classes/dice/register_dice_throw_entity_bases.dart"]}
     auto_apply: root_package
     build_to: source
+  register_dice_throw_matchers:
+    import: "package:prophecy_compagnon_shared/builders/dice_throw_matchers_builder.dart"
+    builder_factories: ["registerDiceThrowMatchersBuilder"]
+    build_extensions: {"lib/$lib$": ["lib/classes/dice/register_dice_throw_matchers.dart"]}
+    auto_apply: root_package
+    build_to: source
   register_entity_effects:
     import: "package:prophecy_compagnon_shared/builders/entity_effects_builder.dart"
     builder_factories: ["registerEntityEffectsBuilder"]

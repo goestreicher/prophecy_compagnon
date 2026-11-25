@@ -32,7 +32,7 @@ Builder registerDiceThrowEntityBasesBuilder(BuilderOptions options) {
 
 class RegisterDiceThrowEntityBasesBuilder implements Builder {
   RegisterDiceThrowEntityBasesBuilder({ required this.options })
-      : generator = RegisterDiceThrowEntityBaseGenerator();
+    : generator = RegisterDiceThrowEntityBaseGenerator();
 
   final BuilderOptions options;
   final RegisterDiceThrowEntityBaseGenerator generator;

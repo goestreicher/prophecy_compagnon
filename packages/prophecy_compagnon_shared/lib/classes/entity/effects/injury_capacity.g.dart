@@ -39,7 +39,7 @@ EntityEffectInjuryCapacity _$EntityEffectInjuryCapacityFromJson(
   damage: (json['damage'] as Map<String, dynamic>).map(
     (k, e) => MapEntry($enumDecode(_$InjuryEnumMap, k), (e as num).toInt()),
   ),
-);
+)..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt();
 
 Map<String, dynamic> _$EntityEffectInjuryCapacityToJson(
   EntityEffectInjuryCapacity instance,
@@ -57,6 +57,7 @@ Map<String, dynamic> _$EntityEffectInjuryCapacityToJson(
       .toList(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
   'remove_on_unapply': instance.removeOnUnapply,
+  'elapsed_trigger_units': instance.elapsedTriggerUnits,
   'elapsed_duration_units': instance.elapsedDurationUnits,
   'active': instance.active,
   'damage': instance.damage.map((k, e) => MapEntry(_$InjuryEnumMap[k]!, e)),

@@ -20,8 +20,8 @@ import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 
 enum CombatActionAttackMeleeType {
   simple(title: "Attaque simple", icon: CustomIcons.sword),
-  // brutal(title: "Attaque brutale", icon: CustomIcons.swordBrutal),
-  // precise(title: "Attaque précise", icon: CustomIcons.swordPrecise),
+  brutal(title: "Attaque brutale", icon: CustomIcons.swordBrutal),
+  precise(title: "Attaque précise", icon: CustomIcons.swordPrecise),
   // stun(title: "Assomer", icon: CustomIcons.sword),
   // confuse(title: "Attaque déroutante", icon: CustomIcons.sword),
   // charge(title: "Charger", icon: CustomIcons.sword),

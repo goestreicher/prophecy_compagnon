@@ -15,9 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_matcher.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 
+part 'request_context.g.dart';
+
+@JsonSerializable()
 class ThrowRequestContextDiceThrowMatcher extends DiceThrowMatcher {
   const ThrowRequestContextDiceThrowMatcher({ required this.context });
 
@@ -26,4 +30,11 @@ class ThrowRequestContextDiceThrowMatcher extends DiceThrowMatcher {
   @override
   bool matches(DiceThrowRequest request) =>
       request.context == context;
+
+  @override
+  Map<String, dynamic> diceThrowMatcherToJson() =>
+      _$ThrowRequestContextDiceThrowMatcherToJson(this);
+
+  factory ThrowRequestContextDiceThrowMatcher.fromJson(Map<String, dynamic> json) =>
+      _$ThrowRequestContextDiceThrowMatcherFromJson(json);
 }

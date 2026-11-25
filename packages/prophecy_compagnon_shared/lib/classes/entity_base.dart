@@ -118,12 +118,17 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
         case EntityEffectTarget.damageMalusModifier:
         case EntityEffectTarget.diceThrowModifier:
           effect.apply(target: this);
+        case EntityEffectTarget.ability:
         case EntityEffectTarget.combatStatus:
+        case EntityEffectTarget.damage:
         case EntityEffectTarget.healthStatus:
         case EntityEffectTarget.initiativeExtraDice:
+        case EntityEffectTarget.injury:
         case EntityEffectTarget.injuryCapacity:
+        case EntityEffectTarget.luck:
         case EntityEffectTarget.luckModifier:
         case EntityEffectTarget.none:
+        case EntityEffectTarget.proficiency:
           continue;
       }
     }
@@ -184,22 +189,13 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
       && !combatStatus.has(EntityCombatStatusFlag.onGround)
       && !combatStatus.has(EntityCombatStatusFlag.grappled);
 
-  int takeDamage(int amount, { int armorDivider = 1 }) {
-    var finalDamage = amount;
-    // TODO: manage shields when used to block an attack (in which case their protection don't apply
-    for(var pp in _protectionProviders) {
-      int reduction = pp.protection() ~/ armorDivider;
-      finalDamage -= reduction;
-    }
-
-    if(finalDamage > 0) {
-      injuries.manager.dealDamage(finalDamage);
+  void takeDamage(int amount) {
+    if(amount > 0) {
+      injuries.manager.dealDamage(amount);
       if(injuries.manager.isDead()) {
         healthStatus.add(EntityHealthStatusFlag.dead);
       }
     }
-
-    return finalDamage > 0 ? finalDamage : 0;
   }
 
   int damageMalus() {
@@ -226,7 +222,7 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
 
     if(damageMalus() < 0) {
       ret.add(
-        OneOffDiceThrowModifier(
+        GenericDiceThrowModifier(
           type: DiceThrowModifierType.malus,
           family: DiceThrowModifierFamily.damage,
           label: 'Malus de dégâts',
@@ -238,7 +234,7 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
 
     if(healthStatus.has(EntityHealthStatusFlag.stunned)) {
       ret.add(
-        OneOffDiceThrowModifier(
+        GenericDiceThrowModifier(
           type: DiceThrowModifierType.malus,
           family: DiceThrowModifierFamily.healthStatus,
           label: 'Étourdi',
@@ -311,6 +307,8 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
   }
 
   final List<ProtectionProvider> _protectionProviders = <ProtectionProvider>[];
+
+  Iterable<ProtectionProvider> get protectionProviders => _protectionProviders;
 
   void addProtectionProvider(ProtectionProvider pp) {
     _protectionProviders.add(pp);

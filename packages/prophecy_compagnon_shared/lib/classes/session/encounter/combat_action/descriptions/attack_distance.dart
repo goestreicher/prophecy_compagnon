@@ -20,8 +20,8 @@ import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 
 enum CombatActionAttackDistanceType {
   simple(title: "Attaque simple", icon: CustomIcons.halberd),
-  // brutal(title: "Attaque brutale"),
-  // precise(title: "Attaque précise"),
+  brutal(title: "Attaque brutale", icon: CustomIcons.halberdBrutal),
+  precise(title: "Attaque précise", icon: CustomIcons.halberdPrecise),
   // stun(title: "Assomer"),
   // confuse(title: "Attaque déroutante"),
   // charge(title: "Charger"),
