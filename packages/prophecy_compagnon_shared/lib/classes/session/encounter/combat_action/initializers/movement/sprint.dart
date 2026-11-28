@@ -62,8 +62,11 @@ class ActionInitializerMovementSprint extends ActionInitializer {
   Future<void> _doPlan(BuildContext context, SessionEncounterEntityAction action) async {
     var messageBus = SessionMessageBusClient.instance;
     if(messageBus == null) {
-      // TODO: display a message
-      return;
+      throw(
+        SessionMessageBusClientException(
+          "Aucune instance du bus de message n'a été trouvée, impossible de planifier l'action",
+        )
+      );
     }
 
     var assignedActions = <SessionEncounterEntityAction>[];
@@ -94,13 +97,26 @@ class ActionInitializerMovementSprint extends ActionInitializer {
       );
 
       if(diceThrowResponse.status != SessionMessageResponseStatus.accepted) {
-        // TODO: display a nice message ?
-        return;
+        throw(
+          ActionInitializerException(
+            title: "Demande de jet de dé non acceptée",
+            message:
+              "La demande de jet de dé n'a pas été acceptée (statut "
+              "${diceThrowResponse.status}), impossible de planifier l'action"
+          )
+        );
       }
 
       if(diceThrowResponse.data is! EntityThrowBundle) {
-        // TODO: display a nice message ?
-        return;
+        throw(
+          ActionInitializerException(
+            title: "Réponse au jet invalide",
+            message:
+              "La réponse au jet n'est pas au format attendu "
+              "(${diceThrowResponse.runtimeType} au lieu de EntityThrowBundle, "
+              "impossible de planifier l'action"
+          )
+        );
       }
 
       var bundle = diceThrowResponse.data as EntityThrowBundle;
@@ -140,8 +156,14 @@ class ActionInitializerMovementSprint extends ActionInitializer {
         );
 
         if(setResponse.status != SessionMessageResponseStatus.accepted) {
-          // TODO: display a message
-          return;
+          throw(
+            ActionInitializerException(
+              title: "Affectation de l'action non acceptée",
+              message:
+                "La demande d'affectation de l'action n'a pas été acceptée (statut "
+                "${setResponse.status}), impossible de planifier l'action"
+            )
+          );
         }
 
         return;
@@ -162,8 +184,14 @@ class ActionInitializerMovementSprint extends ActionInitializer {
       );
 
       if(usableActionsResponse.status != SessionMessageResponseStatus.accepted) {
-        // TODO: display a nice message ?
-        return;
+        throw(
+          ActionInitializerException(
+            title: "Demande d'actions utilisables non acceptée",
+            message:
+              "La demande d'actions utilisables n'a pas été acceptée (statut "
+              "${usableActionsResponse.status}), impossible de planifier l'action"
+          )
+        );
       }
 
       if(usableActionsResponse.data != null) {
@@ -185,8 +213,24 @@ class ActionInitializerMovementSprint extends ActionInitializer {
           );
 
           if(assignResponse.status != SessionMessageResponseStatus.accepted) {
-            // TODO: display a message
-            continue;
+            for(var aa in assignedActions) {
+              messageBus.publish(
+                SessionEncounterTurnUnassignCombatActionMessage(
+                  destination: SessionMessage.masterIdentifier,
+                  actionUuid: aa.uuid,
+                )
+              );
+            }
+
+            throw(
+              ActionInitializerException(
+                title: "Demande d'assignation d'action non acceptée",
+                message:
+                  "La demande d'assignation pour l'action de rang ${a.rank} n'a "
+                  "pas été acceptée (statut ${assignResponse.status}), "
+                  "impossible de planifier l'action"
+              )
+            );
           }
 
           assignedActions.add(a);
@@ -242,8 +286,14 @@ class ActionInitializerMovementSprint extends ActionInitializer {
         );
       }
 
-      // TODO: display a nice message?
-      return;
+      throw(
+        ActionInitializerException(
+          title: "Déplacement invalide retourné",
+          message:
+            "Un chemin invalide ou vide a été retourné, "
+            "impossible de planifier l'action"
+        )
+      );
     }
 
     var setResponse = await messageBus.publishAndWaitForResponse(
@@ -271,8 +321,14 @@ class ActionInitializerMovementSprint extends ActionInitializer {
         );
       }
 
-      // TODO: display a message
-      return;
+      throw(
+        ActionInitializerException(
+          title: "Affectation de l'action non acceptée",
+          message:
+            "La demande d'affectation de l'action n'a pas été acceptée (statut "
+            "${setResponse.status}), impossible de planifier l'action"
+        )
+      );
     }
   }
 }

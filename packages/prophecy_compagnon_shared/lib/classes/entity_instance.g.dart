@@ -39,6 +39,9 @@ EntityInstance _$EntityInstanceFromJson(Map<String, dynamic> json) =>
       )
       ..description = json['description'] as String
       ..skills = EntitySkills.fromJson(json['skills'] as Map<String, dynamic>)
+      ..cumulativeAttackMalus = (json['cumulative_attack_malus'] as num).toInt()
+      ..cumulativeDefenseMalus = (json['cumulative_defense_malus'] as num)
+          .toInt()
       ..image = json['image'] == null
           ? null
           : ExportableBinaryData.fromJson(json['image'] as Map<String, dynamic>)
@@ -60,6 +63,8 @@ Map<String, dynamic> _$EntityInstanceToJson(EntityInstance instance) =>
       'skills': instance.skills.toJson(),
       'health_status': instance.healthStatus.toJson(),
       'combat_status': instance.combatStatus.toJson(),
+      'cumulative_attack_malus': instance.cumulativeAttackMalus,
+      'cumulative_defense_malus': instance.cumulativeDefenseMalus,
       'model_specification': instance.modelSpecification,
       'image': instance.image?.toJson(),
       'icon': instance.icon?.toJson(),

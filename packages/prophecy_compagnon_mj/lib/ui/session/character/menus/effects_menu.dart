@@ -25,6 +25,7 @@ import 'package:prophecy_compagnon_shared/classes/session/clients/session_messag
 import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_effect.dart';
+import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 
 class EffectsMenuWidget extends StatefulWidget {
@@ -158,7 +159,11 @@ class _EffectsMenuWidgetState extends State<EffectsMenuWidget> {
                   );
 
                   if(!selected!.canApply(target: widget.entity, activationDiceThrowEvaluation: activationDiceThrowEvaluation)) {
-                    // TODO: display a message?
+                    await displayErrorDialog(
+                      context,
+                      "L'effet ne peut pas être appliqué",
+                      "Impossible d'appliquer cet effet",
+                    );
                     return;
                   }
                 }

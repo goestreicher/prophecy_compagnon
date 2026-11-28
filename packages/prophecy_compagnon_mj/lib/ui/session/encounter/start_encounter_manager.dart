@@ -28,6 +28,7 @@ import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/action/start_pc_review.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
+import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 
 class StartEncounterResult {
   StartEncounterResult({
@@ -61,23 +62,40 @@ class StartEncounterManager {
     // TODO: In that case, how to manage the board and the thumbnail?
     if(mapResult == null) return false;
 
-    var reviewResponse = await SessionMessageBusClient.instance
-        ?.publishAndWaitForResponse(
-            SessionStartPlayerCharacterReview(
-              destination: SessionMessage.masterIdentifier,
-            ),
-          );
+    var messageBus = SessionMessageBusClient.instance;
+    if(messageBus == null) {
+      await displayErrorDialog(
+        context,
+        "Pas de connexion au bus de messages",
+        "Aucune instance du bus de message n'a été trouvée, impossible de lancer la rencontre",
+      );
+      return false;
+    }
+
+    var reviewResponse = await messageBus.publishAndWaitForResponse(
+      SessionStartPlayerCharacterReview(
+        destination: SessionMessage.masterIdentifier,
+      ),
+    );
     if(!context.mounted) return false;
-    if(reviewResponse == null) return false;
 
     if(reviewResponse.status != SessionMessageResponseStatus.accepted) {
-      // TODO: display a nice message?
+      await displayErrorDialog(
+        context,
+        "Revue non acceptée",
+        "La revue des personnage n'a pas été acceptée (statut "
+        "${reviewResponse.status}), la rencontre est abandonnée",
+      );
       return false;
     }
 
     var selectedCharacters = (reviewResponse.data as List<PlayerCharacter>?);
     if(selectedCharacters == null || selectedCharacters.isEmpty) {
-      // TODO: display a nice message?
+      await displayErrorDialog(
+        context,
+        "Aucun personnage sélectionné",
+        "Aucun personnage n'a été sélectionné, la rencontre est abandonnée",
+      );
       return false;
     }
 

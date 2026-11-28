@@ -37,6 +37,7 @@ import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_instance.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/protection_provider.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/weapon.dart';
 import 'package:prophecy_compagnon_shared/classes/exportable_binary_data.dart';
 import 'package:prophecy_compagnon_shared/classes/magic_user.dart';
@@ -582,6 +583,8 @@ class Creature extends EntityBase with EncounterEntityModel, MagicUser {
     EntityMagic? magic,
     EntityDraconicFavors? favors,
     EntityEffects? effects,
+    int cumulativeAttackMalus = 0,
+    int cumulativeDefenseMalus = 0,
   }) {
     bool isDefault = (location.type == ObjectLocationType.assets);
     String id = uuid ?? (isDefault ? _getId(name) : Uuid().v4().toString());
@@ -613,6 +616,8 @@ class Creature extends EntityBase with EncounterEntityModel, MagicUser {
             magic: magic,
             favors: favors,
             effects: effects,
+            cumulativeAttackMalus: cumulativeAttackMalus,
+            cumulativeDefenseMalus: cumulativeDefenseMalus,
           );
     _cache.add(id, model);
     // Force insertion in CreatureSummary cache
@@ -649,6 +654,8 @@ class Creature extends EntityBase with EncounterEntityModel, MagicUser {
         super.magic,
         super.favors,
         super.effects,
+        super.cumulativeAttackMalus,
+        super.cumulativeDefenseMalus,
       })
     : naturalWeapons = naturalWeapons ?? <NaturalWeaponModel>[],
       specialCapabilities = specialCapabilities ?? <CreatureSpecialCapability>[];

@@ -21,6 +21,19 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_actio
 import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/turn/action_planning.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 
+class ActionInitializerException implements Exception {
+  ActionInitializerException({
+    required this.title,
+    required this.message,
+  });
+
+  final String title;
+  final String message;
+
+  @override
+  String toString() => '$title\n$message';
+}
+
 abstract class ActionInitializer {
   ActionInitializer();
 
@@ -35,7 +48,16 @@ abstract class ActionInitializer {
       SessionEncounterEntityAction action,
       Future<void> Function(BuildContext, SessionEncounterEntityAction) guarded
   ) async {
-    var planResponse = await SessionMessageBusClient.instance?.publishAndWaitForResponse(
+    var messageBus = SessionMessageBusClient.instance;
+    if(messageBus == null) {
+      throw(
+        SessionMessageBusClientException(
+          "Aucune instance du bus de message n'a été trouvée, impossible de planifier l'action",
+        )
+      );
+    }
+
+    var planResponse = await messageBus.publishAndWaitForResponse(
       SessionEncounterTurnActionPlanningStart(
         destination: SessionMessageBusClient.instance!.uuid,
         actionUuid: action.uuid,
@@ -46,19 +68,20 @@ abstract class ActionInitializer {
       return;
     }
 
-    if(planResponse == null) {
-      // TODO: display a nice message?
-      return;
-    }
-
     if(planResponse.status != SessionMessageResponseStatus.accepted) {
-      // TODO: display a nice message?
-      return;
+      throw(
+        ActionInitializerException(
+          title: "Début de planification non accepté",
+          message:
+            "La planification n'a pas été acceptée (statut "
+            "${planResponse.status}), impossible de planifier l'action"
+        )
+      );
     }
 
     await guarded(context, action);
 
-    SessionMessageBusClient.instance?.publish(
+    messageBus.publish(
       SessionEncounterTurnActionPlanningEnd(
         destination: SessionMessageBusClient.instance!.uuid,
         actionUuid: action.uuid,

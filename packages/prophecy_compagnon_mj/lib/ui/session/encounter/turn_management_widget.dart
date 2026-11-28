@@ -370,6 +370,17 @@ class _TurnManagementWidgetState extends State<TurnManagementWidget> {
           action.stage = SessionEncounterEntityActionStage.none;
         });
       }
+      else if(action.stage == SessionEncounterEntityActionStage.approved) {
+        if(action.combatAction?.interpolate ?? false) {
+          // TODO: log that this action cannot be unassigned, ERROR level
+        }
+        else {
+          setState(() {
+            action.combatAction = null;
+            action.stage = SessionEncounterEntityActionStage.none;
+          });
+        }
+      }
     }
     else if(m is SessionEncounterTurnSetCombatActionMessage) {
       if(action == null) {

@@ -278,6 +278,8 @@ class PlayerCharacter extends HumanCharacter {
     EntityDraconicFavors? favors,
     EntityFervor? fervor,
     EntityEffects? effects,
+    int cumulativeAttackMalus = 0,
+    int cumulativeDefenseMalus = 0,
     ExportableBinaryData? image,
     ExportableBinaryData? icon,
   })
@@ -323,6 +325,8 @@ class PlayerCharacter extends HumanCharacter {
           favors: favors,
           fervor: fervor,
           effects: effects,
+          cumulativeAttackMalus: cumulativeAttackMalus,
+          cumulativeDefenseMalus: cumulativeDefenseMalus,
           image: image,
           icon: icon,
         );
@@ -372,6 +376,8 @@ class PlayerCharacter extends HumanCharacter {
     super.favors,
     super.fervor,
     super.effects,
+    super.cumulativeAttackMalus,
+    super.cumulativeDefenseMalus,
     super.image,
     super.icon,
   });

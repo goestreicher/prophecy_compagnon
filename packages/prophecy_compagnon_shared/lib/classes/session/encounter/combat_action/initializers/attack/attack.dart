@@ -18,6 +18,8 @@
 import 'dart:math';
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/character/character_disadvantage.dart';
+import 'package:prophecy_compagnon_shared/classes/character/disadvantages.dart';
 import 'package:prophecy_compagnon_shared/classes/character/tendencies.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.dart';
@@ -29,15 +31,21 @@ import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/ability_change.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/attribute_change.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/damage.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/damage_armor.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/damage_malus_modifier.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/dice_throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/disadvantage.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/gain_experience.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/gain_luck.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/gain_proficiency.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/initiative_extra_dice.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/injury.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/tendency_circles.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/armor.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/weapon.dart';
 import 'package:prophecy_compagnon_shared/classes/human_character.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
@@ -46,6 +54,7 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actio
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/attack.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/defense.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/attack/context.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/attack/utils.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
@@ -60,14 +69,21 @@ import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 import 'package:prophecy_compagnon_shared/ui/dice_roll_input_dialog.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
 
+part 'attack.internal.cc.dart';
+
 abstract class ActionInitializerAttack extends ActionInitializer {
   ActionInitializerAttack({
-    required this.weapon,
-    required this.target,
-  });
+    required EntityBase attacker,
+    required Weapon weapon,
+    required EntityBase target,
+  })
+    : attackContext = ActionInitializerAttackContext(
+        attacker: attacker,
+        weapon: weapon,
+        target: target,
+      );
 
-  final Weapon weapon;
-  final EntityBase target;
+  final ActionInitializerAttackContext attackContext;
 
   int get attackDifficulty;
   int get dodgeDifficulty;
@@ -75,27 +91,15 @@ abstract class ActionInitializerAttack extends ActionInitializer {
   int get damageModifier => 0;
   int get armorModifier => 0;
 
-  @protected
-    SessionEncounterEntityAction? defenseAction;
-  @protected
-    CombatActionDefense? defenseCombatAction;
-  @protected
-    late DiceThrowRequest attackRequest;
-  @protected
-    DiceThrowRequest? defenseRequest;
-  @protected
-    int damage = 0;
-  @protected
-    final List<SessionMessage> attackEffects = <SessionMessage>[];
-  @protected
-    bool ignoreArmor = false;
-
   @override
   Future<void> plan(BuildContext context, SessionEncounterEntityAction action) async {
     var messageBus = SessionMessageBusClient.instance;
     if(messageBus == null) {
-      // TODO: display a message
-      return;
+      throw(
+        SessionMessageBusClientException(
+          "Aucune instance du bus de message n'a été trouvée, impossible de planifier l'action",
+        )
+      );
     }
 
     await selectTargetDefense(
@@ -107,12 +111,12 @@ abstract class ActionInitializerAttack extends ActionInitializer {
     createAttackRequest();
     var entities = <EntityBase>[];
 
-    if(defenseCombatAction != null) {
+    if(attackContext.defenseCombatAction != null) {
       createDefenseRequest();
-      entities.addAll([action.entity, target]);
+      entities.addAll([attackContext.attacker, attackContext.target]);
     }
     else {
-      entities.add(action.entity);
+      entities.add(attackContext.attacker);
     }
 
     var bundles = await showDialog<List<EntityThrowBundle>>(
@@ -120,17 +124,17 @@ abstract class ActionInitializerAttack extends ActionInitializer {
       barrierDismissible: false,
       builder: (BuildContext context) => EntityDiceThrowDialog(
         entities: entities,
-        request: attackRequest,
-        opposingRequest: defenseRequest,
+        request: attackContext.attackRequest,
+        opposingRequest: attackContext.defenseRequest,
         canChangeDifficulty: false,
       ),
     );
     if(bundles == null || bundles.isEmpty || !context.mounted) {
-      if(defenseAction != null) {
+      if(attackContext.defenseAction != null) {
         messageBus.publish(
           SessionEncounterTurnUnassignCombatActionMessage(
             destination: SessionMessage.masterIdentifier,
-            actionUuid: defenseAction!.uuid,
+            actionUuid: attackContext.defenseAction!.uuid,
           )
         );
       }
@@ -139,7 +143,7 @@ abstract class ActionInitializerAttack extends ActionInitializer {
 
     DiceThrowEvaluation attackEvaluation;
     DiceThrowEvaluation? defenseEvaluation;
-    if(defenseCombatAction != null) {
+    if(attackContext.defenseCombatAction != null) {
       attackEvaluation = evaluateDiceThrow(
         bundles[0],
         opposing: bundles[1]
@@ -157,12 +161,12 @@ abstract class ActionInitializerAttack extends ActionInitializer {
     GameSession.instance!.diceThrowHistory.add(
       DiceThrowHistoryEntry(
         actor: bundles[0].entity,
-        opposing: defenseCombatAction != null
+        opposing: attackContext.defenseCombatAction != null
           ? bundles[1].entity
           : null,
         request: bundles[0].request,
-        opposingRequest: defenseCombatAction != null
-          ? bundles[0].request
+        opposingRequest: attackContext.defenseCombatAction != null
+          ? bundles[1].request
           : null,
         evaluation: attackEvaluation,
       )
@@ -175,9 +179,9 @@ abstract class ActionInitializerAttack extends ActionInitializer {
         )
         && defenseEvaluation?.criticalType != DiceThrowResultType.criticalSuccess
     ) {
-      damage = weapon.damage(action.entity) + damageModifier;
+      attackContext.damage = attackContext.weapon.damage(attackContext.attacker) + damageModifier;
       for(var i = 0; i < attackEvaluation.nr; ++i) {
-        damage += Random().nextInt(10) + 1;
+        attackContext.damage += Random().nextInt(10) + 1;
       }
 
       if(attackEvaluation.criticalType == DiceThrowResultType.criticalSuccess) {
@@ -191,18 +195,18 @@ abstract class ActionInitializerAttack extends ActionInitializer {
         if(!context.mounted) return;
 
         criticalTableResult ??= Random().nextInt(10) + 1;
-        Future<void> Function(BuildContext, int, String) handler;
+        Future<void> Function(BuildContext, int, ActionInitializerAttackContext) handler;
 
         if(bundles[0].result.usedTendencies) {
           switch(bundles[0].result.keptTendency!) {
             case Tendency.dragon:
-              criticalTableResult += (action.entity as HumanCharacter).tendencies.dragon.value;
+              criticalTableResult += (attackContext.attacker as HumanCharacter).tendencies.dragon.value;
               handler = _manageDragonCritical;
             case Tendency.fatality:
-              criticalTableResult += (action.entity as HumanCharacter).tendencies.fatality.value;
+              criticalTableResult += (attackContext.attacker as HumanCharacter).tendencies.fatality.value;
               handler = _manageFatalityCritical;
             case Tendency.human:
-              criticalTableResult += (action.entity as HumanCharacter).tendencies.human.value;
+              criticalTableResult += (attackContext.attacker as HumanCharacter).tendencies.human.value;
               handler = _manageHumanCritical;
           }
 
@@ -211,30 +215,41 @@ abstract class ActionInitializerAttack extends ActionInitializer {
           handler = _manageGeneralCritical;
         }
 
-        await handler(context, criticalTableResult, action.entity.id);
+        await handler(context, criticalTableResult, attackContext);
         if(!context.mounted) return;
       }
 
-      if(!ignoreArmor) {
-        for (var pp in target.protectionProviders) {
-          var protection = pp.protection() - armorModifier;
-          // TODO: manage weapons or attack dividing or ignoring armors
-          // TODO: manage shields when used to parry an attack (in which case their protection don't apply)
-          if (protection > 0) {
-            damage -= protection;
+      if(!attackContext.ignoreArmor) {
+        var protection = 0;
+        for(var pp in attackContext.target.protectionProviders) {
+          if((attackContext.defenseCombatAction?.useProtectionProvider(pp) ?? true)) {
+            // TODO: manage weapons or attack dividing or ignoring armors
+            protection += pp.protection();
           }
+        }
+
+        if(protection > 0) {
+          protection -= armorModifier;
+          if(protection < 0) protection = 0;
+          attackContext.damage -= protection;
         }
       }
 
-      if(damage > 0) {
-        attackEffects.add(
+      if(attackContext.damage > 0) {
+        attackContext.attackEffects.add(
           SessionEntityAddEffectMessage(
             broadcastIncludesSelf: true,
-            entityId: action.entity.id,
+            entityId: attackContext.attacker.id,
             effect: EntityEffectDamage(
               name: 'Dégâts',
               trigger: EntityEffectTrigger.once,
-              amount: damage,
+              amount: attackContext.damage,
+              inflictedInjuryProperties: attackContext.inflictedInjuryProperties,
+              statusMessageTitle: attackContext.damageEffectMessageTitle,
+              statusMessageText:
+                "${attackContext.damageEffectMessageText != null ? '${attackContext.damageEffectMessageText}\n' : ''}"
+                "${attackContext.attacker.name} inflige ${attackContext.damage} "
+                "dégâts à ${attackContext.target.name}",
             ),
           )
         );
@@ -247,40 +262,66 @@ abstract class ActionInitializerAttack extends ActionInitializer {
       // TODO: riposte with 2NR
     }
 
+    // TODO: allow a review of the attack context by the DM, so that they can change damages / effects, etc.
+
+    if(attackContext.defenseAction != null && attackContext.defenseCombatAction != null) {
+      var setResponse = await messageBus.publishAndWaitForResponse(
+        SessionEncounterTurnSetCombatActionMessage(
+          destination: SessionMessage.masterIdentifier,
+          actionUuid: attackContext.defenseAction!.uuid,
+          combatAction: attackContext.defenseCombatAction!,
+        )
+      );
+
+      if(setResponse.status != SessionMessageResponseStatus.accepted) {
+        throw(
+          ActionInitializerException(
+            title: "Affectation de l'action de défense non acceptée",
+            message:
+              "La demande d'affectation de l'action n'a pas été acceptée (statut "
+              "${setResponse.status}), impossible de planifier l'action"
+          )
+        );
+      }
+    }
+
+    attackContext.cumulativeDefenseMalus =
+      attackContext.defenseCombatAction != null
+        ? -5
+        : 0;
+
     var setResponse = await messageBus.publishAndWaitForResponse(
       SessionEncounterTurnSetCombatActionMessage(
         destination: SessionMessage.masterIdentifier,
         actionUuid: action.uuid,
         combatAction: CombatActionAttack(
-          entityId: action.entity.id,
+          entityId: attackContext.attacker.id,
           rank: action.rank,
-          effects: attackEffects,
+          effects: attackContext.attackEffects,
+          context: attackContext.toCombatActionAttackContext(),
         ),
       )
     );
 
     if(setResponse.status != SessionMessageResponseStatus.accepted) {
-      // TODO: display a message
-      // unassign the defense action?
-      return;
-    }
+      if(attackContext.defenseAction != null) {
+        messageBus.publish(
+          SessionEncounterTurnUnassignCombatActionMessage(
+            destination: SessionMessage.masterIdentifier,
+            actionUuid: attackContext.defenseAction!.uuid,
+          )
+        );
+      }
 
-    if(defenseAction != null && defenseCombatAction != null) {
-      setResponse = await messageBus.publishAndWaitForResponse(
-        SessionEncounterTurnSetCombatActionMessage(
-          destination: SessionMessage.masterIdentifier,
-          actionUuid: defenseAction!.uuid,
-          combatAction: defenseCombatAction!,
+      throw(
+        ActionInitializerException(
+          title: "Affectation de l'action d'attaque non acceptée",
+          message:
+            "La demande d'affectation de l'action n'a pas été acceptée (statut "
+            "${setResponse.status}), impossible de planifier l'action"
         )
       );
-
-      if(setResponse.status != SessionMessageResponseStatus.accepted) {
-        // TODO: display a message
-        return;
-      }
     }
-
-    // TODO
   }
 
   @protected
@@ -293,13 +334,13 @@ abstract class ActionInitializerAttack extends ActionInitializer {
       throw(SessionMessageBusClientException("No SessionMessageBusClient instance"));
     }
 
-    var controllingClient = messageBus.clientControlling(target.id);
+    var controllingClient = messageBus.clientControlling(attackContext.target.id);
 
     var defenseActionResponse = await messageBus.publishAndWaitForResponse(
       SessionEncounterTurnSelectActions(
         destination: controllingClient,
         description: "Sélectionner l'action de défense",
-        entityId: target.id,
+        entityId: attackContext.target.id,
         allowEmptySelection: true,
         usage: CombatActionType.defense,
       )
@@ -314,14 +355,14 @@ abstract class ActionInitializerAttack extends ActionInitializer {
     var defenseActions = (defenseActionResponse.data as List<SessionEncounterEntityAction>?);
 
     if(defenseActions != null && defenseActions.isNotEmpty) {
-      defenseAction = defenseActions.first;
+      attackContext.defenseAction = defenseActions.first;
       var availableDefenseActions = getAvailableDefenseCombatActions(
-        target: target,
+        target: attackContext.target,
         rank: rank,
-        weakHand: defenseAction!.weakHand,
+        weakHand: attackContext.defenseAction!.weakHand,
       );
 
-      defenseCombatAction = await showDialog<CombatActionDefense>(
+      attackContext.defenseCombatAction = await showDialog<CombatActionDefense>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
           title: const Text('Type de défense'),
@@ -341,19 +382,26 @@ abstract class ActionInitializerAttack extends ActionInitializer {
       );
       if(!context.mounted) return;
 
-      if(defenseCombatAction != null) {
+      if(attackContext.defenseCombatAction != null) {
         var assignResponse = await messageBus.publishAndWaitForResponse(
           SessionEncounterTurnAssignCombatActionMessage(
             destination: SessionMessage.masterIdentifier,
-            actionUuid: defenseAction!.uuid,
-            combatAction: defenseCombatAction!,
+            actionUuid: attackContext.defenseAction!.uuid,
+            combatAction: attackContext.defenseCombatAction!,
           )
         );
         if(!context.mounted) return;
 
         if (assignResponse.status != SessionMessageResponseStatus.accepted) {
-          // TODO: display a message
-          return;
+          throw(
+            ActionInitializerException(
+              title: "Demande d'assignation d'action de défense non acceptée",
+              message:
+                "La demande d'assignation pour l'action de rang "
+                "${attackContext.defenseAction!.rank} n'a pas été acceptée "
+                "(statut ${assignResponse.status}), impossible de planifier l'action"
+            )
+          );
         }
       }
     }
@@ -361,809 +409,29 @@ abstract class ActionInitializerAttack extends ActionInitializer {
 
   @protected
   void createAttackRequest() {
-    attackRequest = DiceThrowRequest(
-      type: defenseCombatAction == null
+    attackContext.attackRequest = DiceThrowRequest(
+      type: attackContext.defenseCombatAction == null
         ? DiceThrowRequestType.simple
         : DiceThrowRequestType.oppositionNR,
       context: DiceThrowRequestContext.attack,
       difficulty: attackDifficulty,
       base: DiceThrowEntityBaseSkill(
         attribute: Attribute.physique,
-        specialization: (weapon.model as WeaponModel).skill,
-        ability: (weapon.model as WeaponModel).ability,
+        specialization: (attackContext.weapon.model as WeaponModel).skill,
+        ability: (attackContext.weapon.model as WeaponModel).ability,
       )
     );
   }
 
   @protected
   void createDefenseRequest() {
-    defenseRequest = DiceThrowRequest(
+    attackContext.defenseRequest = DiceThrowRequest(
       type: DiceThrowRequestType.oppositionNR,
       context: DiceThrowRequestContext.defense,
-      difficulty: defenseCombatAction!.defenseType == CombatActionDefenseType.dodge
+      difficulty: attackContext.defenseCombatAction!.defenseType == CombatActionDefenseType.dodge
         ? dodgeDifficulty
         : parryDifficulty,
-      base: defenseCombatAction!.diceThrowBase(),
+      base: attackContext.defenseCombatAction!.diceThrowBase(),
     );
-  }
-
-  Future<void> _manageGeneralCritical(BuildContext context, int result, String attackerId) async {
-    if(result == 1) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: 'Coup critique - Choc',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.action,
-              count: defenseCombatAction == null ? 1 : 2,
-            ),
-            removeOnUnapply: true,
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 5,
-          ),
-        )
-      );
-    }
-    else if(result == 2) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectDamageMalusModifier(
-            name: 'Coup critique - Douleur',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.combat,
-              count: 1,
-            ),
-            removeOnUnapply: true,
-            value: 1,
-          ),
-        )
-      );
-    }
-    else if(result == 3) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: 'Coup critique - Sonné',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.turn,
-              count: 2,
-            ),
-            removeOnUnapply: true,
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 5,
-          ),
-        )
-      );
-    }
-    else if(result == 4) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectInjury(
-            name: 'Coup critique - Hémorragie mineure',
-            trigger: EntityEffectTrigger.tickerEvent,
-            triggerTickerEvent: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.turn,
-            ),
-            removeOnUnapply: true,
-            injury: Injury.light,
-            count: 1,
-          ),
-        )
-      );
-    }
-    else if(result == 5) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectAbilityChange(
-            name: 'Coup critique - Cicatrice',
-            trigger: EntityEffectTrigger.once,
-            ability: Ability.presence,
-            value: -1,
-          ),
-        )
-      );
-    }
-    else if(result == 6) {
-      // TODO
-    }
-    else if(result == 7) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: "Coup critique - Main d'arme",
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.hour,
-              count: 24,
-            ),
-            removeOnUnapply: true,
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 5,
-          ),
-        )
-      );
-    }
-    else if(result == 8) {
-      // TODO
-    }
-    else if(result == 9) {
-      ignoreArmor = true;
-      damage += 20;
-    }
-    else if(result == 10) {
-      // TODO
-    }
-  }
-
-  Future<void> _manageDragonCritical(BuildContext context, int result, String attackerId) async {
-    if(result == 1) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: 'Coup critique - Choc',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.action,
-              count: defenseCombatAction == null ? 1 : 2,
-            ),
-            removeOnUnapply: true,
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 5,
-          ),
-        )
-      );
-    }
-    else if(result == 2) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: 'Coup critique - Sonné',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.turn,
-              count: 2,
-            ),
-            removeOnUnapply: true,
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 5,
-          ),
-        )
-      );
-    }
-    else if(result == 3) {
-      attackEffects.addAll([
-        SessionEntityAddEffectMessage(
-          entityId: attackerId,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: 'Coup critique - Maîtrise',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.turn,
-              count: 1,
-            ),
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: -5,
-            singleUse: true,
-            matcher: ThrowRequestContextDiceThrowMatcher(
-              context: DiceThrowRequestContext.defense,
-            ),
-          ),
-        ),
-        SessionEntityAddEffectMessage(
-          entityId: attackerId,
-          effect: EntityEffectGainProficiency(
-            name: 'Coup critique - Maîtrise',
-            trigger: EntityEffectTrigger.once,
-            amount: 2,
-          )
-        ),
-      ]);
-    }
-    else if(result == 4) {
-      // TODO
-    }
-    else if(result == 5) {
-      // TODO
-    }
-    else if(result == 6) {
-      // TODO
-    }
-    else if(result == 7) {
-      int? choice = await showDialog<int>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => SimpleDialog(
-          title: Text('Coup critique - Conviction'),
-          children: [
-            Text("L'attaquant peut regagner tous ses points de Chance ou de Maîtrise, au choix :"),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(1);
-              },
-              child: Text('Regagner tous les points de Maîtrise'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(2);
-              },
-              child: Text('Regagner tous les points de Chance'),
-            ),
-          ],
-        )
-      );
-      if(!context.mounted) return;
-
-      EntityEffect effect;
-      if(choice! == 1) {
-        effect = EntityEffectGainProficiency(
-          name: 'Coup critique - Conviction',
-          trigger: EntityEffectTrigger.once,
-          amount: 10,
-        );
-      }
-      else {
-        effect = EntityEffectGainLuck(
-          name: 'Coup critique - Conviction',
-          trigger: EntityEffectTrigger.once,
-          amount: 10,
-        );
-      }
-
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: attackerId,
-          effect: effect,
-        )
-      );
-    }
-    else if(result == 8) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: attackerId,
-          effect: EntityEffectInitiativeExtraDice(
-            name: 'Coup critique - Tactique',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.turn,
-              count: 2,
-            ),
-            removeOnUnapply: true,
-            count: 2
-          )
-        )
-      );
-    }
-    else if(result == 9) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectInjury(
-            name: 'Coup critique - Hémorragie',
-            trigger: EntityEffectTrigger.permanent,
-            removeOnUnapply: true,
-            injury: Injury.scratch,
-            count: 1,
-          )
-        )
-      );
-    }
-    else if(result == 10) {
-      // TODO
-    }
-    else if(result == 11) {
-      // TODO
-    }
-    else if(result == 12) {
-      bool hasOneGrave = false;
-      try {
-        var capacity = target.injuries.manager.capacity(Injury.grave);
-        hasOneGrave = capacity < 2;
-      }
-      on ArgumentError {
-        hasOneGrave = true;
-      }
-
-      if(hasOneGrave) {
-        attackEffects.add(
-          SessionEntityAddEffectMessage(
-            entityId: target.id,
-            effect: EntityEffectInjury(
-              name: 'Coup critique - Défaut critique',
-              trigger: EntityEffectTrigger.once,
-              injury: Injury.death,
-            )
-          )
-        );
-      }
-      else {
-        damage += 10;
-        ignoreArmor = true;
-      }
-    }
-    else if(result == 13) {
-      bool hasOneFatal = false;
-      try {
-        var capacity = target.injuries.manager.capacity(Injury.fatal);
-        hasOneFatal = capacity < 2;
-      }
-      on ArgumentError {
-        hasOneFatal = true;
-      }
-
-      if(hasOneFatal) {
-        attackEffects.add(
-          SessionEntityAddEffectMessage(
-            entityId: target.id,
-            effect: EntityEffectInjury(
-              name: 'Coup critique - Coup mortel',
-              trigger: EntityEffectTrigger.once,
-              injury: Injury.death,
-            )
-          )
-        );
-      }
-      else {
-        damage += 20;
-        ignoreArmor = true;
-      }
-    }
-    else if(result == 14) {
-      bool hasOneDeath = false;
-      try {
-        var capacity = target.injuries.manager.capacity(Injury.death);
-        hasOneDeath = capacity < 2;
-      }
-      on ArgumentError {
-        hasOneDeath = true;
-      }
-
-      if(hasOneDeath) {
-        attackEffects.add(
-          SessionEntityAddEffectMessage(
-            entityId: target.id,
-            effect: EntityEffectInjury(
-              name: 'Coup critique - Coup magistral',
-              trigger: EntityEffectTrigger.once,
-              injury: Injury.death,
-            )
-          )
-        );
-      }
-      else {
-        damage += 20;
-        ignoreArmor = true;
-      }
-    }
-    else if(result == 15) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectInjury(
-            name: 'Coup critique - Guidé par Kroryn',
-            trigger: EntityEffectTrigger.once,
-            injury: Injury.death,
-          )
-        )
-      );
-    }
-  }
-
-  Future<void> _manageFatalityCritical(BuildContext context, int result, String attackerId) async {
-    if(result == 1) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: 'Coup critique - Choc',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.action,
-              count: defenseCombatAction == null ? 1 : 2,
-            ),
-            removeOnUnapply: true,
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 5,
-          ),
-        )
-      );
-    }
-    else if(result == 2) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectDamageMalusModifier(
-            name: 'Coup critique - Douleur',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.combat,
-              count: 1,
-            ),
-            removeOnUnapply: true,
-            value: 1,
-          ),
-        )
-      );
-    }
-    else if(result == 3) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectAbilityChange(
-            name: 'Coup critique - Cicatrice',
-            trigger: EntityEffectTrigger.once,
-            ability: Ability.presence,
-            value: -1,
-          ),
-        )
-      );
-    }
-    else if(result == 4) {
-      // TODO
-    }
-    else if(result == 5) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: 'Coup critique - Doute',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.combat,
-              count: 1,
-            ),
-            removeOnUnapply: true,
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 2,
-          ),
-        )
-      );
-    }
-    else if(result == 6) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectInjury(
-            name: 'Coup critique - Hémorragie',
-            trigger: EntityEffectTrigger.permanent,
-            removeOnUnapply: true,
-            injury: Injury.scratch,
-            count: 1,
-          )
-        )
-      );
-    }
-    else if(result == 7) {
-      // TODO
-    }
-    else if(result == 8) {
-      // TODO
-    }
-    else if(result == 9) {
-      ignoreArmor = true;
-    }
-    else if(result == 10) {
-      // TODO
-    }
-    else if(result == 11) {
-      bool hasOneGrave = false;
-      try {
-        var capacity = target.injuries.manager.capacity(Injury.grave);
-        hasOneGrave = capacity < 2;
-      }
-      on ArgumentError {
-        hasOneGrave = true;
-      }
-
-      if(hasOneGrave) {
-        attackEffects.add(
-          SessionEntityAddEffectMessage(
-            entityId: target.id,
-            effect: EntityEffectInjury(
-              name: 'Coup critique - Défaut critique',
-              trigger: EntityEffectTrigger.once,
-              injury: Injury.death,
-            )
-          )
-        );
-      }
-      else {
-        damage += 10;
-        ignoreArmor = true;
-      }
-    }
-    else if(result == 12) {
-      bool hasOneFatal = false;
-      try {
-        var capacity = target.injuries.manager.capacity(Injury.fatal);
-        hasOneFatal = capacity < 2;
-      }
-      on ArgumentError {
-        hasOneFatal = true;
-      }
-
-      if(hasOneFatal) {
-        attackEffects.add(
-          SessionEntityAddEffectMessage(
-            entityId: target.id,
-            effect: EntityEffectInjury(
-              name: 'Coup critique - Coup mortel',
-              trigger: EntityEffectTrigger.once,
-              injury: Injury.death,
-            )
-          )
-        );
-      }
-      else {
-        damage += 20;
-        ignoreArmor = true;
-      }
-    }
-    else if(result == 13) {
-      bool hasOneDeath = false;
-      try {
-        var capacity = target.injuries.manager.capacity(Injury.death);
-        hasOneDeath = capacity < 2;
-      }
-      on ArgumentError {
-        hasOneDeath = true;
-      }
-
-      if(hasOneDeath) {
-        attackEffects.add(
-          SessionEntityAddEffectMessage(
-            entityId: target.id,
-            effect: EntityEffectInjury(
-              name: 'Coup critique - Coup magistral',
-              trigger: EntityEffectTrigger.once,
-              injury: Injury.death,
-            )
-          )
-        );
-      }
-      else {
-        damage += 20;
-        ignoreArmor = true;
-      }
-    }
-    else if(result == 14) {
-      // TODO
-    }
-    else if(result == 15) {
-      // TODO
-    }
-  }
-
-  Future<void> _manageHumanCritical(BuildContext context, int result, String attackerId) async {
-    if(result == 1) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: 'Coup critique - Choc',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.action,
-              count: defenseCombatAction == null ? 1 : 2,
-            ),
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 5,
-          ),
-        )
-      );
-    }
-    else if(result == 2) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: 'Coup critique - Sonné',
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.turn,
-              count: 2,
-            ),
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 5,
-          ),
-        )
-      );
-    }
-    else if(result == 3) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: attackerId,
-          effect: EntityEffectInitiativeExtraDice(
-              name: 'Coup critique - Surpris',
-              trigger: EntityEffectTrigger.permanent,
-              duration: TickerEvent(
-                type: TickerEventType.end,
-                unit: TickerEventUnit.turn,
-                count: 2,
-              ),
-              removeOnUnapply: true,
-              count: 1
-          )
-        )
-      );
-    }
-    else if(result == 4) {
-      // TODO
-    }
-    else if(result == 5) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: attackerId,
-          effect: EntityEffectGainProficiency(
-            name: 'Coup critique - Technique',
-            trigger: EntityEffectTrigger.once,
-            amount: 10,
-          )
-        )
-      );
-    }
-    else if(result == 6) {
-      attackEffects.add(
-        SessionEntityAddEffectMessage(
-          entityId: target.id,
-          effect: EntityEffectGlobalDiceThrowModifier(
-            name: "Coup critique - Main d'arme",
-            trigger: EntityEffectTrigger.permanent,
-            duration: TickerEvent(
-              type: TickerEventType.end,
-              unit: TickerEventUnit.hour,
-              count: 24,
-            ),
-            removeOnUnapply: true,
-            type: DiceThrowModifierType.difficulty,
-            family: DiceThrowModifierFamily.attackEffect,
-            modifier: 5,
-          ),
-        )
-      );
-    }
-    else if(result == 7) {
-      ignoreArmor = true;
-    }
-    else if(result == 8) {
-      ignoreArmor = true;
-      attackEffects.addAll([
-        SessionEntityAddEffectMessage(
-          entityId: attackerId,
-          effect: EntityEffectGainLuck(
-            name: 'Coup critique - Coup de chance',
-            trigger: EntityEffectTrigger.once,
-            amount: 10,
-          )
-        )
-      ]);
-    }
-    else if(result == 9) {
-      // TODO
-    }
-    else if(result == 10) {
-      bool hasOneGrave = false;
-      try {
-        var capacity = target.injuries.manager.capacity(Injury.grave);
-        hasOneGrave = capacity < 2;
-      }
-      on ArgumentError {
-        hasOneGrave = true;
-      }
-
-      if(hasOneGrave) {
-        attackEffects.add(
-          SessionEntityAddEffectMessage(
-            entityId: target.id,
-            effect: EntityEffectInjury(
-              name: 'Coup critique - Défaut critique',
-              trigger: EntityEffectTrigger.once,
-              injury: Injury.death,
-            )
-          )
-        );
-      }
-      else {
-        damage += 10;
-        ignoreArmor = true;
-      }
-    }
-    else if(result == 11) {
-      bool hasOneFatal = false;
-      try {
-        var capacity = target.injuries.manager.capacity(Injury.fatal);
-        hasOneFatal = capacity < 2;
-      }
-      on ArgumentError {
-        hasOneFatal = true;
-      }
-
-      if(hasOneFatal) {
-        attackEffects.add(
-          SessionEntityAddEffectMessage(
-            entityId: target.id,
-            effect: EntityEffectInjury(
-              name: 'Coup critique - Coup mortel',
-              trigger: EntityEffectTrigger.once,
-              injury: Injury.death,
-            )
-          )
-        );
-      }
-      else {
-        damage += 20;
-        ignoreArmor = true;
-      }
-    }
-    else if(result == 12) {
-      bool hasOneDeath = false;
-      try {
-        var capacity = target.injuries.manager.capacity(Injury.death);
-        hasOneDeath = capacity < 2;
-      }
-      on ArgumentError {
-        hasOneDeath = true;
-      }
-
-      if(hasOneDeath) {
-        attackEffects.add(
-          SessionEntityAddEffectMessage(
-            entityId: target.id,
-            effect: EntityEffectInjury(
-              name: 'Coup critique - Coup magistral',
-              trigger: EntityEffectTrigger.once,
-              injury: Injury.death,
-            )
-          )
-        );
-      }
-      else {
-        damage += 20;
-        ignoreArmor = true;
-      }
-    }
-    else if(result == 13) {
-      // TODO
-    }
-    else if(result == 14) {
-      // TODO
-    }
-    else if(result == 15) {
-      // TODO
-    }
   }
 }

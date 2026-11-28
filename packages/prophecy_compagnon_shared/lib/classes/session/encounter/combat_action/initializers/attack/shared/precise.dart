@@ -23,6 +23,7 @@ import 'package:prophecy_compagnon_shared/ui/single_digit_input_dialog.dart';
 
 class ActionInitializerAttackPrecise extends ActionInitializerAttack {
   ActionInitializerAttackPrecise({
+    required super.attacker,
     required super.weapon,
     required super.target,
     required this.icon,

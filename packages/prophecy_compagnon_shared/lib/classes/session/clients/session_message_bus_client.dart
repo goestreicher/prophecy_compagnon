@@ -28,6 +28,9 @@ class SessionMessageBusClientException implements Exception {
   SessionMessageBusClientException(this.message);
 
   final String message;
+
+  @override
+  String toString() => message;
 }
 
 abstract class SessionMessageBusClient {

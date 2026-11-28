@@ -25,6 +25,8 @@ import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/combat_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/combat_status.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/armor.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/shield.dart';
 import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_entry.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/descriptions/movement.dart';
@@ -55,13 +57,23 @@ class ActionInitializerMovementGetUp extends ActionInitializer {
   Future<void> _doPlan(BuildContext context, SessionEncounterEntityAction action) async {
     var messageBus = SessionMessageBusClient.instance;
     if(messageBus == null) {
-      // TODO: display a message
-      return;
+      throw(
+        SessionMessageBusClientException(
+          "Aucune instance du bus de message n'a été trouvée, impossible de planifier l'action",
+        )
+      );
     }
 
     var controllingClient = messageBus.clientControlling(action.entity.id);
-    // TODO: use the movement malus from the entity
     var difficulty = 0;
+    for(var pp in action.entity.protectionProviders) {
+      if(pp is Armor) {
+        difficulty += (pp.model as ArmorModel).protection;
+      }
+      else if(pp is Shield) {
+        difficulty += (pp.model as ShieldModel).protection;
+      }
+    }
     var request = DiceThrowRequest(
       type: DiceThrowRequestType.simple,
       context: DiceThrowRequestContext.none,
@@ -81,13 +93,26 @@ class ActionInitializerMovementGetUp extends ActionInitializer {
     );
 
     if(diceThrowResponse.status != SessionMessageResponseStatus.accepted) {
-      // TODO: display a nice message ?
-      return;
+      throw(
+        ActionInitializerException(
+          title: "Demande de jet de dé non acceptée",
+          message:
+            "La demande de jet de dé n'a pas été acceptée (statut "
+            "${diceThrowResponse.status}), impossible de planifier l'action"
+        )
+      );
     }
 
     if(diceThrowResponse.data is! EntityThrowBundle) {
-      // TODO: display a nice message ?
-      return;
+      throw(
+        ActionInitializerException(
+          title: "Réponse au jet invalide",
+          message:
+            "La réponse au jet n'est pas au format attendu "
+            "(${diceThrowResponse.runtimeType} au lieu de EntityThrowBundle, "
+            "impossible de planifier l'action"
+        )
+      );
     }
 
     var bundle = diceThrowResponse as EntityThrowBundle;
@@ -111,8 +136,14 @@ class ActionInitializerMovementGetUp extends ActionInitializer {
           );
 
       if(candidates.isEmpty) {
-        // TODO: display a nice message ?
-        return;
+        throw(
+          ActionInitializerException(
+            title: "Aucun effet 'Au sol'",
+            message:
+              "Ce personnage n'a pas d'effet \"Au sol\" actif, "
+              "impossible de planifier l'action"
+          )
+        );
       }
 
       var setResponse = await messageBus.publishAndWaitForResponse(
@@ -133,8 +164,14 @@ class ActionInitializerMovementGetUp extends ActionInitializer {
       );
 
       if(setResponse.status != SessionMessageResponseStatus.accepted) {
-        // TODO: display a message
-        return;
+        throw(
+          ActionInitializerException(
+            title: "Affectation de l'action non acceptée",
+            message:
+              "La demande d'affectation de l'action n'a pas été acceptée (statut "
+              "${setResponse.status}), impossible de planifier l'action"
+          )
+        );
       }
     }
   }

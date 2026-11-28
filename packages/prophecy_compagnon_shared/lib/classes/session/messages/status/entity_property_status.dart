@@ -26,6 +26,11 @@ enum EntityMessageProperty {
   useProficiencyPoints,
   gainProficiencyPoints,
   updateTendency,
+  addCumulativeAttackMalus,
+  setCumulativeAttackMalus,
+  addCumulativeDefenseMalus,
+  setCumulativeDefenseMalus,
+  gainExperience,
 }
 
 @JsonSerializable()

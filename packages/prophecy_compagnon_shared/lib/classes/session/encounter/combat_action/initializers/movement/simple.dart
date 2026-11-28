@@ -44,8 +44,11 @@ class ActionInitializerMovementSimple extends ActionInitializer {
   Future<void> _doPlan(BuildContext context, SessionEncounterEntityAction action) async {
     var messageBus = SessionMessageBusClient.instance;
     if(messageBus == null) {
-      // TODO: display a message
-      return;
+      throw(
+        SessionMessageBusClientException(
+          "Aucune instance du bus de message n'a été trouvée, impossible de planifier l'action",
+        )
+      );
     }
 
     var controllingClient = messageBus.clientControlling(action.entity.id);
@@ -74,8 +77,14 @@ class ActionInitializerMovementSimple extends ActionInitializer {
 
     var r = (pathResponse.data as SessionMovementPathResult?);
     if(r == null || r.path.isEmpty || r.path.length == 0.0) {
-      // TODO: display a nice message?
-      return;
+      throw(
+        ActionInitializerException(
+          title: "Déplacement invalide retourné",
+          message:
+            "Un chemin invalide ou vide a été retourné, "
+            "impossible de planifier l'action"
+        )
+      );
     }
 
     var setResponse = await messageBus.publishAndWaitForResponse(
@@ -93,8 +102,14 @@ class ActionInitializerMovementSimple extends ActionInitializer {
     );
 
     if(setResponse.status != SessionMessageResponseStatus.accepted) {
-      // TODO: display a message
-      return;
+      throw(
+        ActionInitializerException(
+          title: "Affectation de l'action non acceptée",
+          message:
+            "La demande d'affectation de l'action n'a pas été acceptée (statut "
+            "${setResponse.status}), impossible de planifier l'action"
+        )
+      );
     }
   }
 }

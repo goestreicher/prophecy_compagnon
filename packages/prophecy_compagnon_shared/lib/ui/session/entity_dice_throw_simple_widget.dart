@@ -31,6 +31,7 @@ import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history_ent
 import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/dismissible_dialog.dart';
+import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 import 'package:prophecy_compagnon_shared/ui/num_input_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/dice_throw_shared_widgets.dart';
 import 'package:prophecy_compagnon_shared/ui/session/entity_dice_throw_dialog.dart';
@@ -290,7 +291,11 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
                   );
 
                   if(!e.canApply(target: widget.entity, activationDiceThrowEvaluation: activationDiceThrowEvaluation)) {
-                    // TODO: display a message?
+                    await displayErrorDialog(
+                      context,
+                      "L'effet ne peut pas être appliqué",
+                      "Impossible d'appliquer cet effet",
+                    );
                     return;
                   }
                 }
@@ -417,7 +422,7 @@ class _EntityDiceThrowSimpleWidgetState extends State<EntityDiceThrowSimpleWidge
     }
 
     var peerThrowModifierRows = <Widget>[];
-    for(var m in (selectedPeer?.peerThrowModifiers() ?? <DiceThrowModifier>[])) {
+    for(var m in (selectedPeer?.peerThrowModifiers(request: widget.request) ?? <DiceThrowModifier>[])) {
       Widget label = GestureDetector(
         onTap: () {
           setState(() {

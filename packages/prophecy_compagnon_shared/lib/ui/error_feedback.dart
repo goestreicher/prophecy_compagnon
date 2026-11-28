@@ -17,7 +17,7 @@
 
 import 'package:material_ui/material_ui.dart';
 
-void displayErrorDialog(BuildContext context, String title, String content) async {
+Future<void> displayErrorDialog(BuildContext context, String title, String content) async {
   await showDialog(
     context: context,
     builder: (BuildContext context) => AlertDialog(

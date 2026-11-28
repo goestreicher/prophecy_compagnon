@@ -21,6 +21,7 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actio
 
 class ActionInitializerAttackSimple extends ActionInitializerAttack {
   ActionInitializerAttackSimple({
+    required super.attacker,
     required super.weapon,
     required super.target,
     required this.icon,

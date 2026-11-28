@@ -37,6 +37,7 @@ import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/dice_throw_modifier.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/effects/gain_experience.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effects/injury_capacity.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
@@ -74,12 +75,23 @@ enum Disadvantage {
       )
     ],
   ),
-  // TODO: manage the second part of this disadvantage
   complexeDInferiorite(
     title: "Complexe d'infériorité",
     description: "Désabusé, le personnage ne croit plus guère en ses capacités. Face à une situation particulièrement délicate, il se sentira irrémédiablement faible et incompétent. Ce Désavantage fonctionne de deux manières. Tout d’abord, le personnage reçoit une Difficulté supplémentaire de 5 à tous les jets qu’il tentera au cours d’une situation de crise (empêcher un compagnon de tomber au fond d’un gouffre, atteindre d’une flèche un ennemi sur le point de tuer un compagnon, etc.). Ensuite, le meneur de jeu peut décider que le personnage est tout simplement incapable d'accomplir une action capitale.\nDans ce cas, le personnage gagne automatiquement deux Points d’Expérience et voit ses Points de Chance remonter à leur niveau maximum (bien qu’il soit impossible d’utiliser des Points de Chance pour tenter de réussir cette action). Le Complexe d’infériorité peut disparaître si le personnage réussit une action particulièrement importante pour sa survie ou celle de son groupe.",
     cost: [3],
     type: DisadvantageType.commun,
+    effectConfigurations: [
+      EntityEffectGainExperienceConfiguration(
+        name: "Complexe d'infériorité (Désavantage) - Gain d'Expérience",
+        trigger: EntityEffectTrigger.request,
+        amount: 2,
+      ),
+      EntityEffectGainExperienceConfiguration(
+        name: "Complexe d'infériorité (Désavantage) - Gain de Chance",
+        trigger: EntityEffectTrigger.request,
+        amount: 10,
+      ),
+    ],
     throwModifierConfigurations: [
       DiceThrowModifierConfiguration(
         type: DiceThrowModifierType.difficulty,
@@ -118,7 +130,6 @@ enum Disadvantage {
       )
     ],
   ),
-  // TODO: manage the second case with a bonus to the opponent
   emotif(
     title: 'Émotif',
     description: "Certains êtres humains ont une sensibilité tellement développée qu'ils supportent mal les situations de conflit, les visions d'horreur et les périodes de pression intenses. Confronté à une telle situation, le personnage perd son sang-froid et voit la Difficulté de tous ses jets de Volonté augmenter de 5. Les jets d’Intimidation, de Commandement et d’autres actions liées à l’Influence reçoivent un bonus de 2 lorsqu'ils sont employés sur ce personnage.",
@@ -130,7 +141,14 @@ enum Disadvantage {
         value: 5,
         alwaysApply: false,
         matcher: AbilityDiceThrowMatcher(ability: Ability.volonte)
-      )
+      ),
+      DiceThrowModifierConfiguration(
+        target: DiceThrowModifierTarget.other,
+        type: DiceThrowModifierType.bonus,
+        value: 2,
+        alwaysApply: false,
+        matcher: AttributeDiceThrowMatcher(attribute: Attribute.social),
+      ),
     ],
   ),
   ennemi(

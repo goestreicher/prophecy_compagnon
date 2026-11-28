@@ -17,6 +17,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
+import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/implementations/attack_context.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action_type.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
@@ -29,8 +30,11 @@ class CombatActionAttack extends CombatAction {
     required super.entityId,
     required super.rank,
     super.effects,
+    required this.context,
   })
     : super(type: CombatActionType.attack);
+
+  CombatActionAttackContext context;
 
   @override
   ActionInitializer? initializer() => null;

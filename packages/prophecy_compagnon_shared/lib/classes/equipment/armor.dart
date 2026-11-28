@@ -26,6 +26,7 @@ import 'package:prophecy_compagnon_shared/classes/entity/skill_family.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/protection_provider.dart';
 import 'package:prophecy_compagnon_shared/classes/object_location.dart';
 import 'package:prophecy_compagnon_shared/classes/object_source.dart';
 import 'package:prophecy_compagnon_shared/classes/storage/default_assets_store.dart';
@@ -271,7 +272,10 @@ class Armor extends EquipableItem implements ProtectionProvider {
     super.alias,
     super.quality,
     super.metal,
+    int damages = 0,
+    this.repairDifficultyMultiplier = 1,
   })
+    : _damages = damages
   {
     _diceThrowModifier = EquipmentDiceThrowModifier(
       type: DiceThrowModifierType.malus,
@@ -290,15 +294,26 @@ class Armor extends EquipableItem implements ProtectionProvider {
     String? alias,
     EquipmentQuality quality = EquipmentQuality.normal,
     EquipmentMetal metal = EquipmentMetal.none,
+    int damages = 0,
+    int repairDifficultyMultiplier = 1,
   }) => Armor(
           const Uuid().v4().toString(),
           model: model,
           alias: alias,
           quality: quality,
           metal: metal,
+          damages: damages,
+          repairDifficultyMultiplier: repairDifficultyMultiplier,
         );
 
-  final String _uuid;
+  int get damages => _damages;
+  set damages(int v) =>
+      v > (model as ArmorModel).protection
+        ? _damages = (model as ArmorModel).protection
+        : _damages = v;
+  int _damages;
+
+  int repairDifficultyMultiplier;
 
   @override
   String uuid() => _uuid;
@@ -329,13 +344,36 @@ class Armor extends EquipableItem implements ProtectionProvider {
   }
 
   @override
-  int protection() => (model as ArmorModel).protection;
+  int protection() => (model as ArmorModel).protection - damages;
 
+  final String _uuid;
   late final EquipmentDiceThrowModifier _diceThrowModifier;
+
+  @override
+  void restoreFromJson(Map<String, dynamic> json) {
+    super.restoreFromJson(json);
+
+    if(json.containsKey('damages') && json['damages'] is num) {
+      damages = (json['damages'] as num).toInt();
+    }
+
+    if(json.containsKey('repair_difficulty_multiplier') && json['repair_difficulty_multiplier'] is num) {
+      repairDifficultyMultiplier = (json['repair_difficulty_multiplier'] as num).toInt();
+    }
+  }
 
   factory Armor.fromJson(Map<String, dynamic> json) {
     var ret = (EquipmentFactory.instance.forgeEquipment(json['type'], json: json) as Armor);
     ret.restoreFromJson(json);
     return ret;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      ...(super.toJson()),
+      'damages': damages,
+      'repair_difficulty_multiplier': repairDifficultyMultiplier,
+    };
   }
 }

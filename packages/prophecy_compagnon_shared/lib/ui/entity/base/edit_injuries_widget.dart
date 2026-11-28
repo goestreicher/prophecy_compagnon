@@ -211,7 +211,10 @@ class _EditSimpleInjuryManagerLevelsDialogState extends State<_EditSimpleInjuryM
                 levels: widget.levels,
                 source: currentSourceManager,
               );
-              currentSourceManager?.dealInjuries(type, prevCount);
+              currentSourceManager?.dealInjuries(
+                injury: type,
+                count: prevCount
+              );
             }
           },
           onCapacityChanged: (int value) {

@@ -15,6 +15,9 @@ CombatActionAttack _$CombatActionAttackFromJson(Map<String, dynamic> json) =>
               ?.map((e) => SessionMessage.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const <SessionMessage>[],
+      context: CombatActionAttackContext.fromJson(
+        json['context'] as Map<String, dynamic>,
+      ),
     );
 
 Map<String, dynamic> _$CombatActionAttackToJson(CombatActionAttack instance) =>
@@ -22,4 +25,5 @@ Map<String, dynamic> _$CombatActionAttackToJson(CombatActionAttack instance) =>
       'entity_id': instance.entityId,
       'rank': instance.rank,
       'effects': instance.effects.map((e) => e.toJson()).toList(),
+      'context': instance.context.toJson(),
     };

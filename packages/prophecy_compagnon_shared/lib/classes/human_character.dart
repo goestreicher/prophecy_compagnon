@@ -102,6 +102,8 @@ class HumanCharacter extends EntityBase with MagicUser {
     super.favors,
     super.fervor,
     super.effects,
+    super.cumulativeAttackMalus,
+    super.cumulativeDefenseMalus,
     super.image,
     super.icon,
     CharacterCaste? caste,
@@ -139,9 +141,9 @@ class HumanCharacter extends EntityBase with MagicUser {
   CharacterOrigin origin;
   int renown;
   @JsonKey(fromJson: CharacterDisadvantages.fromJson, toJson: CharacterDisadvantages.toJson)
-  CharacterDisadvantages disadvantages;
+    CharacterDisadvantages disadvantages;
   @JsonKey(fromJson: CharacterAdvantages.fromJson, toJson: CharacterAdvantages.toJson)
-  CharacterAdvantages advantages;
+    CharacterAdvantages advantages;
   CharacterTendencies tendencies;
   DraconicLink draconicLink;
 

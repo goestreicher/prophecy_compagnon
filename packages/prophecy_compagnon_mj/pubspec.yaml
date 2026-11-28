@@ -21,6 +21,7 @@ dependencies:
   fleather: ^1.0.0
   float_column: ^4.0.0
   go_router: ^18.0.0
+  logging: any
   material_symbols_icons: ^4.0.0
   parchment: ^1.0.0
   prophecy_compagnon_shared: any

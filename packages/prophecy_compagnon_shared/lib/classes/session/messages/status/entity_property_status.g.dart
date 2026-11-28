@@ -40,4 +40,9 @@ const _$EntityMessagePropertyEnumMap = {
   EntityMessageProperty.useProficiencyPoints: 'useProficiencyPoints',
   EntityMessageProperty.gainProficiencyPoints: 'gainProficiencyPoints',
   EntityMessageProperty.updateTendency: 'updateTendency',
+  EntityMessageProperty.addCumulativeAttackMalus: 'addCumulativeAttackMalus',
+  EntityMessageProperty.setCumulativeAttackMalus: 'setCumulativeAttackMalus',
+  EntityMessageProperty.addCumulativeDefenseMalus: 'addCumulativeDefenseMalus',
+  EntityMessageProperty.setCumulativeDefenseMalus: 'setCumulativeDefenseMalus',
+  EntityMessageProperty.gainExperience: 'gainExperience',
 };

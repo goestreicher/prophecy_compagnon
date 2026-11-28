@@ -17,6 +17,9 @@ GameSession _$GameSessionFromJson(Map<String, dynamic> json) => GameSession(
   time: json['time'] == null
       ? null
       : KorTime.fromJson(json['time'] as Map<String, dynamic>),
+  chat: json['chat'] == null
+      ? null
+      : SessionChat.fromJson(json['chat'] as Map<String, dynamic>),
   diceThrowHistory: json['dice_throw_history'] == null
       ? null
       : DiceThrowHistory.fromJson(
@@ -32,5 +35,6 @@ Map<String, dynamic> _$GameSessionToJson(GameSession instance) =>
       'start_date': instance.startDate.toJson(),
       'scenario_day': instance.scenarioDay,
       'time': instance.time.toJson(),
+      'chat': instance.chat.toJson(),
       'dice_throw_history': instance.diceThrowHistory.toJson(),
     };

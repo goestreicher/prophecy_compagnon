@@ -128,6 +128,15 @@ class _EncounterManagementWidgetState extends State<EncounterManagementWidget> {
       SessionTickerEventMessage(
         event: TickerEvent(
           type: TickerEventType.end,
+          unit: TickerEventUnit.turn,
+        )
+      )
+    );
+
+    SessionMessageBusClient.instance?.publish(
+      SessionTickerEventMessage(
+        event: TickerEvent(
+          type: TickerEventType.end,
           unit: TickerEventUnit.combat,
         )
       )

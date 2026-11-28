@@ -23,6 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_actio
 
 class ActionInitializerAttackBrutal extends ActionInitializerAttack {
   ActionInitializerAttackBrutal({
+    required super.attacker,
     required super.weapon,
     required super.target,
     required this.icon,
@@ -50,7 +51,7 @@ class ActionInitializerAttackBrutal extends ActionInitializerAttack {
 
   @override
   Future<void> plan(BuildContext context, SessionEncounterEntityAction action) async {
-    if((weapon.model as WeaponModel).handiness == 2) {
+    if((attackContext.weapon.model as WeaponModel).handiness == 2) {
       _strengthModifier = 2 * action.entity.abilities.force;
     }
     else {

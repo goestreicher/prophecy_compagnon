@@ -23,6 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/scenario/scenario.dart';
 import 'package:prophecy_compagnon_shared/classes/scenario/scenario_event.dart';
 import 'package:prophecy_compagnon_shared/classes/session/board/board.dart';
+import 'package:prophecy_compagnon_shared/classes/session/chat.dart';
 import 'package:prophecy_compagnon_shared/classes/session/dice_throw_history.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter.dart';
 import 'package:prophecy_compagnon_shared/classes/session/event.dart';
@@ -85,6 +86,7 @@ class GameSession extends ChangeNotifier {
     KorTime? time,
     SessionDays? sessionDays,
     SessionEncounter? encounter,
+    SessionChat? chat,
     DiceThrowHistory? diceThrowHistory,
     SessionGameBoard? board,
   })
@@ -98,6 +100,8 @@ class GameSession extends ChangeNotifier {
       time: time,
       sessionDays: sessionDays,
       encounter: encounter,
+      chat: chat,
+      diceThrowHistory: diceThrowHistory,
       board: board,
     );
     return instance!;
@@ -112,12 +116,14 @@ class GameSession extends ChangeNotifier {
     KorTime? time,
     SessionDays? sessionDays,
     SessionEncounter? encounter,
+    SessionChat? chat,
     DiceThrowHistory? diceThrowHistory,
     SessionGameBoard? board,
   })
     : uuid = uuid ?? const Uuid().v4().toString(),
       time = time ?? KorTime(hour: 0, minute: 0),
       encounter = ValueNotifier<SessionEncounter?>(encounter),
+      chat = chat ?? SessionChat(),
       diceThrowHistory = diceThrowHistory ?? DiceThrowHistory(),
       board = board ?? SessionGameBoard()
   {
@@ -164,6 +170,7 @@ class GameSession extends ChangeNotifier {
   @JsonKey(includeFromJson: false, includeToJson: false)
     ValueNotifier<SessionEncounter?> encounter;
 
+  SessionChat chat;
   DiceThrowHistory diceThrowHistory;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -224,7 +231,14 @@ class GameSession extends ChangeNotifier {
         continue;
       }
 
-      var toRemove = <EntityEffect>[];
+      entity.injuries.manager.tick(event);
+
+      if(event.unit == TickerEventUnit.turn && event.type == TickerEventType.end) {
+        entity.cumulativeAttackMalus = 0;
+        entity.cumulativeDefenseMalus = 0;
+      }
+
+      var effectsToRemove = <EntityEffect>[];
 
       for(var effect in entity.effects) {
         effect.tick(event);
@@ -232,19 +246,23 @@ class GameSession extends ChangeNotifier {
         if(effect.becameActive) {
           effect.apply(target: entity);
           if(effect.trigger == EntityEffectTrigger.once) {
-            toRemove.add(effect);
+            effectsToRemove.add(effect);
           }
+        }
+
+        if(effect.frequencyReApply) {
+          effect.apply(target: entity);
         }
 
         if(effect.expired) {
           effect.unapply(target: entity);
           if(effect.removeOnUnapply) {
-            toRemove.add(effect);
+            effectsToRemove.add(effect);
           }
         }
       }
 
-      for(var e in toRemove) {
+      for(var e in effectsToRemove) {
         entity.effects.remove(e);
       }
     }

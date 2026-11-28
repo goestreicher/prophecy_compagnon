@@ -16,8 +16,10 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
+import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 
 class ActionConfigurationMenuRenderer extends StatelessWidget {
   const ActionConfigurationMenuRenderer({
@@ -40,8 +42,28 @@ class ActionConfigurationMenuRenderer extends StatelessWidget {
         initializer.icon,
         size: 18.0,
       ),
-      onPressed: () {
-        initializer.plan(actionBuildContext, action);
+      onPressed: () async {
+        try {
+          await initializer.plan(context, action);
+        }
+        on SessionMessageBusClientException catch(e) {
+          if(context.mounted) {
+            displayErrorDialog(
+              context,
+              'SessionMessageBusClient exception',
+              e.message
+            );
+          }
+        }
+        on ActionInitializerException catch(e) {
+          if(context.mounted) {
+            displayErrorDialog(
+              context,
+              e.title,
+              e.message
+            );
+          }
+        }
       },
       child: Text(
         initializer.name,

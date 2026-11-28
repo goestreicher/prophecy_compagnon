@@ -20,6 +20,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
 part 'injury.g.dart';
 
@@ -28,36 +29,50 @@ enum Injury {
     title: 'Ignoré',
     rank: -1,
     malus: 0,
+    naturalHealingDays: 0,
+    minimumHealingDays: 0,
   ),
   scratch(
     title: 'Égratignure',
     rank: 0,
     malus: 0,
+    naturalHealingDays: 5,
+    minimumHealingDays: 1,
   ),
   injured(
     title: 'Blessé',
     rank: 1,
     malus: 0,
+    naturalHealingDays: 15,
+    minimumHealingDays: 1,
   ),
   light(
     title: 'Légère',
     rank: 1,
     malus: -1,
+    naturalHealingDays: 10,
+    minimumHealingDays: 1,
   ),
   grave(
     title: 'Grave',
     rank: 2,
     malus: -3,
+    naturalHealingDays: 15,
+    minimumHealingDays: 1,
   ),
   fatal(
     title: 'Fatale',
     rank: 3,
     malus: -5,
+    naturalHealingDays: 30,
+    minimumHealingDays: 1,
   ),
   death(
     title: 'Mort',
     rank: 4,
     malus: -10,
+    naturalHealingDays: -1,
+    minimumHealingDays: -1,
     isFinal: true,
   ),
   ;
@@ -65,17 +80,63 @@ enum Injury {
   final String title;
   final int rank;
   final int malus;
+  final int naturalHealingDays;
+  final int minimumHealingDays;
   final bool isFinal;
 
   const Injury({
     required this.title,
     required this.rank,
     required this.malus,
+    required this.naturalHealingDays,
+    required this.minimumHealingDays,
     this.isFinal = false,
   });
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+enum InjuryHealingMethod {
+  firstHelp,
+  medicine,
+  chirurgy,
+  ;
+}
+
+@JsonSerializable()
+class InflictedInjuryProperties {
+  InflictedInjuryProperties({
+    this.canUseHealingMethod = true,
+    this.healingMethod,
+  });
+
+  bool canUseHealingMethod;
+  InjuryHealingMethod? healingMethod;
+
+  factory InflictedInjuryProperties.fromJson(Map<String, dynamic> json) =>
+      _$InflictedInjuryPropertiesFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$InflictedInjuryPropertiesToJson(this);
+}
+
+@JsonSerializable()
+class InflictedInjury {
+  InflictedInjury({
+    required this.remainingHealingDays,
+    InflictedInjuryProperties? properties,
+  })
+    : properties = properties ?? InflictedInjuryProperties();
+
+  int remainingHealingDays;
+  InflictedInjuryProperties properties;
+
+  factory InflictedInjury.fromJson(Map<String, dynamic> json) =>
+      _$InflictedInjuryFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$InflictedInjuryToJson(this);
+}
+
+@JsonSerializable()
 class InjuryLevel {
   InjuryLevel({
     required this.type,
@@ -102,9 +163,9 @@ class EntityInjuries {
     : managerNotifier = ValueNotifier<InjuryManager>(manager);
 
   InjuryManager get manager => managerNotifier.value;
-  set manager(InjuryManager m) => managerNotifier.value = m;
+    set manager(InjuryManager m) => managerNotifier.value = m;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  final ValueNotifier<InjuryManager> managerNotifier;
+    final ValueNotifier<InjuryManager> managerNotifier;
 
   factory EntityInjuries.fromJson(Map<String, dynamic> json) =>
       _$EntityInjuriesFromJson(json);
@@ -153,8 +214,10 @@ class InjuryManager {
     }
   }
 
-  final SplayTreeMap<_InjuryRange, InjuryLevel> _injuryLevels = SplayTreeMap<_InjuryRange, InjuryLevel>();
-  Map<Injury, int> _injuries = <Injury, int>{};
+  final SplayTreeMap<_InjuryRange, InjuryLevel> _injuryLevels =
+      SplayTreeMap<_InjuryRange, InjuryLevel>();
+  Map<Injury, List<InflictedInjury>> _injuries =
+      <Injury, List<InflictedInjury>>{};
 
   factory InjuryManager.simple({
     required int injuredCeiling,
@@ -296,6 +359,9 @@ class InjuryManager {
     for(var level in _injuryLevels.values) {
       if(level.type == type) {
         level.capacity = capacity;
+        if(_injuries.containsKey(type) && _injuries[type]!.length > capacity) {
+          _injuries[type]!.removeRange(capacity-1, _injuries[type]!.length);
+        }
         return;
       }
     }
@@ -304,41 +370,47 @@ class InjuryManager {
   }
 
   int count(InjuryLevel level) =>
-      _injuries.containsKey(level.type) ? _injuries[level.type]! : 0;
+      _injuries.containsKey(level.type)
+          ? _injuries[level.type]!.length
+          : 0;
 
-  InjuryLevel dealDamage(int amount) {
-    var range = _injuryLevels.lastKeyBefore(_InjuryRange(min: amount, max: 99999));
-    if(range == null) throw ArgumentError('Impossible de trouver le niveau de blessures pour $amount dégats');
-    var level = _injuryLevels[range]!;
+  List<InflictedInjury> inflicted(Injury type) =>
+      _injuries[type] ?? [];
 
-    if(level.type == Injury.ignore) return level;
+  Injury willInflictInjuryForDamage(int amount) =>
+      _injuryLevelForDamage(amount).type;
 
-    while(level.end != -1) {
-      var targetLevelCount = _injuries[level.type] ?? 0;
-      if(targetLevelCount >= level.capacity) {
-        range = _injuryLevels.firstKeyAfter(range!);
-        if(range == null) {
-          throw ArgumentError('Pas de niveau de blessure trouvé après ${level.type.title} (rang ${level.type.rank})');
-        }
-        level = _injuryLevels[range]!;
+  Injury dealDamage(int amount, { InflictedInjuryProperties? properties }) {
+    var level = _injuryLevelForDamage(amount);
+
+    if(level.type != Injury.ignore) {
+      if(!_injuries.containsKey(level.type)) {
+        _injuries[level.type] = <InflictedInjury>[];
       }
-      else {
-        break;
-      }
+
+      _injuries[level.type]!.insert(
+        0,
+        InflictedInjury(
+          remainingHealingDays: level.type.naturalHealingDays,
+          properties: properties,
+        )
+      );
     }
 
-    var count = (_injuries[level.type] ?? 0) + 1;
-    if(count <= level.capacity) _injuries[level.type] = count;
-    return level;
+    return level.type;
   }
 
-  void dealInjuries(Injury injury, int count) {
+  void dealInjuries({
+      required Injury injury,
+      required int count,
+      InflictedInjuryProperties? properties
+  }) {
     if(injury == Injury.ignore) return;
 
     var capacity = 0;
     InjuryLevel? currentLevel;
     for(var level in _injuryLevels.values) {
-      if (level.type == injury) {
+      if(level.type == injury) {
         currentLevel = level;
         capacity = level.capacity;
       }
@@ -349,9 +421,23 @@ class InjuryManager {
 
     var toDeal = count;
     while(toDeal > 0 && currentLevel != null) {
-      var currentLevelInjuries = _injuries[currentLevel.type] ?? 0;
-      var dealt = min(count, currentLevel.capacity - currentLevelInjuries);
-      _injuries[currentLevel.type] = currentLevelInjuries + dealt;
+      var currentLevelInjuriesCount = (_injuries[currentLevel.type] ?? []).length;
+      var dealt = min(count, currentLevel.capacity - currentLevelInjuriesCount);
+
+      if(!_injuries.containsKey(currentLevel.type)) {
+        _injuries[currentLevel.type] = <InflictedInjury>[];
+      }
+
+      for(var i = 0; i < dealt; ++i) {
+        _injuries[currentLevel.type]!.insert(
+          0,
+          InflictedInjury(
+            remainingHealingDays: currentLevel.type.naturalHealingDays,
+            properties: properties,
+          )
+        );
+      }
+
       toDeal -= dealt;
 
       if(currentLevel.type.isFinal) {
@@ -372,18 +458,25 @@ class InjuryManager {
     }
   }
 
-  void heal(InjuryLevel level) {
-    if(!_injuries.containsKey(level.type)) return;
-    if(_injuries[level.type]! == 0) return;
-    _injuries[level.type] = _injuries[level.type]! - 1;
-    if(_injuries[level.type] == 0) {
-      _injuries.remove(level.type);
+  void heal(Injury type, { InflictedInjury? injury }) {
+    if(!_injuries.containsKey(type)) return;
+    if(_injuries[type]!.isEmpty) return;
+
+    if(injury == null) {
+      _injuries[type]!.removeLast();
+    }
+    else {
+      _injuries[type]!.remove(injury);
+    }
+
+    if(_injuries[type]!.isEmpty) {
+      _injuries.remove(type);
     }
   }
 
   bool isDead() {
     var deathLevel = _injuryLevels[_injuryLevels.lastKey()!]!;
-    var deathCount = _injuries[deathLevel.type] ?? 0;
+    var deathCount = (_injuries[deathLevel.type] ?? []).length;
     return deathCount >= deathLevel.capacity;
   }
 
@@ -412,16 +505,63 @@ class InjuryManager {
 
   int getMalus() => getHighestInjuryLevel()?.malus ?? 0;
 
+  void tick(TickerEvent event) {
+    if(event.unit != TickerEventUnit.day) return;
+    if(event.type != TickerEventType.end) return;
+
+    for(var entry in _injuries.entries) {
+      var toRemove = <InflictedInjury>[];
+
+      for(var i in entry.value) {
+        i.remainingHealingDays -= 1;
+        if(i.remainingHealingDays < 0) {
+          toRemove.add(i);
+        }
+      }
+
+      for(var i in toRemove) {
+        entry.value.remove(i);
+      }
+    }
+  }
+
+  InjuryLevel _injuryLevelForDamage(int amount) {
+    var range = _injuryLevels.lastKeyBefore(_InjuryRange(min: amount, max: 99999));
+    if(range == null) throw ArgumentError('Impossible de trouver le niveau de blessures pour $amount dégats');
+    var level = _injuryLevels[range]!;
+
+    if(level.type == Injury.ignore) return level;
+
+    while(level.end != -1) {
+      var targetLevelCount = (_injuries[level.type] ?? []).length;
+      if(targetLevelCount >= level.capacity) {
+        range = _injuryLevels.firstKeyAfter(range!);
+        if(range == null) {
+          throw ArgumentError('Pas de niveau de blessure trouvé après ${level.type.title} (rang ${level.type.rank})');
+        }
+        level = _injuryLevels[range]!;
+      }
+      else {
+        break;
+      }
+    }
+
+    return level;
+  }
+
   Map<String, dynamic> toJson() {
     var levels = <Map<String, dynamic>>[];
-    var injuries = <String, int>{};
+    var injuries = <String, List<Map<String, dynamic>>>{};
 
     for(var level in _injuryLevels.values) {
       levels.add(level.toJson());
     }
 
     for(var injury in _injuries.entries) {
-      injuries[injury.key.name] = injury.value;
+      injuries[injury.key.name] = injury.value.map(
+          (InflictedInjury i) => i.toJson()
+        )
+        .toList();
     }
 
     return <String, dynamic>{
@@ -446,9 +586,12 @@ class InjuryManager {
 
     var ret = InjuryManager(levels: levels);
     if(json.containsKey('injuries') && json['injuries']! is Map) {
-      var injuries = <Injury, int>{};
+      var injuries = <Injury, List<InflictedInjury>>{};
       for(var k in json['injuries'].keys) {
-        injuries[Injury.values.byName(k)] = json['injuries']![k];
+        injuries[Injury.values.byName(k)] =
+          (json['injuries']![k] as List<dynamic>)
+            .map((dynamic d) => InflictedInjury.fromJson(d as Map<String, dynamic>))
+            .toList();
       }
       ret._injuries = injuries;
     }

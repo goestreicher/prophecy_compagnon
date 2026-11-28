@@ -34,29 +34,36 @@ class EntityEffectInjury extends EntityEffect {
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.frequency,
     super.activationDiceThrowRequest,
     super.activationDiceThrowValidResults,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.elapsedDurationUnits,
     super.removeOnUnapply,
+    super.statusMessageTitle,
+    super.statusMessageText,
     super.active,
     required this.injury,
     this.count = 1,
+    this.injuryProperties,
   })
-    : super(
-        target: EntityEffectTarget.injury,
-      );
+    : super(target: EntityEffectTarget.injury);
 
   final Injury injury;
   final int count;
+  final InflictedInjuryProperties? injuryProperties;
 
   @override
   void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
     if(!canApply(target: target)) return;
 
     super.apply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation);
-    target.injuries.manager.dealInjuries(injury, count);
+    target.injuries.manager.dealInjuries(
+      injury: injury,
+      count: count,
+      properties: injuryProperties
+    );
   }
 
   @override

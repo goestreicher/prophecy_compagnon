@@ -32,6 +32,7 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/encounter/tur
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 import 'package:prophecy_compagnon_shared/ui/entity/status_widget.dart';
+import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/button_renderer.dart';
 import 'package:prophecy_compagnon_shared/ui/session/encounter/menu_renderer.dart';
 
@@ -116,7 +117,11 @@ class TurnActionWidget extends StatelessWidget {
               onPressed: () async {
                 var messageBus = SessionMessageBusClient.instance;
                 if(messageBus == null) {
-                  // TODO: display a message
+                  await displayErrorDialog(
+                    context,
+                    "Pas de connexion au bus de messages",
+                    "Aucune instance du bus de message n'a été trouvée, impossible de retarder l'action",
+                  );
                   return;
                 }
 
@@ -126,9 +131,15 @@ class TurnActionWidget extends StatelessWidget {
                     actionUuid: action.uuid,
                   )
                 );
+                if(!context.mounted) return;
 
                 if(response.status != SessionMessageResponseStatus.accepted) {
-                  // TODO: display a message
+                  await displayErrorDialog(
+                    context,
+                    "Planification non acceptée",
+                    "Le décalage de l'action n'a pas été accepté (statut "
+                    "${response.status}), la planification est abandonnée",
+                  );
                   return;
                 }
               },

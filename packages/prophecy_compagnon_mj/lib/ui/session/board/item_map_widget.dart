@@ -38,6 +38,7 @@ import 'package:prophecy_compagnon_shared/classes/session/messages/session_messa
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message_response.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_map_status.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/status/entity_position_status.dart';
+import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 import 'package:prophecy_compagnon_shared/ui/generic_image_widget.dart';
 import 'package:prophecy_compagnon_shared/ui/session/map/item_widget.dart';
 import 'package:provider/provider.dart';
@@ -252,14 +253,18 @@ class _MapActionWidgetState extends State<_MapActionWidget> {
                                   left: item.x - (item.size.width * widget.map.background.pixelsPerMeter) / 2,
                                   top: item.y - (item.size.height * widget.map.background.pixelsPerMeter) / 2,
                                   child: GestureDetector(
-                                    onTap: !selectable? null : () {
+                                    onTap: !selectable? null : () async {
                                       var distance = widget.map.distances.between(
                                         widget.map.items[currentSelectRequestMessage!.entityId]!,
                                         item
                                       );
 
                                       if(distance == null) {
-                                        // TODO: display a message?
+                                        await displayErrorDialog(
+                                          context,
+                                          "Distance non calculée",
+                                          "Impossible de déterminer la distance à la cible",
+                                        );
                                         return;
                                       }
 

@@ -28,6 +28,7 @@ import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/map/select_target.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/responses/action/select_target_result.dart';
 import 'package:prophecy_compagnon_shared/classes/session/messages/session_message.dart';
+import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 
 class ActionInitializerWeapon extends ActionInitializer {
   ActionInitializerWeapon({ required this.weapon });
@@ -48,8 +49,7 @@ class ActionInitializerWeapon extends ActionInitializer {
   Future<void> _doPlan(BuildContext context, SessionEncounterEntityAction action) async {
     var messageBus = SessionMessageBusClient.instance;
     if(messageBus == null) {
-      // TODO: display a message
-      return;
+      throw(SessionMessageBusClientException('No SessionMessageBusClient instance'));
     }
 
     var controllingClient = messageBus.clientControlling(action.entity.id);
@@ -85,24 +85,44 @@ class ActionInitializerWeapon extends ActionInitializer {
 
     var r = (targetResponse.data as SessionSelectTargetResult?);
     if(r == null || GameSession.instance!.entity(r.entityId) == null) {
-      // TODO: display a nice message?
+      await displayErrorDialog(
+        context,
+        'Pas de cible sélectionnée',
+        "Aucune cible sélectionnée pour cette attaque, "
+        "la planification est abandonnée",
+      );
       return;
     }
 
     var target = GameSession.instance?.entity(r.entityId);
     if(target == null) {
-      // TODO: display a message
+      await displayErrorDialog(
+        context,
+        "Cible non trouvée",
+        "La cible sélectionnée n'a pas été trouvée dans les entités de cette "
+        "session, la planification est abandonnée"
+      );
       return;
     }
 
-    var initializers = getAttackInitializersForWeapon(weapon: weapon, target: target);
+    var initializers = getAttackInitializersForWeapon(
+      attacker: action.entity,
+      weapon: weapon,
+      target: target,
+    );
     if(initializers.isEmpty) {
-      // TODO: display a message
+      await displayErrorDialog(
+        context,
+        "Pas d'attaque possible",
+        "Impossible de trouver une attaque pour ce couple cible / arme, "
+        "la planification est abandonnée"
+      );
       return;
     }
 
     var initializer = await showDialog<ActionInitializerAttack?>(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) => SimpleDialog(
         title: const Text("Sélectionner le type d'attaque"),
         children: initializers
@@ -121,12 +141,14 @@ class ActionInitializerWeapon extends ActionInitializer {
     );
     if(!context.mounted) return;
     if(initializer == null) {
-      // TODO: display a message
+      displayErrorDialog(
+        context,
+        "Planification abandonnée",
+        "Aucune attaque sélectionnée, la planification est abandonnée"
+      );
       return;
     }
 
     await initializer.plan(context, action);
-
-    // TODO
   }
 }

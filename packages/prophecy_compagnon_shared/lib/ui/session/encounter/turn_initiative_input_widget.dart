@@ -23,6 +23,7 @@ import 'package:prophecy_compagnon_shared/classes/combat.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/initiative_provider.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/weapon.dart';
 import 'package:prophecy_compagnon_shared/ui/custom_icons.dart';
 import 'package:prophecy_compagnon_shared/ui/dice_roll_input.dart';

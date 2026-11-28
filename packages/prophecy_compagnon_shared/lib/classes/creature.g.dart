@@ -163,6 +163,10 @@ Creature _$CreatureFromJson(Map<String, dynamic> json) =>
                 EntityDraconicFavors.readFavorsFromJson(json, 'favors') as List,
               ),
         effects: EntityEffects.fromJson(json['effects'] as List?),
+        cumulativeAttackMalus:
+            (json['cumulative_attack_malus'] as num?)?.toInt() ?? 0,
+        cumulativeDefenseMalus:
+            (json['cumulative_defense_malus'] as num?)?.toInt() ?? 0,
       )
       ..abilities = EntityAbilities.fromJson(
         json['abilities'] as Map<String, dynamic>,
@@ -193,6 +197,8 @@ Map<String, dynamic> _$CreatureToJson(Creature instance) => <String, dynamic>{
   'magic': instance.magic.toJson(),
   'favors': EntityDraconicFavors.toJson(instance.favors),
   'effects': EntityEffects.toJson(instance.effects),
+  'cumulative_attack_malus': instance.cumulativeAttackMalus,
+  'cumulative_defense_malus': instance.cumulativeDefenseMalus,
   'image': instance.image?.toJson(),
   'icon': instance.icon?.toJson(),
   'unique': instance.unique,

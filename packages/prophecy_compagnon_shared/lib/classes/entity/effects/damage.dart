@@ -20,7 +20,9 @@ import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart'
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/effect.dart';
+import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/armor.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
 part 'damage.g.dart';
@@ -33,27 +35,37 @@ class EntityEffectDamage extends EntityEffect {
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.frequency,
     super.activationDiceThrowRequest,
     super.activationDiceThrowValidResults,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.elapsedDurationUnits,
     super.removeOnUnapply,
+    super.statusMessageTitle,
+    super.statusMessageText,
     super.active,
     required this.amount,
+    this.inflictedInjuryProperties,
   })
-    : super(
-        target: EntityEffectTarget.damage,
-      );
+    : super(target: EntityEffectTarget.damage);
 
   final int amount;
+  final InflictedInjuryProperties? inflictedInjuryProperties;
 
   @override
   void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
     if(!canApply(target: target)) return;
 
     super.apply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation);
-    target.takeDamage(amount);
+    var inflicted = target.takeDamage(amount, properties: inflictedInjuryProperties);
+
+    if((inflicted?.rank ?? -1) >= 0) {
+      for (var pp in target.protectionProviders) {
+        if (pp is! Armor) continue;
+        pp.damages = pp.damages + 1;
+      }
+    }
   }
 
   @override

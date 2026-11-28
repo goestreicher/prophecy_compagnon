@@ -475,6 +475,8 @@ class NonPlayerCharacter extends HumanCharacter with EncounterEntityModel {
     EntityDraconicFavors? favors,
     EntityFervor? fervor,
     EntityEffects? effects,
+    int cumulativeAttackMalus = 0,
+    int cumulativeDefenseMalus = 0,
     ExportableBinaryData? image,
     ExportableBinaryData? icon,
   }) {
@@ -520,6 +522,8 @@ class NonPlayerCharacter extends HumanCharacter with EncounterEntityModel {
             favors: favors,
             fervor: fervor,
             effects: effects,
+            cumulativeAttackMalus: cumulativeAttackMalus,
+            cumulativeDefenseMalus: cumulativeDefenseMalus,
             image: image,
             icon: icon,
           );
@@ -569,6 +573,8 @@ class NonPlayerCharacter extends HumanCharacter with EncounterEntityModel {
     super.favors,
     super.fervor,
     super.effects,
+    super.cumulativeAttackMalus,
+    super.cumulativeDefenseMalus,
     super.image,
     super.icon,
   })

@@ -8,44 +8,54 @@ part of 'ability_modifier.dart';
 
 EntityEffectAbilityModifier _$EntityEffectAbilityModifierFromJson(
   Map<String, dynamic> json,
-) => EntityEffectAbilityModifier(
-  uuid: json['uuid'] as String?,
-  name: json['name'] as String,
-  trigger: $enumDecode(_$EntityEffectTriggerEnumMap, json['trigger']),
-  triggerTickerEvent: json['trigger_ticker_event'] == null
-      ? null
-      : TickerEvent.fromJson(
-          json['trigger_ticker_event'] as Map<String, dynamic>,
-        ),
-  duration: json['duration'] == null
-      ? null
-      : TickerEvent.fromJson(json['duration'] as Map<String, dynamic>),
-  activationDiceThrowRequest: json['activation_dice_throw_request'] == null
-      ? null
-      : DiceThrowRequest.fromJson(
-          json['activation_dice_throw_request'] as Map<String, dynamic>,
-        ),
-  activationDiceThrowValidResults:
-      (json['activation_dice_throw_valid_results'] as List<dynamic>?)
-          ?.map((e) => $enumDecode(_$DiceThrowResultTypeEnumMap, e))
-          .toList() ??
-      const [DiceThrowResultType.success],
-  activationDiceThrowValueTransformer:
-      json['activation_dice_throw_value_transformer'] == null
-      ? null
-      : EntityEffectActivationDiceThrowValueTransformer.fromJson(
-          json['activation_dice_throw_value_transformer']
-              as Map<String, dynamic>,
-        ),
-  postEffects: (json['post_effects'] as List<dynamic>?)
-      ?.map((e) => EntityEffect.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  removeOnUnapply: json['remove_on_unapply'] as bool? ?? false,
-  elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
-  active: json['active'] as bool? ?? false,
-  ability: $enumDecode(_$AbilityEnumMap, json['ability']),
-  modifier: (json['modifier'] as num).toInt(),
-)..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt();
+) =>
+    EntityEffectAbilityModifier(
+        uuid: json['uuid'] as String?,
+        name: json['name'] as String,
+        trigger: $enumDecode(_$EntityEffectTriggerEnumMap, json['trigger']),
+        triggerTickerEvent: json['trigger_ticker_event'] == null
+            ? null
+            : TickerEvent.fromJson(
+                json['trigger_ticker_event'] as Map<String, dynamic>,
+              ),
+        duration: json['duration'] == null
+            ? null
+            : TickerEvent.fromJson(json['duration'] as Map<String, dynamic>),
+        frequency: json['frequency'] == null
+            ? null
+            : TickerEvent.fromJson(json['frequency'] as Map<String, dynamic>),
+        activationDiceThrowRequest:
+            json['activation_dice_throw_request'] == null
+            ? null
+            : DiceThrowRequest.fromJson(
+                json['activation_dice_throw_request'] as Map<String, dynamic>,
+              ),
+        activationDiceThrowValidResults:
+            (json['activation_dice_throw_valid_results'] as List<dynamic>?)
+                ?.map((e) => $enumDecode(_$DiceThrowResultTypeEnumMap, e))
+                .toList() ??
+            const [DiceThrowResultType.success],
+        activationDiceThrowValueTransformer:
+            json['activation_dice_throw_value_transformer'] == null
+            ? null
+            : EntityEffectActivationDiceThrowValueTransformer.fromJson(
+                json['activation_dice_throw_value_transformer']
+                    as Map<String, dynamic>,
+              ),
+        postEffects: (json['post_effects'] as List<dynamic>?)
+            ?.map((e) => EntityEffect.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        removeOnUnapply: json['remove_on_unapply'] as bool? ?? false,
+        statusMessageTitle: json['status_message_title'] as String?,
+        statusMessageText: json['status_message_text'] as String?,
+        elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
+        active: json['active'] as bool? ?? false,
+        ability: $enumDecode(_$AbilityEnumMap, json['ability']),
+        modifier: (json['modifier'] as num).toInt(),
+      )
+      ..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt()
+      ..elapsedFrequencyUnits = (json['elapsed_frequency_units'] as num?)
+          ?.toInt();
 
 Map<String, dynamic> _$EntityEffectAbilityModifierToJson(
   EntityEffectAbilityModifier instance,
@@ -55,6 +65,7 @@ Map<String, dynamic> _$EntityEffectAbilityModifierToJson(
   'trigger': _$EntityEffectTriggerEnumMap[instance.trigger]!,
   'trigger_ticker_event': instance.triggerTickerEvent?.toJson(),
   'duration': instance.duration?.toJson(),
+  'frequency': instance.frequency?.toJson(),
   'activation_dice_throw_request': instance.activationDiceThrowRequest
       ?.toJson(),
   'activation_dice_throw_valid_results': instance
@@ -66,8 +77,11 @@ Map<String, dynamic> _$EntityEffectAbilityModifierToJson(
       ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
   'remove_on_unapply': instance.removeOnUnapply,
+  'status_message_title': instance.statusMessageTitle,
+  'status_message_text': instance.statusMessageText,
   'elapsed_trigger_units': instance.elapsedTriggerUnits,
   'elapsed_duration_units': instance.elapsedDurationUnits,
+  'elapsed_frequency_units': instance.elapsedFrequencyUnits,
   'active': instance.active,
   'ability': _$AbilityEnumMap[instance.ability]!,
   'modifier': instance.modifier,

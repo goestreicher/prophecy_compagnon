@@ -21,6 +21,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/throw_entity_base/skill.d
 import 'package:prophecy_compagnon_shared/classes/entity/abilities.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/attributes.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skill.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/protection_provider.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/shield.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/weapon.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action.dart';
@@ -47,6 +48,7 @@ abstract class CombatActionDefense extends CombatAction {
   ActionInitializer? initializer() => null;
 
   DiceThrowEntityBase diceThrowBase();
+  bool useProtectionProvider(ProtectionProvider provider) => true;
 }
 
 @JsonSerializable()
@@ -89,6 +91,10 @@ class CombatActionDefenseParryShield extends CombatActionDefense {
     skill: Skill.bouclier,
     ability: Ability.force,
   );
+
+  @override
+  bool useProtectionProvider(ProtectionProvider provider) =>
+      !(provider is Shield && provider.uuid() == shield.uuid());
 
   factory CombatActionDefenseParryShield.fromJson(Map<String, dynamic> json) =>
       _$CombatActionDefenseParryShieldFromJson(json);

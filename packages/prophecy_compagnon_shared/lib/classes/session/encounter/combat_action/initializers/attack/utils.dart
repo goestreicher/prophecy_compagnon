@@ -31,6 +31,7 @@ import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_actio
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/attack/shared/simple.dart';
 
 List<ActionInitializerAttack> getAttackInitializersForWeapon({
+    required EntityBase attacker,
     required Weapon weapon,
     required EntityBase target,
 }) {
@@ -44,18 +45,21 @@ List<ActionInitializerAttack> getAttackInitializersForWeapon({
         switch(t) {
           case CombatActionAttackContactType.simple:
             initializer = ActionInitializerAttackSimple(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
             );
           case CombatActionAttackContactType.brutal:
             initializer = ActionInitializerAttackBrutal(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
             );
           case CombatActionAttackContactType.precise:
             initializer = ActionInitializerAttackPrecise(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
@@ -69,18 +73,21 @@ List<ActionInitializerAttack> getAttackInitializersForWeapon({
         switch(t) {
           case CombatActionAttackMeleeType.simple:
             initializer = ActionInitializerAttackSimple(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
             );
           case CombatActionAttackMeleeType.brutal:
             initializer = ActionInitializerAttackBrutal(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
             );
           case CombatActionAttackMeleeType.precise:
             initializer = ActionInitializerAttackPrecise(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
@@ -94,18 +101,21 @@ List<ActionInitializerAttack> getAttackInitializersForWeapon({
         switch(t) {
           case CombatActionAttackDistanceType.simple:
             initializer = ActionInitializerAttackSimple(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
             );
           case CombatActionAttackDistanceType.brutal:
             initializer = ActionInitializerAttackBrutal(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
             );
           case CombatActionAttackDistanceType.precise:
             initializer = ActionInitializerAttackPrecise(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
@@ -119,12 +129,14 @@ List<ActionInitializerAttack> getAttackInitializersForWeapon({
         switch(t) {
           case CombatActionAttackRangedType.simple:
             initializer = ActionInitializerAttackSimple(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,
             );
           case CombatActionAttackRangedType.precise:
             initializer = ActionInitializerAttackPrecise(
+              attacker: attacker,
               weapon: weapon,
               target: target,
               icon: t.icon,

@@ -49,18 +49,26 @@ class _EntityInjuryManagerWidgetState extends State<EntityInjuryManagerWidget> {
       levelInputs.add(
         _InjuryLevelInputWidget(
           level: level,
-          count: widget.manager.count(level),
+          inflicted: widget.manager.inflicted(level.type),
           circlesDiameter: widget.circlesDiameter,
           increase: !widget.allowChanges ? null : () {
             setState(() {
-              widget.manager.dealInjuries(level.type, 1);
+              widget.manager.dealInjuries(
+                injury: level.type,
+                count: 1
+              );
             });
           },
           decrease: !widget.allowChanges ? null : () {
             setState(() {
-              widget.manager.heal(level);
+              widget.manager.heal(level.type);
             });
           },
+          heal: !widget.allowChanges ? null : (InflictedInjury i) {
+            setState(() {
+              widget.manager.heal(level.type, injury: i);
+            });
+          }
         )
       );
     }
@@ -88,69 +96,149 @@ class _EntityInjuryManagerWidgetState extends State<EntityInjuryManagerWidget> {
   }
 }
 
-class _InjuryLevelInputWidget extends StatelessWidget {
+class _InflictedInjuryOverlay extends StatelessWidget {
+  const _InflictedInjuryOverlay({
+    required this.injury,
+    this.onHeal,
+  });
+
+  final InflictedInjury injury;
+  final void Function()? onHeal;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              injury.remainingHealingDays > 0
+                ? "Guérie dans ${injury.remainingHealingDays} jours"
+                : "Impossible à guérir",
+            ),
+            if(onHeal != null)
+              TextButton.icon(
+                onPressed: () {
+                  onHeal!();
+                },
+                label: const Text('Soigner'),
+                icon: Icon(Icons.healing),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InjuryLevelInputWidget extends StatefulWidget {
   const _InjuryLevelInputWidget({
     required this.level,
-    required this.count,
+    required this.inflicted,
     this.increase,
     this.decrease,
+    this.heal,
     required this.circlesDiameter,
   });
 
   final InjuryLevel level;
-  final int count;
+  final List<InflictedInjury> inflicted;
   final void Function()? increase;
   final void Function()? decrease;
+  final void Function(InflictedInjury)? heal;
   final double circlesDiameter;
+
+  @override
+  State<_InjuryLevelInputWidget> createState() => _InjuryLevelInputWidgetState();
+}
+
+class _InjuryLevelInputWidgetState extends State<_InjuryLevelInputWidget> {
+  OverlayEntry? infoOverlay;
+
+  void dismissOverlay() {
+    infoOverlay?.remove();
+    infoOverlay?.dispose();
+    infoOverlay = null;
+  }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     List<Widget> circles = <Widget>[];
-    var colored = 0;
 
-    for(var i = 0; i < level.capacity; ++i) {
-      if(colored < count) {
-        circles.add(
-          UnconstrainedBox(
+    for(var i in widget.inflicted) {
+      circles.add(
+        GestureDetector(
+          onTapUp: (TapUpDetails details) {
+            var overlayState = Overlay.of(context);
+            infoOverlay = OverlayEntry(
+              builder: (BuildContext context) {
+                return Stack(
+                  children: [
+                    ModalBarrier(
+                      dismissible: true,
+                      onDismiss: () {
+                        dismissOverlay();
+                      },
+                    ),
+                    Positioned(
+                      top: details.globalPosition.dy,
+                      left: details.globalPosition.dx,
+                      child: _InflictedInjuryOverlay(
+                        injury: i,
+                        onHeal: widget.heal == null ? null : () {
+                          widget.heal!(i);
+                          dismissOverlay();
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+            overlayState.insert(infoOverlay!);
+          },
+          child: UnconstrainedBox(
             child: Container(
-              width: circlesDiameter,
-              height: circlesDiameter,
+              width: widget.circlesDiameter,
+              height: widget.circlesDiameter,
               decoration: BoxDecoration(
                 color: Colors.black,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.black),
               ),
             ),
-          )
-        );
-        ++colored;
-      }
-      else {
-        circles.add(
-          UnconstrainedBox(
-            child: Container(
-              width: circlesDiameter,
-              height: circlesDiameter,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceBright,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black),
-              ),
-            ),
-          )
-        );
-      }
+          ),
+        )
+      );
     }
 
-    var minWidth = circlesDiameter * 2 + 2.0;
+    for(var i = 0; i < widget.level.capacity - widget.inflicted.length; ++i) {
+      circles.add(
+        UnconstrainedBox(
+          child: Container(
+            width: widget.circlesDiameter,
+            height: widget.circlesDiameter,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceBright,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black),
+            ),
+          ),
+        )
+      );
+    }
+
+    var minWidth = widget.circlesDiameter * 2 + 2.0;
 
     return Row(
       spacing: 4.0,
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        if(decrease != null)
+        if(widget.decrease != null)
           IconButton(
             icon: const Icon(Icons.remove),
             style: IconButton.styleFrom(
@@ -158,7 +246,7 @@ class _InjuryLevelInputWidget extends StatelessWidget {
               maximumSize: Size.square(28.0),
               iconSize: 12.0,
             ),
-            onPressed: () => decrease!(),
+            onPressed: () => widget.decrease!(),
           ),
         Flexible(
           child: ConstraintsTransformBox(
@@ -183,7 +271,7 @@ class _InjuryLevelInputWidget extends StatelessWidget {
             ),
           ),
         ),
-        if(increase != null)
+        if(widget.increase != null)
           IconButton(
             icon: const Icon(Icons.add),
             style: IconButton.styleFrom(
@@ -191,7 +279,7 @@ class _InjuryLevelInputWidget extends StatelessWidget {
               maximumSize: Size.square(28.0),
               iconSize: 12.0,
             ),
-            onPressed: () => increase!(),
+            onPressed: () => widget.increase!(),
         ),
       ],
     );

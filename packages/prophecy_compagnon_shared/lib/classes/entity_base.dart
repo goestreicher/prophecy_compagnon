@@ -34,8 +34,11 @@ import 'package:prophecy_compagnon_shared/classes/entity/health_status.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/injury.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/magic.dart';
 import 'package:prophecy_compagnon_shared/classes/entity/skills.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/damage_provider.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/enums.dart';
 import 'package:prophecy_compagnon_shared/classes/equipment/equipment.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/initiative_provider.dart';
+import 'package:prophecy_compagnon_shared/classes/equipment/protection_provider.dart';
 import 'package:prophecy_compagnon_shared/classes/exportable_binary_data.dart';
 import 'package:prophecy_compagnon_shared/classes/money.dart';
 import 'package:prophecy_compagnon_shared/classes/object_location.dart';
@@ -47,18 +50,6 @@ import 'package:uuid/uuid.dart';
 part 'entity_base.g.dart';
 
 typedef InjuryProvider = InjuryManager Function(EntityBase?, InjuryManager?);
-
-abstract interface class ProtectionProvider {
-  int protection();
-}
-
-abstract interface class DamageProvider {
-  int damage(EntityBase owner, { List<int>? throws });
-}
-
-abstract interface class InitiativeProvider {
-  int initiativeForRange(WeaponRange range);
-}
 
 abstract interface class RangeProvider {
   WeaponRange get range;
@@ -89,6 +80,8 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     EntityDraconicFavors? favors,
     EntityFervor? fervor,
     EntityEffects? effects,
+    this.cumulativeAttackMalus = 0,
+    this.cumulativeDefenseMalus = 0,
     ExportableBinaryData? image,
     ExportableBinaryData? icon,
   })
@@ -119,8 +112,12 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
         case EntityEffectTarget.diceThrowModifier:
           effect.apply(target: this);
         case EntityEffectTarget.ability:
+        case EntityEffectTarget.attribute:
         case EntityEffectTarget.combatStatus:
         case EntityEffectTarget.damage:
+        case EntityEffectTarget.damageArmor:
+        case EntityEffectTarget.disadvantage:
+        case EntityEffectTarget.experience:
         case EntityEffectTarget.healthStatus:
         case EntityEffectTarget.initiativeExtraDice:
         case EntityEffectTarget.injury:
@@ -129,6 +126,7 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
         case EntityEffectTarget.luckModifier:
         case EntityEffectTarget.none:
         case EntityEffectTarget.proficiency:
+        case EntityEffectTarget.tendencyCircles:
           continue;
       }
     }
@@ -161,6 +159,8 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
   final EntityFervor fervor;
   @JsonKey(fromJson: EntityEffects.fromJson, toJson: EntityEffects.toJson)
     final EntityEffects effects;
+  int cumulativeAttackMalus;
+  int cumulativeDefenseMalus;
 
   ExportableBinaryData? get image => _image;
   set image(ExportableBinaryData? i) {
@@ -189,13 +189,17 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
       && !combatStatus.has(EntityCombatStatusFlag.onGround)
       && !combatStatus.has(EntityCombatStatusFlag.grappled);
 
-  void takeDamage(int amount) {
+  Injury? takeDamage(int amount, { InflictedInjuryProperties? properties }) {
+    Injury? ret;
+
     if(amount > 0) {
-      injuries.manager.dealDamage(amount);
+      ret = injuries.manager.dealDamage(amount, properties: properties);
       if(injuries.manager.isDead()) {
         healthStatus.add(EntityHealthStatusFlag.dead);
       }
     }
+
+    return ret;
   }
 
   int damageMalus() {
@@ -244,6 +248,30 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
       );
     }
 
+    if(request.context == DiceThrowRequestContext.attack && cumulativeAttackMalus < 0) {
+      ret.add(
+        GenericDiceThrowModifier(
+          type: DiceThrowModifierType.malus,
+          family: DiceThrowModifierFamily.context,
+          label: "Malus pour plusieurs attaques",
+          value: cumulativeAttackMalus,
+          name: 'cumulativeAttackMalus',
+        )
+      );
+    }
+
+    if(request.context == DiceThrowRequestContext.defense && cumulativeDefenseMalus < 0) {
+      ret.add(
+        GenericDiceThrowModifier(
+          type: DiceThrowModifierType.malus,
+          family: DiceThrowModifierFamily.context,
+          label: "Malus pour plusieurs défenses",
+          value: cumulativeDefenseMalus,
+          name: 'cumulativeDefenseMalus',
+        )
+      );
+    }
+
     for(var mod in _throwModifiers.values) {
       if(mod.matcher == null || mod.matcher!.matches(request)) {
         ret.add(mod);
@@ -255,9 +283,10 @@ class EntityBase extends ResourceBaseClass with SupportsEquipableItem {
     return ret;
   }
 
-  List<DiceThrowModifier> peerThrowModifiers() =>
+  List<DiceThrowModifier> peerThrowModifiers({DiceThrowRequest? request}) =>
       _throwModifiers.values
         .where((DiceThrowModifier m) => m.target == DiceThrowModifierTarget.other)
+        .where((DiceThrowModifier m) => request == null || m.matcher == null || m.matcher!.matches(request))
         .toList();
 
   @override

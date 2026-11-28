@@ -21,6 +21,9 @@ EntityEffectCombatStatus _$EntityEffectCombatStatusFromJson(
         duration: json['duration'] == null
             ? null
             : TickerEvent.fromJson(json['duration'] as Map<String, dynamic>),
+        frequency: json['frequency'] == null
+            ? null
+            : TickerEvent.fromJson(json['frequency'] as Map<String, dynamic>),
         activationDiceThrowRequest:
             json['activation_dice_throw_request'] == null
             ? null
@@ -42,10 +45,14 @@ EntityEffectCombatStatus _$EntityEffectCombatStatusFromJson(
         postEffects: (json['post_effects'] as List<dynamic>?)
             ?.map((e) => EntityEffect.fromJson(e as Map<String, dynamic>))
             .toList(),
+        statusMessageTitle: json['status_message_title'] as String?,
+        statusMessageText: json['status_message_text'] as String?,
         elapsedDurationUnits: (json['elapsed_duration_units'] as num?)?.toInt(),
         status: $enumDecode(_$EntityCombatStatusFlagEnumMap, json['status']),
       )
       ..elapsedTriggerUnits = (json['elapsed_trigger_units'] as num).toInt()
+      ..elapsedFrequencyUnits = (json['elapsed_frequency_units'] as num?)
+          ?.toInt()
       ..active = json['active'] as bool;
 
 Map<String, dynamic> _$EntityEffectCombatStatusToJson(
@@ -56,6 +63,7 @@ Map<String, dynamic> _$EntityEffectCombatStatusToJson(
   'trigger': _$EntityEffectTriggerEnumMap[instance.trigger]!,
   'trigger_ticker_event': instance.triggerTickerEvent?.toJson(),
   'duration': instance.duration?.toJson(),
+  'frequency': instance.frequency?.toJson(),
   'activation_dice_throw_request': instance.activationDiceThrowRequest
       ?.toJson(),
   'activation_dice_throw_valid_results': instance
@@ -66,8 +74,11 @@ Map<String, dynamic> _$EntityEffectCombatStatusToJson(
       .activationDiceThrowValueTransformer
       ?.toJson(),
   'post_effects': instance.postEffects.map((e) => e.toJson()).toList(),
+  'status_message_title': instance.statusMessageTitle,
+  'status_message_text': instance.statusMessageText,
   'elapsed_trigger_units': instance.elapsedTriggerUnits,
   'elapsed_duration_units': instance.elapsedDurationUnits,
+  'elapsed_frequency_units': instance.elapsedFrequencyUnits,
   'active': instance.active,
   'status': _$EntityCombatStatusFlagEnumMap[instance.status]!,
 };

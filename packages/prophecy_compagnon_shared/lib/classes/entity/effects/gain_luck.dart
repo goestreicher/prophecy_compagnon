@@ -26,6 +26,40 @@ import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 
 part 'gain_luck.g.dart';
 
+class EntityEffectGainLuckConfiguration extends EntityEffectConfiguration {
+  const EntityEffectGainLuckConfiguration({
+    required super.name,
+    required super.trigger,
+    super.triggerTickerEvent,
+    super.duration,
+    super.frequency,
+    super.activationDiceThrowRequest,
+    super.activationDiceThrowValidResults,
+    super.activationDiceThrowValueTransformer,
+    super.postEffects,
+    super.removeOnUnapply,
+    required this.amount,
+  })
+    : super(target: EntityEffectTarget.luck);
+
+  final int amount;
+
+  @override
+  EntityEffect create() => EntityEffectGainLuck(
+    name: name,
+    trigger: trigger,
+    triggerTickerEvent: triggerTickerEvent,
+    duration: duration,
+    frequency: frequency,
+    activationDiceThrowRequest: activationDiceThrowRequest,
+    activationDiceThrowValidResults: activationDiceThrowValidResults,
+    activationDiceThrowValueTransformer: activationDiceThrowValueTransformer,
+    postEffects: postEffects,
+    removeOnUnapply: removeOnUnapply,
+    amount: amount,
+  );
+}
+
 @JsonSerializable()
 class EntityEffectGainLuck extends EntityEffect {
   EntityEffectGainLuck({
@@ -34,12 +68,15 @@ class EntityEffectGainLuck extends EntityEffect {
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.frequency,
     super.activationDiceThrowRequest,
     super.activationDiceThrowValidResults,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.elapsedDurationUnits,
     super.removeOnUnapply,
+    super.statusMessageTitle,
+    super.statusMessageText,
     super.active,
     required this.amount,
   })

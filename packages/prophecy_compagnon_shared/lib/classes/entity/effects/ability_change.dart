@@ -27,40 +27,45 @@ import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 part 'ability_change.g.dart';
 
 @JsonSerializable()
-class EntityEffectAbilityChange extends EntityEffect {
-  EntityEffectAbilityChange({
+class EntityEffectChangeAbility extends EntityEffect {
+  EntityEffectChangeAbility({
     super.uuid,
     required super.name,
     required super.trigger,
     super.triggerTickerEvent,
     super.duration,
+    super.frequency,
     super.activationDiceThrowRequest,
     super.activationDiceThrowValidResults,
     super.activationDiceThrowValueTransformer,
     super.postEffects,
     super.removeOnUnapply,
+    super.statusMessageTitle,
+    super.statusMessageText,
     super.elapsedDurationUnits,
     super.active,
     required this.ability,
-    required this.value,
+    required this.delta,
   })
     : super(target: EntityEffectTarget.ability);
 
   final Ability ability;
-  final int value;
+  final int delta;
 
   @override
   void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
     if(!canApply(target: target)) return;
 
     super.apply(target: target, activationDiceThrowEvaluation: activationDiceThrowEvaluation);
-    target.abilities.setAbility(ability, target.abilities[ability] + value);
+    int v = target.abilities[ability] + delta;
+    if(v < 0) v = 0;
+    target.abilities.setAbility(ability, v);
   }
 
   @override
   Map<String, dynamic> effectToJson() =>
-      _$EntityEffectAbilityChangeToJson(this);
+      _$EntityEffectChangeAbilityToJson(this);
 
-  factory EntityEffectAbilityChange.fromJson(Map<String, dynamic> json) =>
-      _$EntityEffectAbilityChangeFromJson(json);
+  factory EntityEffectChangeAbility.fromJson(Map<String, dynamic> json) =>
+      _$EntityEffectChangeAbilityFromJson(json);
 }

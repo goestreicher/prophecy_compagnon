@@ -21,6 +21,7 @@ import 'package:prophecy_compagnon_shared/classes/dice/evaluate_dice_throw.dart'
 import 'package:prophecy_compagnon_shared/classes/dice/throw_request.dart';
 import 'package:prophecy_compagnon_shared/classes/dice/throw_result.dart';
 import 'package:prophecy_compagnon_shared/classes/entity_base.dart';
+import 'package:prophecy_compagnon_shared/classes/session/game_session.dart';
 import 'package:prophecy_compagnon_shared/classes/ticker.dart';
 import 'package:uuid/uuid.dart';
 
@@ -38,11 +39,15 @@ enum EntityEffectTrigger {
 enum EntityEffectTarget {
   ability,
   abilityModifier,
+  attribute,
   attributeModifier,
   combatStatus,
   damage,
+  damageArmor,
   damageMalusModifier,
   diceThrowModifier,
+  disadvantage,
+  experience,
   healthStatus,
   initiativeExtraDice,
   injury,
@@ -51,6 +56,7 @@ enum EntityEffectTarget {
   luckModifier,
   none,
   proficiency,
+  tendencyCircles,
   ;
 }
 
@@ -76,6 +82,7 @@ abstract class EntityEffectConfiguration{
     required this.trigger,
     this.triggerTickerEvent,
     this.duration,
+    this.frequency,
     this.activationDiceThrowRequest,
     this.activationDiceThrowValidResults = const [DiceThrowResultType.success],
     this.activationDiceThrowValueTransformer,
@@ -89,6 +96,7 @@ abstract class EntityEffectConfiguration{
   final EntityEffectTrigger trigger;
   final TickerEvent? triggerTickerEvent;
   final TickerEvent? duration;
+  final TickerEvent? frequency;
   final DiceThrowRequest? activationDiceThrowRequest;
   final List<DiceThrowResultType> activationDiceThrowValidResults;
   final EntityEffectActivationDiceThrowValueTransformer? activationDiceThrowValueTransformer;
@@ -127,11 +135,14 @@ abstract class EntityEffect {
     required this.trigger,
     this.triggerTickerEvent,
     this.duration,
+    this.frequency,
     this.activationDiceThrowRequest,
     this.activationDiceThrowValidResults = const [DiceThrowResultType.success],
     this.activationDiceThrowValueTransformer,
     List<EntityEffect>? postEffects,
     this.removeOnUnapply = false,
+    this.statusMessageTitle,
+    this.statusMessageText,
     this.elapsedTriggerUnits = 0,
     this.elapsedDurationUnits,
     bool active = false,
@@ -146,19 +157,23 @@ abstract class EntityEffect {
   final EntityEffectTrigger trigger;
   final TickerEvent? triggerTickerEvent;
   final TickerEvent? duration;
+  final TickerEvent? frequency;
   final DiceThrowRequest? activationDiceThrowRequest;
   final List<DiceThrowResultType> activationDiceThrowValidResults;
   final EntityEffectActivationDiceThrowValueTransformer? activationDiceThrowValueTransformer;
   final List<EntityEffect> postEffects;
   final bool removeOnUnapply;
+  final String? statusMessageTitle;
+  final String? statusMessageText;
   int elapsedTriggerUnits;
   int? elapsedDurationUnits;
+  int? elapsedFrequencyUnits;
   bool _active;
 
   Map<String, dynamic> effectToJson();
 
   bool canApply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
-    if(_active) {
+    if(_active && frequency == null) {
       return false;
     }
 
@@ -179,8 +194,12 @@ abstract class EntityEffect {
 
   @mustCallSuper
   void apply({ required EntityBase target, DiceThrowEvaluation? activationDiceThrowEvaluation }) {
-    if(duration != null) {
+    if(!_active && duration != null) {
       elapsedDurationUnits = 0;
+    }
+
+    if(_active && frequency != null) {
+      elapsedFrequencyUnits = 0;
     }
 
     if(
@@ -196,6 +215,13 @@ abstract class EntityEffect {
       );
     }
 
+    if(statusMessageText != null) {
+      GameSession.instance?.chat.post(
+        title: statusMessageTitle ?? "Effet appliqué : $name",
+        text: statusMessageText!,
+      );
+    }
+
     active = true;
   }
 
@@ -205,12 +231,23 @@ abstract class EntityEffect {
       elapsedDurationUnits = null;
     }
 
+    if(frequency != null) {
+      elapsedFrequencyUnits = null;
+    }
+
     for(var effect in postEffects) {
       target.effects.add(effect);
       effect.apply(target: target);
     }
 
     active = false;
+
+    if(statusMessageText != null) {
+      GameSession.instance?.chat.post(
+        title: statusMessageTitle ?? "Effet désappliqué : $name",
+        text: statusMessageText!,
+      );
+    }
   }
 
   String get id => uuid;
@@ -222,28 +259,17 @@ abstract class EntityEffect {
   void tick(TickerEvent event) {
     _tickTrigger(event);
     _tickDuration(event);
-  }
-
-  void _tickTrigger(TickerEvent event) {
-    if(triggerTickerEvent == null) return;
-    if(triggerTickerEvent!.type != TickerEventType.end) return;
-    if(active) return;
-
-    elapsedTriggerUnits = elapsedTriggerUnits + 1;
-  }
-
-  void _tickDuration(TickerEvent event) {
-    if(duration == null) return;
-    if(duration!.type != TickerEventType.end) return;
-    if(!active) return;
-
-    // TODO: manage ticker events with a higher duration unit
-    elapsedDurationUnits = elapsedDurationUnits! + 1;
+    _tickFrequency(event);
   }
 
   bool get becameActive =>
       triggerTickerEvent != null
       && elapsedTriggerUnits >= triggerTickerEvent!.count;
+
+  bool get frequencyReApply =>
+      frequency != null
+      && elapsedFrequencyUnits != null
+      && elapsedFrequencyUnits! >= frequency!.count;
 
   bool get expired {
     if(duration == null) {
@@ -259,6 +285,32 @@ abstract class EntityEffect {
         elapsedDurationUnits != null
         && elapsedDurationUnits! >= duration!.count;
     }
+  }
+
+  void _tickTrigger(TickerEvent event) {
+    if(triggerTickerEvent == null) return;
+    if(triggerTickerEvent!.type != TickerEventType.end) return;
+    if(_active) return;
+
+    elapsedTriggerUnits = elapsedTriggerUnits + 1;
+  }
+
+  void _tickDuration(TickerEvent event) {
+    if(duration == null) return;
+    if(duration!.type != TickerEventType.end) return;
+    if(!_active) return;
+
+    // TODO: manage ticker events with a higher duration unit
+    elapsedDurationUnits = elapsedDurationUnits! + 1;
+  }
+
+  void _tickFrequency(TickerEvent event) {
+    if(frequency == null) return;
+    if(frequency!.type != TickerEventType.end) return;
+    if(!_active) return;
+
+    // TODO: manage ticker events with a higher duration unit
+    elapsedFrequencyUnits = elapsedFrequencyUnits! + 1;
   }
 
   factory EntityEffect.fromJson(Map<String, dynamic> json) {

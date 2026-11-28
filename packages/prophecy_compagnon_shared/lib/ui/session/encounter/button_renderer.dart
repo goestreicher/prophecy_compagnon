@@ -16,8 +16,10 @@
  */
 
 import 'package:material_ui/material_ui.dart';
+import 'package:prophecy_compagnon_shared/classes/session/clients/session_message_bus_client.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/combat_action/initializers/action_initializer.dart';
 import 'package:prophecy_compagnon_shared/classes/session/encounter/entity_action.dart';
+import 'package:prophecy_compagnon_shared/ui/error_feedback.dart';
 
 class ActionConfigurationButtonRenderer extends StatelessWidget {
   const ActionConfigurationButtonRenderer({
@@ -32,8 +34,28 @@ class ActionConfigurationButtonRenderer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () {
-        initializer.plan(context, action);
+      onPressed: () async {
+        try {
+          await initializer.plan(context, action);
+        }
+        on SessionMessageBusClientException catch(e) {
+          if(context.mounted) {
+            displayErrorDialog(
+              context,
+              'SessionMessageBusClient exception',
+              e.message
+            );
+          }
+        }
+        on ActionInitializerException catch(e) {
+          if(context.mounted) {
+            displayErrorDialog(
+              context,
+              e.title,
+              e.message
+            );
+          }
+        }
       },
       icon: Icon(initializer.icon),
       iconSize: 18.0,
